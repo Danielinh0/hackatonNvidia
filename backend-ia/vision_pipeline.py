@@ -1,21 +1,24 @@
 """Imagen -> texto OCR para el asistente.
 
 VISION_MODO (variable de entorno):
-    tesseract  (por defecto) OCR de la foto completa con Tesseract en español. Es un OCR
-               PREENTRENADO, NO entrenado por el equipo: complemento declarado (CLAUDE.md sec. 17).
-               Sirve para probar el recorrido completo mientras se integra YOLO.
+    tao        (por defecto) OCDNet + OCRNet ajustados por el equipo con TAO, en CPU (vision_tao.py).
+               Pesos en VISION_MODELOS (por defecto modelos/). Sin pesos: OCRNoDisponible -> 503.
+    tesseract  respaldo: OCR de la foto completa con Tesseract en español. Es un OCR PREENTRENADO,
+               NO entrenado por el equipo: complemento declarado (CLAUDE.md sec. 17).
     simulada   sin OCR: devuelve training/asistente/ejemplos/ticket_ejemplo.txt (sintético) y la
                respuesta se marca SIMULADO. Nunca en la demo. (También VISION_SIMULADA=1.)
-    yolo       PENDIENTE (equipo de visión): YOLO11 entrenado detecta el ticket/regiones y el OCR
-               lee en orden. Implementar en `_texto_yolo`.
 
 Contrato: el texto va **línea por línea, de arriba a abajo**, como ticket_ejemplo.txt. Así se
 entrenó el asistente; recortes sueltos sin orden pueden empeorar la lectura.
 La imagen solo vive en memoria: no se escribe en disco (CLAUDE.md sec. 16).
 """
 import io
+import logging
 import os
 import shutil
+import threading
+
+log = logging.getLogger("vision")
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 EJEMPLO = os.path.join(AQUI, "..", "training", "asistente", "ejemplos", "ticket_ejemplo.txt")
@@ -40,13 +43,7 @@ _candado = threading.Lock()
 def modo() -> str:
     if os.environ.get("VISION_SIMULADA") == "1":
         return "simulada"
-    return os.environ.get("VISION_MODO", "tesseract")
-
-
-def modo() -> str:
-    if os.environ.get("VISION_SIMULADA") == "1":
-        return "simulada"
-    return os.environ.get("VISION_MODO", "tesseract")
+    return os.environ.get("VISION_MODO", "tao")
 
 
 def simulada() -> bool:
@@ -75,52 +72,62 @@ def _obtener_lector():
 
 def cargar():
     """Se llama al arrancar el servicio. No es fatal: sin visión, /vision/* responde 503."""
-    if not simulada():
-        _obtener_lector()
-
-
-def _obtener_lector():
-    """Crea y carga el lector una sola vez. Si faltan pesos o dependencias, guarda el error."""
-    global _lector, _error
-    with _candado:
-        if _lector is not None:
-            return _lector
-        try:
-            import vision_tao
-            lector = vision_tao.Lector()
-            if not lector.disponible():
-                raise FileNotFoundError(f"No están los pesos de visión en {lector.carpeta}.")
-            lector.cargar()
-        except Exception as e:  # sin pesos, sin torch/cv2/onnxruntime, o pesos que no coinciden
-            _error = str(e)
-            log.warning("Visión no disponible: %s", e)
-            return None
-        _lector, _error = lector, None
-        return _lector
-
-
-def cargar():
-    """Se llama al arrancar el servicio. No es fatal: sin visión, /vision/* responde 503."""
-    if not simulada():
+    if modo() == "tao":
         _obtener_lector()
 
 
 def estado() -> dict:
     m = modo()
-    listo = m == "simulada" or (m == "tesseract" and shutil.which("tesseract") is not None)
-    return {"modo": m, "simulado": m == "simulada", "conectado": listo,
-            "entrenado_por_equipo": False if m in ("tesseract", "simulada") else None}
+    e = {"modo": m, "simulado": m == "simulada", "entrenado_por_equipo": m == "tao"}
+    if m == "simulada":
+        e["conectado"] = True
+    elif m == "tesseract":
+        e["conectado"] = shutil.which("tesseract") is not None
+    elif m == "tao":
+        e["conectado"] = _lector is not None
+        e["error"] = _error
+        if _lector is not None:
+            e.update({k: v for k, v in _lector.estado().items() if k in ("modelos", "ocdnet_val", "carpeta")})
+    else:
+        e["conectado"], e["error"] = False, f"VISION_MODO desconocido: {m}"
+    return e
+
+
+def _leer_simulado() -> dict:
+    with open(EJEMPLO, encoding="utf-8") as f:
+        texto = f.read().rstrip("\n")
+    return {"palabras": [], "segmentos": [], "texto": texto, "texto_para_llm": texto,
+            "modelos": [], "simulado": True}
+
+
+def leer(imagen: bytes) -> dict:
+    """Solo visión (OCDNet + OCRNet): palabras, segmentos con polígono y confianzas, texto.
+    Lanza OCRNoDisponible (sin pesos) o ImagenIlegible (IMAGEN_INVALIDA / SIN_TEXTO)."""
+    if simulada():
+        return _leer_simulado()
+    lector = _obtener_lector()
+    if lector is None:
+        raise OCRNoDisponible(f"El modelo de visión no está conectado: {_error}")
+    import vision_tao
+    try:
+        r = lector.leer(imagen)
+    except vision_tao.ImagenInvalida as e:
+        raise ImagenIlegible(str(e), codigo="IMAGEN_INVALIDA")
+    if len(r["texto"].strip()) < MIN_CARACTERES:
+        raise ImagenIlegible("No encontramos texto en la foto. Acércate al ticket y que tenga buena luz.")
+    r["modelos"] = lector.modelos  # sha256 de los pesos en uso (acredita el modelo entrenado)
+    r["simulado"] = False
+    return r
 
 
 def extraer_texto(imagen: bytes) -> str:
     m = modo()
     if m == "simulada":
-        with open(EJEMPLO, encoding="utf-8") as f:
-            return f.read()
+        return _leer_simulado()["texto"]
+    if m == "tao":
+        return leer(imagen)["texto"]
     if m == "tesseract":
         return _texto_tesseract(imagen)
-    if m == "yolo":
-        return _texto_yolo(imagen)
     raise OCRNoDisponible(f"VISION_MODO desconocido: {m}")
 
 
@@ -157,9 +164,3 @@ def _texto_tesseract(imagen: bytes) -> str:
         raise ImagenIlegible("No encontramos texto en la foto. Acércate al ticket y que tenga buena luz.")
     return texto
 
-
-def _texto_yolo(imagen: bytes) -> str:
-    # TODO (visión): cargar los pesos entrenados (training/vision/weights/...), detectar el ticket y
-    # sus regiones, recortar y pasar a OCR en orden de lectura. Si no hay detección:
-    #   raise ImagenIlegible("No encontramos un ticket en la foto.")
-    raise OCRNoDisponible("El detector YOLO todavía no está conectado (VISION_MODO=yolo).")

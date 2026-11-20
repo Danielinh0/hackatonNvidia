@@ -107,8 +107,16 @@ class Asistente:
         print(f"Cargando {self.base}" + (f" + {self.adaptador}" if self.adaptador else " (SIN adaptador)") + " ...")
         self.torch = torch
         self.tok = AutoTokenizer.from_pretrained(self.base)
-        q = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16)
-        m = AutoModelForCausalLM.from_pretrained(self.base, quantization_config=q, device_map={"": 0})
+        modo = os.environ.get("MODO_MEMORIA", "auto")
+        vram = torch.cuda.get_device_properties(0).total_memory / 2**30
+        bajo = modo == "bajo" or (modo == "auto" and vram < 10)
+        self.modo_memoria = "bajo" if bajo else "normal"
+        print(f"GPU con {vram:.1f} GB → modo de memoria {self.modo_memoria}")
+        if bajo:
+            m = self._cargar_memoria_baja(torch, AutoModelForCausalLM, BitsAndBytesConfig, vram)
+        else:
+            q = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16)
+            m = AutoModelForCausalLM.from_pretrained(self.base, quantization_config=q, device_map={"": 0})
         if self.adaptador:
             from peft import PeftModel
             m = PeftModel.from_pretrained(m, self.adaptador)

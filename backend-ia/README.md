@@ -4,7 +4,7 @@ Lo llama **solo el servidor Next.js** (`frontend-pwa/lib/analisis.ts`) con un se
 
 ```
 foto → Next.js ──Bearer BACKEND_TOKEN──> POST /vision/analizar
-                                          ├─ vision_pipeline.extraer_texto()   Tesseract hoy · OCDNet + OCRNet del equipo (TAO), en CPU
+                                          ├─ vision_pipeline.extraer_texto()   OCDNet + OCRNet del equipo (TAO), en CPU · Tesseract de respaldo
                                           └─ llm_service.Asistente.leer()      Qwen2.5-7B + adaptador LoRA → JSON CFDI validado
 ```
 
@@ -13,7 +13,7 @@ foto → Next.js ──Bearer BACKEND_TOKEN──> POST /vision/analizar
 | `app.py` | Rutas `/salud`, `/asistente/leer`, `/vision/analizar`; límite de 10 MB; sin CORS ni `/docs` |
 | `llm_service.py` | Carga base + adaptador (`ADAPTADOR`), genera y **valida** que la respuesta tenga las claves del contrato. Si no, responde error; nunca la "arregla" |
 | `prompt_lector.txt` | Prompt de sistema, idéntico al del entrenamiento (al arrancar se compara con `dataset/test.jsonl`) |
-| `vision_pipeline.py` | Imagen → texto OCR: Tesseract de respaldo hoy; **aquí se conecta YOLO** (`_texto_yolo`, contrato en el archivo) |
+| `vision_pipeline.py` | Imagen → texto OCR con OCDNet + OCRNet del equipo (`vision_tao.py`); Tesseract como respaldo |
 | `auth_backend.py` | Revisa `Authorization: Bearer <BACKEND_TOKEN>` |
 
 ## Variables de entorno
@@ -22,11 +22,11 @@ foto → Next.js ──Bearer BACKEND_TOKEN──> POST /vision/analizar
 | `BACKEND_TOKEN` | Obligatoria, ≥ 16 caracteres; **la misma** en `frontend-pwa/.env.local` |
 | `ADAPTADOR` | Carpeta del adaptador, p. ej. `../training/asistente/adapters/prueba` (luego `epoca1`). Vacía = modelo base (solo para comparar) |
 | `MODO_MEMORIA` | `auto` (por defecto): `bajo` si la GPU tiene < 10 GB (RTX 4050), si no `normal`. `bajo` = doble cuantización + embeddings en RAM |
-| `VISION_MODO` | `tesseract` (por defecto, OCR preentrenado de respaldo) · `simulada` (texto de ejemplo, SIMULADO) · `yolo` (PENDIENTE, modelo del equipo) |
+| `VISION_MODO` | `tao` (por defecto, OCDNet + OCRNet del equipo; pesos en `VISION_MODELOS`) · `tesseract` (OCR preentrenado de respaldo) · `simulada` (texto de ejemplo, SIMULADO) |
 | `LLM_SIMULADO=1` | No carga el modelo; salida fija real de `prueba`, marcada **SIMULADO**. Solo para probar sin GPU |
 
 Con `LLM_SIMULADO=1` o `VISION_MODO=simulada` la respuesta trae `"simulado": true` y la app la guarda y la muestra como SIMULADO. **En la demo, ninguno de los dos.**
-**Tesseract no es un modelo entrenado por el equipo:** es un complemento declarado (CLAUDE.md sec. 17). El modelo de visión que acredita el requisito es YOLO (`VISION_MODO=yolo`, pendiente).
+**Tesseract no es un modelo entrenado por el equipo:** es un complemento declarado (CLAUDE.md sec. 17). El modelo de visión que acredita el requisito es OCDNet + OCRNet ajustados con TAO (`VISION_MODO=tao`).
 
 ## Correr los dos servicios en la laptop con la RTX 4050
 
@@ -70,7 +70,7 @@ curl -X POST http://127.0.0.1:8000/asistente/leer \
 curl -X POST http://127.0.0.1:8000/vision/analizar \
   -H "Authorization: Bearer <el secreto>" -F "imagen=@/ruta/a/foto_ticket.jpg"
 ```
-En `/vision/analizar` revisa `texto_ocr`, que muestra lo que leyó Tesseract. Si el JSON sale mal, primero mira si el OCR leyó bien.
+En `/vision/analizar` revisa `texto_ocr`, que muestra lo que leyó la visión. Si el JSON sale mal, primero mira si el OCR leyó bien.
 
 ### 3. Terminal 2: la app
 ```bash
@@ -96,7 +96,7 @@ LLM_SIMULADO=1 VISION_MODO=simulada uvicorn app:app --host 127.0.0.1 --port 8000
 ```
 
 ## Respuestas
-- `200`: `{"cfdi": {...}, "conf_global": null, "simulado": bool, "adaptador": "...", "segundos": n}`.
+- `200`: `{"cfdi": {...}, "conf_global": null, "simulado": bool, "adaptador": "...", "segundos": n}`; `/vision/analizar` agrega `"vision"` y `"texto_ocr"`.
 - `400`: falta la imagen o el texto.
 - `401`: sin token.
 - `413`: la imagen pesa más de 10 MB.
@@ -106,7 +106,7 @@ LLM_SIMULADO=1 VISION_MODO=simulada uvicorn app:app --host 127.0.0.1 --port 8000
 La imagen no se escribe en disco.
 
 ## Pendiente
-- `_texto_yolo` con YOLO11 + OCR (hoy: Tesseract de respaldo). **Ojo:** el asistente se entrenó con el texto del ticket completo, línea por línea. Mandarle recortes sueltos puede bajar la calidad.
+- **Ojo:** el asistente se entrenó con el texto del ticket completo, línea por línea. Mandarle recortes sueltos puede bajar la calidad.
 - Confianza por campo (`conf_global`, CLAUDE.md sec. 14).
 - `/asistente/chat` (conversación de Bisie', con prompt) y `/asistente/transcribir`.
 - `reglas_fiscales.py`.
