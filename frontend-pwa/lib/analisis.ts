@@ -57,5 +57,7 @@ export async function analizarDocumento(bytes: Uint8Array, tipo: string, nombre:
   if (!l.ok) return l;
   const conf = (json as { conf_global?: unknown }).conf_global;
   const confGlobal = typeof conf === "number" && conf >= 0 && conf <= 1 ? conf : null;
-  return { ok: true, cfdi: l.cfdi, faltantes: l.faltantes, json, confGlobal, simulado: false };
+  // backend-ia marca simulado=true si corre con LLM_SIMULADO o VISION_SIMULADA: se guarda y se muestra como SIMULADO.
+  const simulado = (json as { simulado?: unknown }).simulado === true;
+  return { ok: true, cfdi: l.cfdi, faltantes: l.faltantes, json, confGlobal, simulado };
 }

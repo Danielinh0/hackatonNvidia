@@ -1,0 +1,12 @@
+# Servicio (siempre)
+fastapi==0.115.6
+uvicorn==0.32.1
+python-multipart==0.0.20
+
+# Modelo (solo si LLM_SIMULADO no es 1). Mismas versiones que el entrenamiento en el servidor DLI.
+# Requiere Python 3.12 (con 3.14 tokenizers no instala).
+torch
+transformers==4.46.3
+peft==0.13.2
+bitsandbytes
+accelerate
