@@ -77,5 +77,7 @@ def vision_analizar(imagen: UploadFile = File(...)):
         "conf_global": None,  # PENDIENTE: confianza por campo (CLAUDE.md sec. 14)
         "simulado": r["simulado"] or vision.simulada(),
         "adaptador": r["adaptador"],
+        "vision": vision.modo(),  # tesseract = OCR preentrenado (complemento), no el modelo del equipo
+        "texto_ocr": texto,       # lo que leyó el OCR, para revisar errores de lectura
         "segundos": r["segundos"],
     }

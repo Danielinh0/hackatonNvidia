@@ -44,7 +44,18 @@ export async function analizarDocumento(bytes: Uint8Array, tipo: string, nombre:
   }
   if (!respuesta.ok) {
     console.error("analizarDocumento: HTTP", respuesta.status);
-    return { ok: false, motivo: "El servicio de análisis no pudo procesar esta imagen." };
+    // 422 (foto sin texto, respuesta inválida) y 503 (OCR o modelo sin conectar) traen un mensaje
+    // pensado para la persona en `detail` (backend-ia/app.py). Lo demás, mensaje genérico.
+    let detalle: string | null = null;
+    if (respuesta.status === 422 || respuesta.status === 503) {
+      try {
+        const d = (await respuesta.json()) as { detail?: unknown };
+        if (typeof d.detail === "string" && d.detail.length <= 200) detalle = d.detail;
+      } catch {
+        /* sin cuerpo JSON: mensaje genérico */
+      }
+    }
+    return { ok: false, motivo: detalle ?? "El servicio de análisis no pudo procesar esta imagen." };
   }
 
   let json: unknown;

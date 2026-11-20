@@ -6,6 +6,13 @@ Variables de entorno:
     MODELO_BASE    por defecto Qwen/Qwen2.5-7B-Instruct
     LLM_SIMULADO   "1" = no carga el modelo; responde una salida fija (ver SALIDA_SIMULADA) marcada SIMULADO.
                    Sirve para conectar la app sin GPU. Nunca usar en la demo.
+    MODO_MEMORIA   auto (por defecto) | normal | bajo
+                   normal: todo en la GPU, igual que en el entrenamiento (T4 de 15 GB).
+                   bajo:   para GPUs de < 10 GB (RTX 4050 de 6 GB): doble cuantización (~0.4 GB menos)
+                           y la tabla de embeddings (~1 GB) en RAM; solo busca una fila por token,
+                           así que casi no frena. No es bit a bit igual al servidor: para comparar
+                           base vs. ajustado, correr ambos en la misma máquina y modo.
+                   auto:   bajo si la GPU tiene < 10 GB, si no normal.
 
 El LLM solo copia y ordena lo que el OCR leyó; no calcula ni convierte a claves SAT
 (CLAUDE.md sec. 0). Lo que devuelve se valida aquí y luego la persona lo revisa en la app.
@@ -78,11 +85,12 @@ class Asistente:
         self.adaptador = os.environ.get("ADAPTADOR") or None
         self.cargado = False
         self.gpu = None
+        self.modo_memoria = None
         self._candado = threading.Lock()  # una sola GPU: una generación a la vez
 
     def estado(self) -> dict:
         return {"simulado": self.simulado, "modelo_base": self.base, "adaptador": self.adaptador,
-                "cargado": self.cargado, "gpu": self.gpu}
+                "cargado": self.cargado, "gpu": self.gpu, "modo_memoria": self.modo_memoria}
 
     def cargar(self):
         if self.simulado:
@@ -99,8 +107,23 @@ class Asistente:
         print(f"Cargando {self.base}" + (f" + {self.adaptador}" if self.adaptador else " (SIN adaptador)") + " ...")
         self.torch = torch
         self.tok = AutoTokenizer.from_pretrained(self.base)
-        q = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16)
-        m = AutoModelForCausalLM.from_pretrained(self.base, quantization_config=q, device_map={"": 0})
+        modo = os.environ.get("MODO_MEMORIA", "auto")
+        vram = torch.cuda.get_device_properties(0).total_memory / 2**30
+        bajo = modo == "bajo" or (modo == "auto" and vram < 10)
+        self.modo_memoria = "bajo" if bajo else "normal"
+        q = BitsAndBytesConfig(
+            load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_use_double_quant=bajo,
+            llm_int8_enable_fp32_cpu_offload=bajo,  # permite dejar un módulo (embeddings) en CPU
+        )
+        if bajo:
+            # Mapa explícito: embeddings en RAM, todo lo demás en la GPU 0.
+            mapa = {"model.embed_tokens": "cpu", "model.layers": 0, "model.norm": 0,
+                    "model.rotary_emb": 0, "lm_head": 0}
+        else:
+            mapa = {"": 0}
+        print(f"GPU con {vram:.1f} GB → modo de memoria {self.modo_memoria}")
+        m = AutoModelForCausalLM.from_pretrained(self.base, quantization_config=q, device_map=mapa)
         if self.adaptador:
             from peft import PeftModel
             m = PeftModel.from_pretrained(m, self.adaptador)
