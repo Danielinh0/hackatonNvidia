@@ -183,10 +183,11 @@ hackathon-nvidia-oaxaca-2026/
 ├── CLAUDE.md   README.md
 ├── docs/            ficha PDF, pruebas de uso, evidencias, declaracion_ia.md,
 │                    prompt-bueno.md (prompts finales de Stitch), prompt-google-stitch.md (versión con análisis de contraste)
+│                    fuentes/ (diccionarios zapotecos), pruebas_uso/, evidencias/
 ├── frontend-pwa/    Next.js (TS) + Tailwind -> Vercel; Firebase client SDK
 ├── backend-ia/      FastAPI: vision_pipeline.py, llm_service.py, reglas_fiscales.py, auth_firebase.py
 ├── firebase/        firestore.rules, storage.rules (sin claves)
-└── training-ngc/
+└── training/
     ├── vision/      dataset train/val/test, train_vision.py, logs/, weights/
     └── asistente/   dataset JSONL, train_qlora.py, test_10_casos.py, logs/, adapters/
 ```
