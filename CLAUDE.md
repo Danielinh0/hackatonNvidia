@@ -1,7 +1,8 @@
-# CLAUDE.md — Hackathon NVIDIA Oaxaca 2026
+# CLAUDE.md — Dzuun · Hackathon NVIDIA Oaxaca 2026
 
 > Fuente única de verdad del equipo y contexto para Claude Code. Si algo cambia, se edita aquí.
 > Última decisión de alcance: 19-nov-2026. Reloj de 24 h en curso.
+> **Nombre del producto: Dzuun** (ver sec. 22). Asistente/mascota: **Bisie'** propuesto en los bocetos; en el resto del documento aún aparece como "Tona" hasta confirmarlo (sec. 21).
 
 ## 0. Instrucciones para Claude Code (leer primero)
 - Lee este archivo completo antes de escribir código. Si una petición contradice las secciones 1–10, avisa antes de actuar.
@@ -104,7 +105,7 @@ Al concluir las 24 h: se cierra el registro de entregables; entrenamientos termi
 - **Dolor:** tickets de venta, de gasto y comprobantes SPEI/CoDi en silos; no saben qué tiene CFDI, qué es ingreso o egreso, ni qué les sirve fiscalmente.
 - **Proceso actual:** guardar tickets en bolsa o cajón, capturar a mano, revisar al final del mes.
 - **Relación con la ley:** adopción de medios de pago digitales y trazabilidad. El efectivo alto puede afectar lo acreditable (verificar en LISR/LIVA vigentes).
-- **Fuera de alcance:** el alta ante el SAT. Idea P2: Tona acompaña como guía de pasos.
+- **Fuera de alcance:** el alta ante el SAT (trámite). Sí se incluye en la bienvenida una **guía informativa** de pasos con enlace al portal del SAT (sec. 23); el acompañamiento interactivo de Tona sigue siendo P2.
 
 ## 11. Alcance
 | Prio | Funcionalidad |
@@ -180,7 +181,8 @@ PWA (Next.js + TypeScript + Tailwind, Vercel)
 ```text
 hackathon-nvidia-oaxaca-2026/
 ├── CLAUDE.md   README.md
-├── docs/            ficha PDF, pruebas de uso, evidencias, declaracion_ia.md
+├── docs/            ficha PDF, pruebas de uso, evidencias, declaracion_ia.md,
+│                    prompt-bueno.md (prompts finales de Stitch), prompt-google-stitch.md (versión con análisis de contraste)
 ├── frontend-pwa/    Next.js (TS) + Tailwind -> Vercel; Firebase client SDK
 ├── backend-ia/      FastAPI: vision_pipeline.py, llm_service.py, reglas_fiscales.py, auth_firebase.py
 ├── firebase/        firestore.rules, storage.rules (sin claves)
@@ -199,4 +201,36 @@ hackathon-nvidia-oaxaca-2026/
 - [ ] Proyecto Firebase creado, Google Auth activo, dominio de Vercel autorizado; confirmar si Storage requiere Blaze
 - [ ] Reglas de Firestore/Storage por `uid` desplegadas
 - [ ] Verificar clave 626 y reglas RESICO en fuentes oficiales
-- [ ] Nombre final del asistente; declaración de IA firmada
+- [x] Nombre de la app: **Dzuun** (19-nov-2026)
+- [ ] Confirmar asistente/mascota **Bisie'** y reemplazar "Tona" en este archivo, dataset y prompts del LLM
+- [ ] Verificar *dzuun* y *bisieꞌ* (escritura y pronunciación) y citar la fuente en la ficha
+- [ ] Verificar los pasos de alta en el SAT de la bienvenida contra la ficha vigente en sat.gob.mx
+- [ ] Elegir herramienta de bocetos → Figma (conectar MCP de Figma si se usará para pasar diseño a código)
+- [ ] Registrar en `docs/declaracion_ia.md` el uso de Claude Code para naming, prompts de Stitch y paleta
+- [ ] Declaración de IA firmada
+
+---
+
+# Identidad y diseño
+
+## 22. Nombre, mascota y paleta
+- **App: Dzuun.** Zapoteco de Mitla (Valles Centrales), *dzuun* = "labor, trabajo, obra". Fuente: *Diccionario zapoteco de Mitla, Oaxaca*, Morris Stubblefield y Carol Miller de Stubblefield, ILV. Citar variante y fuente en la ficha.
+- **Eslogan:** "Con Dzuun trabajas menos, facturas más". ⚠️ La emisión de facturas es SIMULADA: en demo y ficha decir "pre-factura simulada" para no presentar lo simulado como implementado.
+- **Mascota/asistente (propuesta): Bisie'**, granito de cacao con carita. *bisieꞌ* = "semilla de cacao" (mismo diccionario). El cacao fue moneda en Mesoamérica. Misma personalidad que la sec. 17.
+- Otras palabras verificadas (Mitla): *meel* dinero, *guijtz* papel, *rcuaani* escribir, *bajl* luz, *guii* mercado/flor, *rbäxani* aclarar/explicar. Istmo: *gui'chi'* papel/documento.
+- **Paleta de marca** (contraste WCAG medido):
+  | Color | Rol | Regla |
+  |---|---|---|
+  | `#FF3A24` rojo-naranja | Marca, emoción, botón principal | Blanco encima solo en texto ≥ 19 px bold (3.6:1); `#000F2A` encima 5.3:1 |
+  | `#104094` azul | Confianza, acciones secundarias, enlaces | Blanco encima 9.6:1 |
+  | `#D4FF24` lima neón | Acento: chips, resaltados, burbujas | Siempre con `#000F2A` encima (16.5:1). **Nunca sobre blanco** (1.2:1) |
+  | `#000F2A` | Texto y superficies oscuras | 19.1:1 sobre blanco |
+  | `#FFFFFF` / `#FFF8EC` | Fondos | — |
+- **Colores de estado** (no son de marca; siempre con icono + palabra): éxito `#1E8E4E`, advertencia ámbar `#F2A900` con texto `#000F2A`, error `#B3261E` (distinto del rojo de marca). Semáforo de confianza (sec. 14): verde "Alta", ámbar "Media", rojo oscuro "Baja". El lima no se usa como estado porque se confunde con verde.
+
+## 23. Bocetos (Google Stitch) y pantallas
+- Prompts finales en `docs/prompt-bueno.md`: un prompt maestro (sistema de diseño + Inicio) y uno por pantalla, pegados por separado en Stitch modo Mobile. `docs/prompt-google-stitch.md` conserva la versión anterior con la tabla de contraste.
+- **Pantallas:** 1 Inicio (resumen del mes como estimación) · 2 Bienvenida/login · 3 Configurar negocio (nombre, RFC, régimen 626) · 4 Subir lote · 5 Revisión modo detalle · 6 Revisión modo sencillo · 7 Chat con la mascota · 8 Operaciones · 9 Mi mes · 10 Pre-factura SIMULADO · 11 Errores y estados.
+- **Bienvenida (pantalla 2), 4 secciones:** héroe con eslogan y "Continuar con Google" · "Así de fácil" en 3 pasos (foto → la mascota lee y ordena → tú revisas y guardas) · tarjeta "¿Aún no te has dado de alta en el SAT? Recuerda que con Dzuun facturar nunca había sido tan fácil" con 6 pasos (consultar RFC con CURP; inscribirse en línea o con cita; Contraseña y e.firma; elegir régimen, p. ej. RESICO; descargar Constancia de Situación Fiscal; registrarla en Dzuun), nota "Guía informativa, los requisitos pueden cambiar" y enlace subrayado "Para más información ingresa al portal del SAT" → `https://www.sat.gob.mx` (`target="_blank" rel="noopener noreferrer"`) · pie con "Ya tengo cuenta, entrar".
+- Los bocetos son guía visual; el código lo escribe y lo explica el equipo. Toda pantalla usa datos ficticios y rotula estimaciones y SIMULADO.
+- **Tres decisiones de diseño candidatas para la ficha (sec. 5):** botón "Confirmar" bloqueado mientras haya campos de confianza baja; modo sencillo de un ticket por vez con voz; cola de carga donde un fallo no bloquea el lote.

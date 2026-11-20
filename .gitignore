@@ -42,3 +42,6 @@ next-env.d.ts
 
 # firebase credentials
 serviceAccount*.json
+
+# base de datos SQLite local (contiene las fotos subidas)
+/data/

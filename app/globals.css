@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/*
+ * Tokens tomados del archivo de Figma "Pantallas Dzuun".
+ * Nota: los tonos de Figma (generados con Stitch) difieren un poco de la paleta
+ * de marca de CLAUDE.md sec. 22 (p. ej. #BA0B00 vs #FF3A24). Se respetan los de
+ * Figma para que la vista coincida con el boceto; ajustar aquí si se unifica.
+ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-fondo: #f9f9ff;
+  --color-superficie: #ffffff;
+  --color-tinta: #0b1b36;
+  --color-tinta-suave: #5d3f3a;
+  --color-marca: #ba0b00;
+  --color-marca-viva: #e32411;
+  --color-lima: #c8f30c;
+  --color-lima-tinta: #171e00;
+  --color-oliva: #506300;
+  --color-oliva-viva: #667d00;
+  --color-azul: #345baf;
+  --color-azul-50: #e8edff;
+  --color-azul-100: #e0e8ff;
+  --color-azul-150: #dae2ff;
+  --color-azul-200: #d7e2ff;
+  --color-noche: #21304c;
+  --color-noche-tinta: #edf0ff;
+  --color-salmon: #ffb4a7;
+  /* Paleta de marca pura (usada en Bienvenida) */
+  --color-marca-brillante: #ff3a24;
+  --color-lima-neon: #d4ff24;
+  --color-azul-marca: #104094;
+  --color-azul-tinta: #003688;
+  --color-noche-profunda: #000f2a;
+  --color-crema: #faf7f2;
+  --color-crema-clara: #fffdf9;
+  --color-durazno: #ffdad4;
+  --color-error: #ba1a1a;
+
+  --font-sans: var(--font-jakarta);
+
+  --shadow-tarjeta: 0px 6px 20px 0px rgba(0, 15, 42, 0.06);
+  --shadow-fila: 0px 2px 5px 0px rgba(0, 15, 42, 0.04);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-fondo);
+  color: var(--color-tinta);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-fondo);
+  color: var(--color-tinta);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ícono monocromático recoloreable con currentColor (barra de navegación). */
+.icono-mascara {
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
 }
