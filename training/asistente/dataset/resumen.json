@@ -1,0 +1,255 @@
+{
+  "descripcion": "Dataset SINTÉTICO texto OCR -> JSON CFDI (tarea a, CLAUDE.md sec. 17).",
+  "sintetico": true,
+  "generador": "generar_dataset_ocr.py",
+  "sha256_generador": "b857fdf5d4cffcd7a6dfbd6631d6331409df7fda6a6dc58d5b7fa8cd29c0857d",
+  "semilla": 2026,
+  "generado": "2026-11-20T05:43:20",
+  "division": "por plantilla y por grupo de nombres; sin textos repetidos entre splits (sha256)",
+  "plantillas_por_split": {
+    "train": {
+      "ticket": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6"
+      ],
+      "cfdi": [
+        "C1",
+        "C2"
+      ],
+      "ilegible": [
+        "X1"
+      ],
+      "no_comprobante": [
+        "N1",
+        "N2",
+        "N3"
+      ]
+    },
+    "val": {
+      "ticket": [
+        "T7"
+      ],
+      "cfdi": [
+        "C3"
+      ],
+      "ilegible": [
+        "X1"
+      ],
+      "no_comprobante": [
+        "N4"
+      ]
+    },
+    "test": {
+      "ticket": [
+        "T8"
+      ],
+      "cfdi": [
+        "C4"
+      ],
+      "ilegible": [
+        "X1"
+      ],
+      "no_comprobante": [
+        "N5"
+      ]
+    }
+  },
+  "pesos_por_tipo": {
+    "ticket": 0.7,
+    "cfdi": 0.2,
+    "ilegible": 0.05,
+    "no_comprobante": 0.05
+  },
+  "splits": {
+    "train": {
+      "total": 1600,
+      "por_tipo": {
+        "cfdi": 303,
+        "ticket": 1162,
+        "ilegible": 61,
+        "no_comprobante": 74
+      },
+      "por_plantilla": {
+        "C1": 179,
+        "T6": 189,
+        "T2": 195,
+        "X1": 61,
+        "C2": 124,
+        "T3": 175,
+        "N1": 27,
+        "T1": 196,
+        "T5": 203,
+        "T4": 204,
+        "N3": 19,
+        "N2": 28
+      },
+      "por_giro": {
+        "gasolinera": 201,
+        "papeleria": 169,
+        "restaurante": 195,
+        "abarrotes": 175,
+        "farmacia": 185,
+        "mayoreo": 177,
+        "ferreteria": 176,
+        "servicios": 187
+      },
+      "por_nivel_ruido": {
+        "0.1": 393,
+        "0.0": 404,
+        "0.35": 407,
+        "0.2": 396
+      },
+      "pct_auto_en_tickets_y_cfdi": {
+        "Fecha": 11.4,
+        "Total": 7.0,
+        "SubTotal": 41.8,
+        "Emisor.Rfc": 24.9,
+        "Emisor.Nombre": 3.8,
+        "FormaPago": 81.0,
+        "FormaPagoLeida": 45.4,
+        "UUID": 81.0
+      },
+      "conceptos_promedio": 2.65,
+      "descartados_duplicado": 10,
+      "descartados_largo": 32,
+      "nombres_negocio": [
+        "LA MODERNA",
+        "LA HUERTA",
+        "LAS FLORES",
+        "SAN JOSE",
+        "LA PROVIDENCIA",
+        "SAN PABLO",
+        "EL CALVARIO",
+        "LA OAXAQUEÑA",
+        "EL ROBLE",
+        "DON PEPE",
+        "LA CANDELARIA",
+        "LA ESPERANZA",
+        "LA CIMA",
+        "EL CARMEN",
+        "LA LUZ",
+        "EL PORVENIR",
+        "EL MANANTIAL",
+        "EL PROGRESO",
+        "SAN FELIPE",
+        "EL NOPAL",
+        "EL TULE",
+        "LA GUADALUPANA",
+        "LA TRINIDAD",
+        "SAN ANTONIO",
+        "LOS PINOS",
+        "EL MIRADOR",
+        "DOÑA ROSA",
+        "DOS HERMANOS"
+      ]
+    },
+    "val": {
+      "total": 200,
+      "por_tipo": {
+        "cfdi": 44,
+        "ticket": 146,
+        "no_comprobante": 5,
+        "ilegible": 5
+      },
+      "por_plantilla": {
+        "C3": 44,
+        "T7": 146,
+        "N4": 5,
+        "X1": 5
+      },
+      "por_giro": {
+        "restaurante": 22,
+        "ferreteria": 23,
+        "abarrotes": 17,
+        "mayoreo": 20,
+        "papeleria": 31,
+        "gasolinera": 22,
+        "servicios": 28,
+        "farmacia": 27
+      },
+      "por_nivel_ruido": {
+        "0.1": 49,
+        "0.35": 48,
+        "0.0": 64,
+        "0.2": 39
+      },
+      "pct_auto_en_tickets_y_cfdi": {
+        "Fecha": 8.9,
+        "Total": 8.4,
+        "SubTotal": 38.9,
+        "Emisor.Rfc": 20.5,
+        "Emisor.Nombre": 1.6,
+        "FormaPago": 81.1,
+        "FormaPagoLeida": 41.1,
+        "UUID": 78.9
+      },
+      "conceptos_promedio": 2.68,
+      "descartados_duplicado": 4,
+      "descartados_largo": 1,
+      "nombres_negocio": [
+        "LA ESTRELLA",
+        "DON CHUY",
+        "SANTA CRUZ",
+        "LA SOLEDAD",
+        "LOS ANGELES",
+        "LA PALMA"
+      ]
+    },
+    "test": {
+      "total": 200,
+      "por_tipo": {
+        "ticket": 145,
+        "ilegible": 13,
+        "cfdi": 32,
+        "no_comprobante": 10
+      },
+      "por_plantilla": {
+        "T8": 145,
+        "X1": 13,
+        "C4": 32,
+        "N5": 10
+      },
+      "por_giro": {
+        "ferreteria": 21,
+        "papeleria": 25,
+        "mayoreo": 16,
+        "abarrotes": 22,
+        "restaurante": 21,
+        "farmacia": 25,
+        "servicios": 26,
+        "gasolinera": 21
+      },
+      "por_nivel_ruido": {
+        "0.2": 53,
+        "0.0": 53,
+        "0.1": 46,
+        "0.35": 48
+      },
+      "pct_auto_en_tickets_y_cfdi": {
+        "Fecha": 8.5,
+        "Total": 7.3,
+        "SubTotal": 42.4,
+        "Emisor.Rfc": 23.7,
+        "Emisor.Nombre": 2.8,
+        "FormaPago": 83.1,
+        "FormaPagoLeida": 43.5,
+        "UUID": 82.5
+      },
+      "conceptos_promedio": 2.75,
+      "descartados_duplicado": 0,
+      "descartados_largo": 9,
+      "nombres_negocio": [
+        "EL SOL",
+        "EL CENTENARIO",
+        "SAN JUAN",
+        "LOS ARCOS",
+        "LA FE",
+        "EL GUERO"
+      ]
+    }
+  }
+}

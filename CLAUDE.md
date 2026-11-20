@@ -200,7 +200,7 @@ hackathon-nvidia-oaxaca-2026/
 - **Plan (18 h restantes al 19-nov 19:00):** 0–2 acceso GPU y entorno · 2–6 entrenar visión + dataset Tona · 6–10 QLoRA + backend + PWA · 10–14 integración y modos · 14–16 evaluación y 2 pruebas de uso · 16–18 ficha, presentación, video y registro. Si no hay GPU en 3 h, reducir alcance y avisar.
 
 ## 21. Pendientes
-- [ ] Método de acceso al GPU; confirmar si créditos DLI cuentan como servidores proporcionados
+- [x] Servidor GPU: entorno DLI de NVIDIA (Tesla T4 15 GB, driver 545 / CUDA 12.3), confirmado como válido (20-nov-2026). Sin torch en el host: se entrena dentro del contenedor NGC `nvcr.io/nvidia/pytorch` (`docker run --gpus all` funciona). T4 = fp16 (sin bf16)
 - [ ] `nvidia-smi` funcionando; túnel probado desde la PWA (necesario también para probar en teléfonos: la red UsaLab aísla clientes, sec. 16)
 - [x] Base de datos: SQLite en lugar de Firebase (20-nov-2026)
 - [x] Acceso local (correo + contraseña) y sesiones en SQLite, con regreso a la ruta pedida (20-nov-2026)

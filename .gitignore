@@ -52,3 +52,6 @@ frontend-pwa/docs/login.md
 # PAC simulado: facturas de prueba guardadas localmente
 /.mock-pac/
 frontend-pwa/.mock-pac/
+
+# Caché de Hugging Face del entrenamiento (modelo base, ~15 GB)
+training/asistente/cache/

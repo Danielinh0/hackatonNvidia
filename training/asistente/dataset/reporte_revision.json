@@ -1,0 +1,208 @@
+{
+  "revisado": "2026-11-20T05:43:31",
+  "dataset": "/home/daniel/Next/mi-next-front/training/asistente/dataset",
+  "fugas": {
+    "textos_identicos_entre_splits": 0,
+    "textos_casi_iguales_entre_splits": 0,
+    "plantillas_por_split": {
+      "train": [
+        "C1",
+        "C2",
+        "N1",
+        "N2",
+        "N3",
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "X1"
+      ],
+      "val": [
+        "C3",
+        "N4",
+        "T7",
+        "X1"
+      ],
+      "test": [
+        "C4",
+        "N5",
+        "T8",
+        "X1"
+      ]
+    }
+  },
+  "largo": {
+    "train": {
+      "chars_max": 3998,
+      "chars_p95": 3677,
+      "chars_promedio": 2664
+    },
+    "val": {
+      "chars_max": 3982,
+      "chars_p95": 3814,
+      "chars_promedio": 2731
+    },
+    "test": {
+      "chars_max": 3964,
+      "chars_p95": 3629,
+      "chars_promedio": 2631
+    }
+  },
+  "distribucion": {
+    "train": {
+      "total": 1600,
+      "por_tipo": {
+        "cfdi": {
+          "n": 303,
+          "pct": 18.9
+        },
+        "ticket": {
+          "n": 1162,
+          "pct": 72.6
+        },
+        "ilegible": {
+          "n": 61,
+          "pct": 3.8
+        },
+        "no_comprobante": {
+          "n": 74,
+          "pct": 4.6
+        }
+      },
+      "por_plantilla": {
+        "C1": 179,
+        "T6": 189,
+        "T2": 195,
+        "X1": 61,
+        "C2": 124,
+        "T3": 175,
+        "N1": 27,
+        "T1": 196,
+        "T5": 203,
+        "T4": 204,
+        "N3": 19,
+        "N2": 28
+      },
+      "por_nivel_ruido": {
+        "0.1": 393,
+        "0.0": 404,
+        "0.35": 407,
+        "0.2": 396
+      },
+      "pct_auto_en_tickets_y_cfdi": {
+        "Fecha": 11.4,
+        "Total": 7.0,
+        "SubTotal": 41.8,
+        "Emisor.Rfc": 24.9,
+        "Emisor.Nombre": 3.8,
+        "FormaPago": 81.0,
+        "FormaPagoLeida": 45.4,
+        "UUID": 81.0
+      },
+      "conceptos_promedio": 2.65
+    },
+    "val": {
+      "total": 200,
+      "por_tipo": {
+        "cfdi": {
+          "n": 44,
+          "pct": 22.0
+        },
+        "ticket": {
+          "n": 146,
+          "pct": 73.0
+        },
+        "no_comprobante": {
+          "n": 5,
+          "pct": 2.5
+        },
+        "ilegible": {
+          "n": 5,
+          "pct": 2.5
+        }
+      },
+      "por_plantilla": {
+        "C3": 44,
+        "T7": 146,
+        "N4": 5,
+        "X1": 5
+      },
+      "por_nivel_ruido": {
+        "0.1": 49,
+        "0.35": 48,
+        "0.0": 64,
+        "0.2": 39
+      },
+      "pct_auto_en_tickets_y_cfdi": {
+        "Fecha": 8.9,
+        "Total": 8.4,
+        "SubTotal": 38.9,
+        "Emisor.Rfc": 20.5,
+        "Emisor.Nombre": 1.6,
+        "FormaPago": 81.1,
+        "FormaPagoLeida": 41.1,
+        "UUID": 78.9
+      },
+      "conceptos_promedio": 2.68
+    },
+    "test": {
+      "total": 200,
+      "por_tipo": {
+        "ticket": {
+          "n": 145,
+          "pct": 72.5
+        },
+        "ilegible": {
+          "n": 13,
+          "pct": 6.5
+        },
+        "cfdi": {
+          "n": 32,
+          "pct": 16.0
+        },
+        "no_comprobante": {
+          "n": 10,
+          "pct": 5.0
+        }
+      },
+      "por_plantilla": {
+        "T8": 145,
+        "X1": 13,
+        "C4": 32,
+        "N5": 10
+      },
+      "por_nivel_ruido": {
+        "0.2": 53,
+        "0.0": 53,
+        "0.1": 46,
+        "0.35": 48
+      },
+      "pct_auto_en_tickets_y_cfdi": {
+        "Fecha": 8.5,
+        "Total": 7.3,
+        "SubTotal": 42.4,
+        "Emisor.Rfc": 23.7,
+        "Emisor.Nombre": 2.8,
+        "FormaPago": 83.1,
+        "FormaPagoLeida": 43.5,
+        "UUID": 82.5
+      },
+      "conceptos_promedio": 2.75
+    }
+  },
+  "muestra_manual": 40,
+  "errores": {},
+  "avisos": {
+    "largo": {
+      "total": 1,
+      "ejemplos": [
+        {
+          "id": "-",
+          "detalle": "sin --tokenizador: solo se midieron caracteres, no tokens reales"
+        }
+      ]
+    }
+  }
+}
