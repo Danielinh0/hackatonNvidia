@@ -11,16 +11,6 @@ SPLITS = ("train", "val", "test")
 ETIQUETA_IGNORAR = "###"
 
 
-def texto_para_icdar(texto):
-    # El lector ICDAR separa por comas y toma las 8 primeras como coordenadas; OCDNet solo usa la
-    # transcripción para saber si la región se ignora. Quitar las comas evita cualquier ambigüedad.
-    # Pendiente de validar en el lab contra el cargador de OCDNet de TAO 5.5.0.
-    if texto == ETIQUETA_IGNORAR:
-        return texto
-    limpio = " ".join(texto.replace(",", " ").split())
-    return limpio or ETIQUETA_IGNORAR
-
-
 def poligono_a_icdar(poligono):
     return ",".join(str(int(round(v))) for punto in poligono for v in punto)
 
@@ -53,9 +43,14 @@ def exportar_para_ocdnet(origen, destino):
             # Calidad 95 para no degradar los bordes del texto.
             im.convert("RGB").save(destino / split / "img" / f"{nombre_base}.jpg", "JPEG", quality=95)
 
-        lineas_gt = [
-            f"{poligono_a_icdar(seg['poligono'])},{texto_para_icdar(seg['texto'])}" for seg in reg["segmentos"]
-        ]
+        # Una caja por palabra, igual que OCRNet. El cargador ICDAR de TAO 5.5 toma las 8 primeras
+        # columnas como coordenadas y une el resto con comas, así que las comas del texto no estorban.
+        lineas_gt = []
+        for seg in reg["segmentos"]:
+            if seg["texto"] == ETIQUETA_IGNORAR:
+                lineas_gt.append(f"{poligono_a_icdar(seg['poligono'])},{ETIQUETA_IGNORAR}")
+            else:
+                lineas_gt += [f"{poligono_a_icdar(p['poligono'])},{p['texto']}" for p in seg["palabras"]]
         (destino / split / "gt" / f"gt_{nombre_base}.txt").write_text("\n".join(lineas_gt) + "\n", encoding="utf-8")
         conteo[split] += 1
 

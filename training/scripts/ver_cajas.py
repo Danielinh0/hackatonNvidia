@@ -15,10 +15,10 @@ def leer_gt(ruta):
         if not linea.strip():
             continue
         partes = linea.split(",")
-        if len(partes) != 9:
-            raise ValueError(f"{ruta.name}:{num} tiene {len(partes)} campos separados por coma, se esperaban 9")
+        if len(partes) < 9:
+            raise ValueError(f"{ruta.name}:{num} tiene {len(partes)} campos separados por coma, se esperaban al menos 9")
         coords = [int(v) for v in partes[:8]]
-        regiones.append((list(zip(coords[0::2], coords[1::2])), partes[8]))
+        regiones.append((list(zip(coords[0::2], coords[1::2])), ",".join(partes[8:])))
     return regiones
 
 

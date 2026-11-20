@@ -1,5 +1,6 @@
 import argparse
 import glob
+import multiprocessing
 import json
 import math
 import random
@@ -13,6 +14,13 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 RAIZ = Path(__file__).resolve().parents[1]
+# Factor de resolución del dibujo. Con 1 el texto chico queda de ~10 px de alto, ilegible tras el
+# desenfoque y el JPEG; con 2 se acerca a lo que mide en una foto de celular.
+ESCALA_RENDER = 2.0
+
+
+def px(n):
+    return max(1, int(round(n * ESCALA_RENDER)))
 
 CDN_FUENTES = [
     "https://raw.githubusercontent.com/google/fonts/main/ofl/",
@@ -306,13 +314,13 @@ def generar_ruido_papel(ancho, alto):
 
 
 def aplicar_efecto_termico(imagen):
-    imagen = imagen.filter(ImageFilter.GaussianBlur(radius=random.uniform(0.3, 0.65)))
+    imagen = imagen.filter(ImageFilter.GaussianBlur(radius=random.uniform(0.3, 0.65) * ESCALA_RENDER))
     arr = np.array(imagen, dtype=np.float32)
     alto = arr.shape[0]
     # Franjas horizontales más claras: desgaste del cabezal térmico.
     for _ in range(random.randint(2, 9)):
         y = random.randint(0, alto - 1)
-        grosor = random.randint(1, 2)
+        grosor = px(random.randint(1, 2))
         arr[y : y + grosor, :, :] = np.clip(arr[y : y + grosor, :, :] + random.randint(8, 22), 0, 255)
     return Image.fromarray(arr.astype(np.uint8), "RGB")
 
@@ -336,13 +344,13 @@ def rotar_poligono(bbox, angulo_grados, ancho_orig, alto_orig, ancho_nuevo, alto
 class Lienzo:
     def __init__(self, ancho, ruta_fuente, escala_fuente, color):
         self.ancho = ancho
-        self.margen = max(14, int(ancho * 0.055))
-        self.img = generar_ruido_papel(ancho, 2600)
+        self.margen = max(px(14), int(ancho * 0.055))
+        self.img = generar_ruido_papel(ancho, px(2600))
         self.draw = ImageDraw.Draw(self.img)
         self.ruta_fuente = ruta_fuente
         self.escala = escala_fuente * ancho / 440
         self.color = color
-        self.y = 24
+        self.y = px(24)
         self.linea = 0
         self.segmentos = []
         self._fuentes = {}
@@ -378,21 +386,32 @@ class Lienzo:
             return
         self.draw.text((x, self.y), texto, font=fuente, fill=color or self.color)
         bbox = self.draw.textbbox((x, self.y), texto, font=fuente)
+        # OCRNet de TAO no admite espacios en la etiqueta, así que también se guarda la caja de cada palabra.
+        palabras = []
+        inicio = 0
+        for palabra in texto.split(" "):
+            if palabra:
+                x_pal = x + fuente.getlength(texto[:inicio])
+                caja = self.draw.textbbox((x_pal, self.y), palabra, font=fuente)
+                palabras.append({"texto": palabra, "bbox": [float(v) for v in caja]})
+            inicio += len(palabra) + 1
         self.segmentos.append(
-            {"texto": texto, "etiqueta": etiqueta, "linea": self.linea, "bbox": [float(v) for v in bbox]}
+            {"texto": texto, "etiqueta": etiqueta, "linea": self.linea, "bbox": [float(v) for v in bbox],
+             "palabras": palabras}
         )
 
     def _ignorar(self, bbox):
         self.segmentos.append(
-            {"texto": "###", "etiqueta": "IGNORAR", "linea": self.linea, "bbox": [float(v) for v in bbox]}
+            {"texto": "###", "etiqueta": "IGNORAR", "linea": self.linea, "bbox": [float(v) for v in bbox],
+             "palabras": []}
         )
 
     def avanzar(self, fuente, extra=0):
         self.y += int(fuente.size * random.uniform(1.25, 1.45)) + extra
         self.linea += 1
 
-    def espacio(self, px):
-        self.y += px
+    def espacio(self, n):
+        self.y += px(n)
 
     def centrado(self, texto, etiqueta, puntos, color=None):
         f = self.ajustar([texto], puntos)
@@ -439,12 +458,12 @@ class Lienzo:
         x0 = int(self.ancho * 0.17)
         x = x0
         while x < self.ancho - x0:
-            w = random.choice([1, 2, 3])
+            w = px(random.choice([1, 2, 3]))
             if random.random() > 0.35:
-                self.draw.rectangle([x, self.y, x + w, self.y + 40], fill=self.color)
-            x += w + random.choice([1, 2, 3])
-        self._ignorar([x0, self.y, x, self.y + 40])
-        self.y += 50
+                self.draw.rectangle([x, self.y, x + w, self.y + px(40)], fill=self.color)
+            x += w + px(random.choice([1, 2, 3]))
+        self._ignorar([x0, self.y, x, self.y + px(40)])
+        self.y += px(50)
         self.linea += 1
 
     def logo(self, nombre_comercio, dir_logos):
@@ -461,7 +480,7 @@ class Lienzo:
 
     def _logo_archivo(self, ruta):
         logo_raw = Image.open(ruta).convert("RGBA")
-        logo_raw.thumbnail((160, 75), Image.Resampling.LANCZOS)
+        logo_raw.thumbnail((px(160), px(75)), Image.Resampling.LANCZOS)
         fondo = Image.new("RGBA", logo_raw.size, (255, 255, 255, 255))
         gris = Image.alpha_composite(fondo, logo_raw).convert("L")
         if random.random() > 0.35:
@@ -478,35 +497,34 @@ class Lienzo:
         self.img.paste(Image.fromarray(mezcla, "RGB"), (x, self.y))
         # Un logo de archivo puede traer letras: se marca completo como región a ignorar.
         self._ignorar([x, self.y, x + w, self.y + h])
-        self.y += h + 14
+        self.y += h + px(14)
 
     def _logo_geometrico(self, nombre_comercio):
-        cx, radio = self.ancho // 2, 26
+        cx, radio = self.ancho // 2, px(26)
         cy = self.y + radio
         estilo = random.choice(["circulo", "hexagono", "cuadro"])
         if estilo == "circulo":
-            self.draw.ellipse([cx - radio, cy - radio, cx + radio, cy + radio], outline=self.color, width=3)
-            self.draw.ellipse(
-                [cx - radio + 5, cy - radio + 5, cx + radio - 5, cy + radio - 5], outline=self.color, width=1
-            )
+            self.draw.ellipse([cx - radio, cy - radio, cx + radio, cy + radio], outline=self.color, width=px(3))
+            d = px(5)
+            self.draw.ellipse([cx - radio + d, cy - radio + d, cx + radio - d, cy + radio - d], outline=self.color, width=px(1))
         elif estilo == "hexagono":
             puntos = [
                 (cx + radio * math.cos(math.radians(60 * k)), cy + radio * math.sin(math.radians(60 * k)))
                 for k in range(6)
             ]
-            self.draw.polygon(puntos, outline=self.color, width=3)
+            self.draw.polygon(puntos, outline=self.color, width=px(3))
         else:
-            self.draw.rectangle([cx - radio, cy - radio + 4, cx + radio, cy + radio - 4], outline=self.color, width=3)
+            self.draw.rectangle([cx - radio, cy - radio + px(4), cx + radio, cy + radio - px(4)], outline=self.color, width=px(3))
 
         iniciales = "".join(p[0] for p in nombre_comercio.split()[:2]).upper()
         f_ini = self.fuente(18)
         bbox = self.draw.textbbox((0, 0), iniciales, font=f_ini)
         iw, ih = bbox[2] - bbox[0], bbox[3] - bbox[1]
-        pos = (cx - iw / 2, cy - ih / 2 - 2)
+        pos = (cx - iw / 2, cy - ih / 2 - px(2))
         self.draw.text(pos, iniciales, font=f_ini, fill=self.color)
         # Las iniciales dentro del logo no son texto útil del ticket.
         self._ignorar(self.draw.textbbox(pos, iniciales, font=f_ini))
-        self.y += radio * 2 + 14
+        self.y += radio * 2 + px(14)
 
 
 def formatear_fecha(dt):
@@ -572,7 +590,7 @@ def generar_un_ticket(indice, split, catalogos, fuentes, args):
 
     nombre_fuente = random.choice(sorted(fuentes))
     ruta_ttf, escala = fuentes[nombre_fuente]
-    ancho = random.randrange(380, 601, 4)
+    ancho = px(random.randrange(380, 601, 4))
     intensidad = random.randint(28, 65)
     color_tinta = (intensidad, intensidad + 2, intensidad + 4)
     color_tenue = (intensidad + 45, intensidad + 47, intensidad + 49)
@@ -653,16 +671,21 @@ def generar_un_ticket(indice, split, catalogos, fuentes, args):
         if x1 < 0 or x2 > ancho:
             raise RuntimeError(f"Ticket {indice}: '{seg['texto']}' se sale del ancho ({x1:.0f}-{x2:.0f} de {ancho})")
 
-    alto_recorte = lz.y + 20
+    alto_recorte = lz.y + px(20)
     img = aplicar_efecto_termico(lz.img.crop((0, 0, ancho, alto_recorte)))
     angulo = random.uniform(-2.2, 2.2)
     img = img.rotate(angulo, expand=True, fillcolor=(225, 225, 225))
     ancho_final, alto_final = img.size
 
+    def rotar(bbox):
+        return rotar_poligono(bbox, angulo, ancho, alto_recorte, ancho_final, alto_final)
+
     segmentos = []
     for seg in lz.segmentos:
-        poligono = rotar_poligono(seg["bbox"], angulo, ancho, alto_recorte, ancho_final, alto_final)
-        segmentos.append({"texto": seg["texto"], "etiqueta": seg["etiqueta"], "linea": seg["linea"], "poligono": poligono})
+        segmentos.append({
+            "texto": seg["texto"], "etiqueta": seg["etiqueta"], "linea": seg["linea"], "poligono": rotar(seg["bbox"]),
+            "palabras": [{"texto": p["texto"], "poligono": rotar(p["bbox"])} for p in seg["palabras"]],
+        })
 
     nombre_archivo = f"ticket_{indice:05d}.png"
     img.save(args.salida / "images" / nombre_archivo)
@@ -695,7 +718,27 @@ def generar_un_ticket(indice, split, catalogos, fuentes, args):
     }
 
 
+_TRABAJO = {}
+
+
+def _iniciar_proceso(catalogos, fuentes, args):
+    global ESCALA_RENDER
+    ESCALA_RENDER = args.escala_render
+    _TRABAJO.update(catalogos=catalogos, fuentes=fuentes, args=args)
+
+
+def _generar(tarea):
+    indice, split = tarea
+    # Semilla propia por ticket: el resultado no depende del orden en que terminen los procesos.
+    semilla = (_TRABAJO["args"].semilla * 1_000_003 + indice) % 2**32
+    random.seed(semilla)
+    np.random.seed(semilla)
+    return generar_un_ticket(indice, split, _TRABAJO["catalogos"], _TRABAJO["fuentes"], _TRABAJO["args"])
+
+
 def generar_lote(args):
+    global ESCALA_RENDER
+    ESCALA_RENDER = args.escala_render
     random.seed(args.semilla)
     np.random.seed(args.semilla)
 
@@ -709,10 +752,12 @@ def generar_lote(args):
     splits = asignar_splits(args.cantidad)
 
     registros = []
-    for i, split in enumerate(splits, start=1):
-        registros.append(generar_un_ticket(i, split, catalogos, fuentes, args))
-        if i % 50 == 0 or i == args.cantidad:
-            print(f"Generados {i}/{args.cantidad} tickets...")
+    tareas = list(enumerate(splits, start=1))
+    with multiprocessing.Pool(args.procesos, initializer=_iniciar_proceso, initargs=(catalogos, fuentes, args)) as pool:
+        for i, reg in enumerate(pool.imap(_generar, tareas, chunksize=4), start=1):
+            registros.append(reg)
+            if i % 50 == 0 or i == args.cantidad:
+                print(f"Generados {i}/{args.cantidad} tickets...")
 
     with open(args.salida / "anotaciones.json", "w", encoding="utf-8") as f:
         json.dump(registros, f, indent=1, ensure_ascii=False)
@@ -720,6 +765,7 @@ def generar_lote(args):
     nombres, _, productos = catalogos
     manifiesto = {
         "semilla": args.semilla,
+        "escala_render": args.escala_render,
         "cantidad": args.cantidad,
         "fecha_ref": args.fecha_ref.strftime("%Y-%m-%d"),
         "ratios_tickets": dict(zip(SPLITS, RATIOS_TICKETS)),
@@ -742,6 +788,8 @@ def leer_args():
     p = argparse.ArgumentParser(description="Genera tickets sintéticos con anotaciones por segmento de texto.")
     p.add_argument("--cantidad", type=int, default=500)
     p.add_argument("--semilla", type=int, default=42)
+    p.add_argument("--escala-render", type=float, default=ESCALA_RENDER)
+    p.add_argument("--procesos", type=int, default=max(1, multiprocessing.cpu_count() - 1))
     p.add_argument("--salida", type=Path, default=RAIZ / "data" / "synthetic")
     p.add_argument("--dir-fuentes", type=Path, default=RAIZ / ".cache" / "fuentes")
     p.add_argument("--dir-logos", type=Path, default=None, help="Carpeta opcional con logos propios o con licencia libre")

@@ -2,6 +2,7 @@ import argparse
 import io
 import json
 import math
+import multiprocessing
 import random
 import shutil
 from pathlib import Path
@@ -181,19 +182,24 @@ def aumentar(ruta_img, segmentos):
     img = iluminacion(img)
     img = desenfoque(img)
 
-    # Por debajo de 0.75 el texto chico baja de ~8 px de alto, menos que en una foto real de celular.
-    escala = random.uniform(0.75, 1.5)
+    # Con main.py a escala de render 2, este rango deja el texto chico entre ~13 y ~22 px de alto.
+    escala = random.uniform(0.7, 1.1)
     img = img.resize((round(ancho_lienzo * escala), round(alto_lienzo * escala)), Image.LANCZOS)
     escala_x, escala_y = img.size[0] / ancho_lienzo, img.size[1] / alto_lienzo
     img, calidad = ruido_y_jpeg(img)
     w, hh = img.size
 
-    nuevos = []
-    for seg in segmentos:
-        pts = aplicar_h(h, seg["poligono"]) * [escala_x, escala_y]
+    def mover(poligono):
+        pts = aplicar_h(h, poligono) * [escala_x, escala_y]
         pts[:, 0] = np.clip(pts[:, 0], 0, w)
         pts[:, 1] = np.clip(pts[:, 1], 0, hh)
-        nuevos.append({**seg, "poligono": [[round(float(x), 1), round(float(y), 1)] for x, y in pts]})
+        return [[round(float(x), 1), round(float(y), 1)] for x, y in pts]
+
+    nuevos = [
+        {**seg, "poligono": mover(seg["poligono"]),
+         "palabras": [{**p, "poligono": mover(p["poligono"])} for p in seg["palabras"]]}
+        for seg in segmentos
+    ]
 
     params = {
         "fondo": tipo_fondo, "angulo": round(math.degrees(angulo), 2), "jitter_px": round(jitter, 1),
@@ -202,9 +208,31 @@ def aumentar(ruta_img, segmentos):
     return img, nuevos, params
 
 
+def procesar(tarea):
+    reg, origen, dir_img, copias_train, semilla_base = tarea
+    semilla = (semilla_base * 1_000_003 + reg["id"]) % 2**32
+    random.seed(semilla)
+    np.random.seed(semilla)
+    salida = []
+    if reg["split"] == "train":
+        shutil.copy2(origen / "images" / reg["archivo"], dir_img / reg["archivo"])
+        salida.append({**reg, "origen": reg["archivo"], "aumento": None})
+        copias = copias_train
+    else:
+        # val y test: una sola versión tipo foto que reemplaza al original, para que se parezcan al uso real.
+        copias = 1
+    for c in range(1, copias + 1):
+        img, segmentos, params = aumentar(origen / "images" / reg["archivo"], reg["segmentos"])
+        nombre = f"{Path(reg['archivo']).stem}_a{c}.jpg"
+        img.save(dir_img / nombre, "JPEG", quality=95)
+        salida.append({
+            **reg, "archivo": nombre, "ancho": img.size[0], "alto": img.size[1],
+            "segmentos": segmentos, "origen": reg["archivo"], "aumento": params,
+        })
+    return salida
+
+
 def main(args):
-    random.seed(args.semilla)
-    np.random.seed(args.semilla)
     registros = json.loads((args.origen / "anotaciones.json").read_text(encoding="utf-8"))
 
     dir_img = args.destino / "images"
@@ -212,22 +240,13 @@ def main(args):
         shutil.rmtree(dir_img)
     dir_img.mkdir(parents=True)
 
+    tareas = [(reg, args.origen, dir_img, args.copias, args.semilla) for reg in registros]
     salida = []
-    for n, reg in enumerate(registros, start=1):
-        shutil.copy2(args.origen / "images" / reg["archivo"], dir_img / reg["archivo"])
-        salida.append({**reg, "origen": reg["archivo"], "aumento": None})
-
-        copias = args.copias if reg["split"] in args.splits else 0
-        for c in range(1, copias + 1):
-            img, segmentos, params = aumentar(args.origen / "images" / reg["archivo"], reg["segmentos"])
-            nombre = f"{Path(reg['archivo']).stem}_a{c}.jpg"
-            img.save(dir_img / nombre, "JPEG", quality=95)
-            salida.append({
-                **reg, "archivo": nombre, "ancho": img.size[0], "alto": img.size[1],
-                "segmentos": segmentos, "origen": reg["archivo"], "aumento": params,
-            })
-        if n % 50 == 0 or n == len(registros):
-            print(f"Procesados {n}/{len(registros)} tickets...")
+    with multiprocessing.Pool(args.procesos) as pool:
+        for n, parte in enumerate(pool.imap(procesar, tareas, chunksize=2), start=1):
+            salida += parte
+            if n % 50 == 0 or n == len(registros):
+                print(f"Procesados {n}/{len(registros)} tickets...")
 
     (args.destino / "anotaciones.json").write_text(json.dumps(salida, indent=1, ensure_ascii=False), encoding="utf-8")
     conteo = {s: sum(r["split"] == s for r in salida) for s in ("train", "val", "test")}
@@ -238,10 +257,11 @@ def leer_args():
     p = argparse.ArgumentParser(description="Simula fotos de celular sobre los tickets sintéticos sin romper las cajas.")
     p.add_argument("--origen", type=Path, default=RAIZ / "data" / "synthetic")
     p.add_argument("--destino", type=Path, default=RAIZ / "data" / "augmented")
-    p.add_argument("--copias", type=int, default=2, help="Copias aumentadas por ticket en los splits elegidos")
-    # Solo train por defecto (CLAUDE.md sec. 18). Todas las copias de un ticket quedan en su mismo split.
-    p.add_argument("--splits", nargs="+", default=["train"], choices=["train", "val", "test"])
+    # train: original + N copias. val/test: solo 1 versión tipo foto (CLAUDE.md sec. 18).
+    # Todas las versiones de un ticket quedan en su mismo split.
+    p.add_argument("--copias", type=int, default=2, help="Copias aumentadas por ticket de train")
     p.add_argument("--semilla", type=int, default=42)
+    p.add_argument("--procesos", type=int, default=max(1, multiprocessing.cpu_count() - 1))
     return p.parse_args()
 
 

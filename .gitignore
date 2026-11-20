@@ -52,3 +52,4 @@ training/data/*/*
 training/.venv/
 training/.cache/
 __pycache__/
+training/data/*.log

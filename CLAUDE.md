@@ -308,6 +308,16 @@ hackathon-nvidia-oaxaca-2026/
   7. Hay poca variedad de comercios, productos y formatos.
   8. Usan rutas relativas al directorio actual.
 
+### Verificado en el código fuente de TAO 5.5 (rama `tao_5.5_release` de NVIDIA/tao_pytorch_backend, 20-nov-2026)
+- **OCDNet:** carpeta `img/` + `gt/gt_<nombre>.txt`. Cada línea: 8 coordenadas y el texto; el texto es `','.join(params[8:])`, así que las comas no rompen nada. `ignore_tags: ['*', '###']`. El spec de ejemplo usa `backbone: deformable_resnet18` y `pretrained_model_path`.
+- **OCRNet:** `dataset_convert` crea LMDB desde `input_img_dir` + `gt_file` con líneas `imagen<TAB>etiqueta`. La ruta sin LMDB (`train_gt_file`) separa con `split()` y no admite espacios: usar LMDB.
+- **Lista de caracteres:** un carácter por línea, leído con `strip()`; **el espacio no se puede incluir**.
+- **Filtro silencioso:** se descarta toda etiqueta con más de `max_label_length` caracteres (25 por defecto) o con un carácter fuera de la lista, comparando `label.lower()`. Luego codifica la etiqueta tal cual. Por eso: **etiquetas y lista en minúsculas**; el backend pasa a mayúsculas.
+- La lista arma la expresión regular `[^<caracteres>]`: el `-` va al final.
+- Entrada por defecto: escala de grises 32×100, `TPS: True`, `ResNet`, `BiLSTM`, `CTC`.
+- Con `train.pretrained_model_path` se hace fine-tune: si la lista de caracteres cambia el tamaño de la salida, TAO descarta solo la capa de predicción (`load_for_finetune`) y conserva el resto.
+- **Sin verificar todavía (docs.nvidia.com no respondió desde la máquina local):** nombre exacto de la imagen Docker de TAO 5.5.0, formato de `~/.tao_mounts.json`, versiones y licencias de los modelos preentrenados en NGC. Se verifican en el lab.
+
 ## 25. Reglas de trabajo (entrenamiento de visión)
 - Trabajar una etapa a la vez. Al terminar cada una: explicar qué se hizo y cómo probarla, y esperar confirmación.
 - No inventar claves de los specs de TAO. Verificarlas contra la documentación oficial de TAO 5.5 y, si existe, contra los specs por defecto del contenedor (acción `download_specs`). Lo que no se pueda verificar se marca como pendiente de validar en el lab.
@@ -322,12 +332,14 @@ hackathon-nvidia-oaxaca-2026/
 ```bash
 cd training && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python scripts/main.py --cantidad 500 --semilla 42   # data/synthetic: images/, anotaciones.json, manifiesto.json
-.venv/bin/python scripts/aumentar.py --copias 2                 # data/augmented: originales + 2 fotos simuladas por ticket de train
-.venv/bin/python scripts/prep_mod.py --origen data/augmented     # data/ocdnet/{train,val,test}/{img,gt}
+.venv/bin/python scripts/aumentar.py --copias 2                 # data/augmented: train = original + 2 fotos simuladas; val/test = 1 foto simulada
+.venv/bin/python scripts/prep_mod.py --origen data/augmented     # data/ocdnet/{train,val,test}/{img,gt}  (una caja por palabra)
+.venv/bin/python scripts/prep_ocrnet.py                          # data/ocrnet/{train,val,test}/{images,gt_list.txt} + character_list
 .venv/bin/python scripts/ver_cajas.py -n 4                      # data/revision_cajas/*.png + conteos
 ```
-- Un ticket = una lista de **segmentos** (texto con caja de 4 puntos, etiqueta y número de fila). Una fila con hueco grande (p. ej. "TOTAL" ... "$446.22") se anota como dos segmentos.
+- Un ticket = una lista de **segmentos** (texto con caja de 4 puntos, etiqueta y número de fila), y cada segmento trae sus **palabras** con su propia caja. Una fila con hueco grande (p. ej. "TOTAL" ... "$446.22") son dos segmentos. **OCDNet y OCRNet trabajan por palabra** (20-nov-2026, porque OCRNet de TAO no admite espacios); el backend reagrupa palabras en filas para el LLM.
 - `###` marca regiones a ignorar: separadores, código de barras e iniciales del logo.
 - El split es al generar: 80/10/10 de tickets; los nombres de comercio y los productos se reparten 70/15/15, así que val y test solo usan comercios y productos que no existen en train. Lo registra `manifiesto.json`.
-- `aumentar.py` (Etapa 2) simula foto de celular: fondo (madera, mesa, tela, kraft, oscuro), perspectiva y rotación ±8° con homografía, pliegues fotométricos, sombra, gradiente de luz y tinte, desenfoque gaussiano o de movimiento, escala 0.75–1.5, ruido y JPEG 35–90. Los polígonos se transforman con la misma homografía. Las copias de un ticket quedan en su mismo split; por defecto solo se aumenta train.
+- `aumentar.py` (Etapa 2) simula foto de celular: fondo (madera, mesa, tela, kraft, oscuro), perspectiva y rotación ±8° con homografía, pliegues fotométricos, sombra, gradiente de luz y tinte, desenfoque gaussiano o de movimiento, escala 0.75–1.5, ruido y JPEG 35–90. Los polígonos se transforman con la misma homografía. Las versiones de un ticket quedan en su mismo split. **Decisión 20-nov-2026 (aclara la sec. 18):** train lleva el original + 2 copias aleatorias; val y test llevan UNA versión tipo foto que reemplaza al original, para que la selección de checkpoint y la prueba se parezcan al uso real. No hay versiones de una imagen en splits distintos.
+- **Resolución (20-nov-2026):** `main.py --escala-render 2` (por defecto) dibuja al doble. Con escala 1 el texto chico quedaba de ~10 px y, tras desenfoque y JPEG, era ilegible incluso para una persona; ahora los recortes de OCRNet miden 15–38 px de alto. `main.py` y `aumentar.py` corren en paralelo con una semilla por ticket, así que el resultado no depende del orden de los procesos.
 - Simplificación: todo artículo lleva IVA 16 % (en la realidad muchos alimentos son tasa 0 %).
