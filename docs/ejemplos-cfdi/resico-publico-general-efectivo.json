@@ -1,0 +1,81 @@
+{
+  "Version": "4.0",
+  "Serie": "DZ",
+  "Fecha": "AUTO",
+  "FormaPago": "01",
+  "MetodoPago": "PUE",
+  "Moneda": "MXN",
+  "TipoDeComprobante": "I",
+  "Exportacion": "01",
+  "LugarExpedicion": "70800",
+  "SubTotal": "2150.00",
+  "Total": "2494.00",
+  "Emisor": {
+    "RegimenFiscal": "626",
+    "Rfc": "MALM800101AB1",
+    "Nombre": "MARIA LOPEZ MARTINEZ (FICTICIO)"
+  },
+  "Receptor": {
+    "Rfc": "XAXX010101000",
+    "Nombre": "PUBLICO EN GENERAL",
+    "DomicilioFiscalReceptor": "70800",
+    "RegimenFiscalReceptor": "616",
+    "UsoCFDI": "S01"
+  },
+  "Conceptos": [
+    {
+      "ClaveProdServ": "90101501",
+      "Cantidad": "10",
+      "ClaveUnidad": "H87",
+      "Unidad": "Pieza",
+      "Descripcion": "Tlayuda con tasajo",
+      "ValorUnitario": "150.00",
+      "Importe": "1500.00",
+      "ObjetoImp": "02",
+      "Impuestos": {
+        "Traslados": [
+          {
+            "Base": "1500.00",
+            "Impuesto": "002",
+            "TipoFactor": "Tasa",
+            "TasaOCuota": "0.160000",
+            "Importe": "240.00"
+          }
+        ]
+      }
+    },
+    {
+      "ClaveProdServ": "50202306",
+      "Cantidad": "13",
+      "ClaveUnidad": "H87",
+      "Unidad": "Pieza",
+      "Descripcion": "Agua fresca 1 L",
+      "ValorUnitario": "50.00",
+      "Importe": "650.00",
+      "ObjetoImp": "02",
+      "Impuestos": {
+        "Traslados": [
+          {
+            "Base": "650.00",
+            "Impuesto": "002",
+            "TipoFactor": "Tasa",
+            "TasaOCuota": "0.160000",
+            "Importe": "104.00"
+          }
+        ]
+      }
+    }
+  ],
+  "Impuestos": {
+    "TotalImpuestosTrasladados": "344.00",
+    "Traslados": [
+      {
+        "Base": "2150.00",
+        "Impuesto": "002",
+        "TipoFactor": "Tasa",
+        "TasaOCuota": "0.160000",
+        "Importe": "344.00"
+      }
+    ]
+  }
+}

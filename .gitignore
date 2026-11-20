@@ -47,3 +47,7 @@ serviceAccount*.json
 frontend-pwa/data/
 docs/login.md
 frontend-pwa/docs/login.md
+/data/
+
+# PAC simulado: facturas de prueba guardadas localmente
+/.mock-pac/
