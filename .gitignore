@@ -45,3 +45,6 @@ serviceAccount*.json
 
 # base de datos SQLite local (contiene las fotos subidas)
 /data/
+
+# PAC simulado: facturas de prueba guardadas localmente
+/.mock-pac/
