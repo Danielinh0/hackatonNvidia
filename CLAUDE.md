@@ -200,7 +200,8 @@ hackathon-nvidia-oaxaca-2026/
 └── training/
     ├── data/        raw/ (fotos reales de prueba, fuera de git), synthetic/, ocdnet/, ocrnet/
     ├── specs/       YAML de TAO (OCDNet, OCRNet)
-    ├── scripts/     main.py (generador), prep_mod.py (export ICDAR), run_lab.sh
+    ├── scripts/     main.py, aumentar.py, prep_mod.py, prep_ocrnet.py, ver_cajas.py, verificar_specs.py, run_lab.sh
+    ├── LAB.md       paso a paso para entrenar en el lab (run_lab.sh)
     ├── notebooks/
     └── asistente/   dataset JSONL, train_qlora.py, test_10_casos.py, logs/, adapters/
 ```
@@ -317,6 +318,7 @@ hackathon-nvidia-oaxaca-2026/
 - Entrada por defecto: escala de grises 32×100, `TPS: True`, `ResNet`, `BiLSTM`, `CTC`.
 - Con `train.pretrained_model_path` se hace fine-tune: si la lista de caracteres cambia el tamaño de la salida, TAO descarta solo la capa de predicción (`load_for_finetune`) y conserva el resto.
 - **Specs (Etapa 4):** `training/specs/ocdnet.yaml` y `ocrnet.yaml`. Cada clave se comprueba con `scripts/verificar_specs.py` contra el esquema de TAO 5.5. **OCRNet entrena en fp32** porque TAO 5.5 no expone precisión para OCRNet; el fp16 se aplica en su motor TensorRT. Decisiones y pendientes en `training/specs/README.md`.
+- **Lab (Etapa 5):** `training/scripts/run_lab.sh` por pasos (verificar, datos, montajes, modelos, convertir, prueba, entrenar, evaluar, exportar, empaquetar); guía en `training/LAB.md`. Los datos se regeneran en el lab con la misma semilla y se comparan con `training/huella_datos.sha256`. Probado de punta a punta con simuladores de tao/ngc/nvidia-smi; falta la corrida real.
 - **Sin verificar todavía (docs.nvidia.com no respondió desde la máquina local):** nombre exacto de la imagen Docker de TAO 5.5.0, formato de `~/.tao_mounts.json`, versiones y licencias de los modelos preentrenados en NGC. Se verifican en el lab.
 
 ## 25. Reglas de trabajo (entrenamiento de visión)
