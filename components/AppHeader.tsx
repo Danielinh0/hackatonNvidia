@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { AvatarUsuario, AvatarVacio } from "./AvatarUsuario";
 import { ModoToggle } from "./ModoToggle";
 
 /** Encabezado fijo de las pantallas principales (Figma 1:190). */
@@ -11,15 +13,13 @@ export function AppHeader() {
         </Link>
         <div className="flex items-center gap-1">
           <ModoToggle />
-          <Link
-            href="/chat"
-            aria-label="Perfil de Bisie'"
-            className="relative flex size-11 items-center justify-center rounded-full"
-          >
-            {/* Avatar: en Figma el nodo "Profile" está vacío (sin imagen aún). */}
-            <span className="size-8 rounded-full bg-azul-150" />
-            <span className="absolute top-1.5 right-1.5 size-2.5 rounded-full bg-lima shadow-[0px_0px_0px_2px_#f9f9ff]" />
-          </Link>
+          <span className="relative flex size-11 items-center justify-center">
+            {/* Foto de Google de la persona; en Figma el nodo "Profile" está vacío. */}
+            <Suspense fallback={<AvatarVacio />}>
+              <AvatarUsuario />
+            </Suspense>
+            <span className="pointer-events-none absolute top-1.5 right-1.5 size-2.5 rounded-full bg-lima shadow-[0px_0px_0px_2px_#f9f9ff]" />
+          </span>
         </div>
       </div>
     </header>

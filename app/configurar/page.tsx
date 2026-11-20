@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { AvatarUsuario, AvatarVacio } from "@/components/AvatarUsuario";
+import { requerirUsuario } from "@/lib/sesion";
 import { HeaderSecundario } from "@/components/HeaderSecundario";
 import { Ico, MascotaBisie } from "@/components/ui";
 
 /*
  * Pantalla 3 · Configuración inicial (Figma 1:475).
- * Vista estática con valores de ejemplo; aún no guarda en Firestore.
+ * Vista con valores de ejemplo; el negocio y el RFC aún no se guardan (la cuenta sí: acceso local en SQLite).
  * La clave 626 (RESICO PF) está pendiente de verificar en c_RegimenFiscal (CLAUDE.md sec. 12).
  */
 const C = "/figma/configurar";
@@ -22,7 +25,9 @@ export default function Configurar() {
             <button aria-label="Ayuda de configuración" className="flex size-11 items-center justify-center rounded-full">
               <Ico src={`${C}/ayuda.svg`} w={18.333} h={18.333} />
             </button>
-            <span className="size-8 rounded-full bg-azul-150 drop-shadow-[0px_2px_3px_rgba(0,15,42,0.12)]" />
+            <Suspense fallback={<AvatarVacio />}>
+              <AvatarUsuario />
+            </Suspense>
           </>
         }
       />
@@ -202,7 +207,29 @@ export default function Configurar() {
             Podrás modificar estos datos en cualquier momento desde tu perfil.
           </p>
         </div>
+
+        {/* Cuenta conectada (no está en el boceto; necesaria para poder salir) */}
+        <section className="flex items-center justify-between gap-3 rounded-2xl bg-white p-4 drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]">
+          <Suspense fallback={<span className="text-sm text-tinta-suave">Cargando cuenta…</span>}>
+            <CuentaConectada />
+          </Suspense>
+          <form action="/auth/salir" method="post">
+            <button className="min-h-11 shrink-0 rounded-full bg-azul-50 px-4 text-sm leading-5 font-bold text-azul">
+              Cerrar sesión
+            </button>
+          </form>
+        </section>
       </main>
     </>
+  );
+}
+
+async function CuentaConectada() {
+  const u = await requerirUsuario();
+  return (
+    <p className="flex min-w-0 flex-col text-sm leading-5">
+      <span className="font-bold text-tinta">Tu cuenta</span>
+      <span className="truncate text-tinta-suave">{u.email}</span>
+    </p>
   );
 }

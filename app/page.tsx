@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { Ico, MascotaBisie, PantallaApp, Simulado } from "@/components/ui";
+import { Suspense } from "react";
+import { Saludo } from "@/components/AvatarUsuario";
+import { PantallaApp } from "@/components/PantallaApp";
+import { Ico, MascotaBisie, Simulado } from "@/components/ui";
 
 /*
  * Pantalla 1 · Inicio (Figma 1:2). Vista estática: los montos y movimientos son
@@ -83,7 +86,10 @@ export default function Inicio() {
           <div className="flex min-w-0 flex-1 flex-col">
             <p className="flex w-fit items-center gap-1.5 rounded-full bg-lima px-3 py-1 text-xs leading-4 font-bold text-lima-tinta drop-shadow-[0px_2px_4px_rgba(200,243,12,0.4)]">
               <Ico src={`${I}/chip-hola.svg`} w={12} h={13.333} />
-              ¡Hola, Mari! Tienes 3 tickets por revisar 📋
+              <Suspense fallback="¡Hola!">
+                <Saludo />
+              </Suspense>{" "}
+              Tienes 3 tickets por revisar 📋
             </p>
             <p className="pt-2 text-base leading-[22px] text-tinta">
               Revisémoslos en un minuto para que nada se te escape del cajón.

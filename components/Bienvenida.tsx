@@ -1,15 +1,18 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { AccionesLogin, Privacidad } from "./AccionesLogin";
 import { Ico, MascotaBisie } from "./ui";
 
 /*
  * Pantalla 2 · Bienvenida y login (Figma 1:2985), con sus variantes
- * "Cargando Google" (1:2662) y "Error de conexión" (1:2819).
- * Vista estática: el botón de Google solo navega a la variante de carga;
- * todavía no llama a Firebase Auth.
+ * "Cargando Google" (1:2662, en AccionesLogin) y "Error de conexión" (1:2819).
+ * Acceso local por ahora: "Crear mi cuenta" → /registro y "Ya tengo cuenta, entrar" → /entrar.
+ * "Continuar con Google" aparece solo si hay credenciales (docs/login.md).
  */
 const B = "/figma/bienvenida";
+const googleDisponible = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
-export type EstadoLogin = "inicial" | "cargando" | "error";
+export type EstadoLogin = "inicial" | "error";
 
 const pasosApp = [
   {
@@ -61,30 +64,7 @@ function Eslogan() {
   );
 }
 
-function Privacidad() {
-  return (
-    <p className="flex items-center gap-1.5 pt-1 text-xs leading-4 font-bold text-tinta-suave/80">
-      <Ico src={`${B}/candado.svg`} w={10.667} h={14} />
-      Usamos tus fotos solo para leer tus tickets
-    </p>
-  );
-}
-
-function BotonGoogle() {
-  return (
-    <Link
-      href="/bienvenida/cargando"
-      className="flex h-14 w-full items-center justify-center gap-4 rounded-full bg-marca-brillante shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]"
-    >
-      <span className="flex size-7 items-center justify-center rounded-full bg-white">
-        <Ico src={`${B}/google.svg`} w={16} h={16} />
-      </span>
-      <span className="text-[19px] leading-6 font-bold tracking-[-0.475px] text-white">Continuar con Google</span>
-    </Link>
-  );
-}
-
-function HeroInicial({ cargando }: { cargando: boolean }) {
+function HeroInicial() {
   return (
     <>
       <div className="flex items-center gap-1 pb-6">
@@ -106,34 +86,12 @@ function HeroInicial({ cargando }: { cargando: boolean }) {
         Toma fotos, Bisie&apos; las ordena y tú confirmas
       </p>
 
-      {cargando ? (
-        <div className="flex w-full max-w-[384px] flex-col items-center gap-2" aria-live="polite">
-          <button
-            disabled
-            className="flex h-[52px] w-full items-center justify-center gap-3 overflow-clip rounded-full bg-white px-4 opacity-95 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]"
-          >
-            <Ico src={`${B}/spinner.svg`} w={20} h={20} className="animate-spin" />
-            <span className="text-[19px] leading-6 font-bold text-tinta">Conectando con Google...</span>
-          </button>
-          <p className="flex w-full items-center gap-2 bg-azul-150/50 p-2 text-xs leading-[15px] font-bold text-azul-tinta shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-azul">
-              <Ico src={`${B}/sync.svg`} w={12} h={12} />
-            </span>
-            Espera un momento mientras verificamos tu cuenta...
-          </p>
-          <Privacidad />
-        </div>
-      ) : (
-        <div className="flex w-full max-w-[320px] flex-col items-center gap-2">
-          <BotonGoogle />
-          <Privacidad />
-        </div>
-      )}
+      <AccionesLogin google={googleDisponible} />
     </>
   );
 }
 
-function HeroError() {
+function HeroError({ detalle }: { detalle?: ReactNode }) {
   return (
     <>
       <div className="flex flex-col items-center pt-1 pb-2">
@@ -161,23 +119,24 @@ function HeroError() {
             <p className="text-base leading-6 text-tinta">
               Revisa tu conexión a internet o intenta nuevamente en unos segundos.
             </p>
+            {detalle}
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <Link
-            href="/bienvenida/cargando"
+          <a
+            href="/auth/google"
             className="flex min-h-[52px] items-center justify-center gap-1 rounded-full bg-marca py-3.5 text-[19px] leading-6 font-bold text-white shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]"
           >
             <Ico src={`${B}/reintentar.svg`} w={16} h={16} />
             Reintentar
-          </Link>
-          <Link
-            href="/bienvenida/cargando"
+          </a>
+          <a
+            href="/auth/google"
             className="flex min-h-12 items-center justify-center gap-1 rounded-full bg-white py-3 text-base leading-6 font-semibold text-azul drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]"
           >
             <Ico src={`${B}/google.svg`} w={20} h={20} />
             O continuar con Google de nuevo
-          </Link>
+          </a>
         </div>
       </div>
       <Privacidad />
@@ -185,7 +144,7 @@ function HeroError() {
   );
 }
 
-export function Bienvenida({ estado }: { estado: EstadoLogin }) {
+export function Bienvenida({ estado, detalle }: { estado: EstadoLogin; detalle?: ReactNode }) {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-fondo">
       {/* 1 · Héroe */}
@@ -193,7 +152,7 @@ export function Bienvenida({ estado }: { estado: EstadoLogin }) {
         <span className="absolute -top-12 -right-12 size-48 rounded-full bg-lima/25 blur-[40px]" />
         <span className="absolute top-1/3 -left-16 h-56 w-56 rounded-full bg-durazno/20 blur-[64px]" />
         <div className="relative flex w-full flex-col items-center">
-          {estado === "error" ? <HeroError /> : <HeroInicial cargando={estado === "cargando"} />}
+          {estado === "error" ? <HeroError detalle={detalle} /> : <HeroInicial />}
         </div>
       </section>
 
@@ -265,11 +224,8 @@ export function Bienvenida({ estado }: { estado: EstadoLogin }) {
       <footer className="flex flex-col items-center bg-crema-clara px-5 py-8">
         <div className="flex w-full max-w-[320px] flex-col items-center gap-6">
           <Link
-            href="/"
-            aria-disabled={estado === "cargando"}
-            className={`flex h-12 w-full items-center justify-center gap-1 rounded-full bg-azul-marca text-[19px] leading-6 font-bold text-white drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] ${
-              estado === "cargando" ? "pointer-events-none opacity-50" : ""
-            }`}
+            href="/entrar"
+            className="flex h-12 w-full items-center justify-center gap-1 rounded-full bg-azul-marca text-[19px] leading-6 font-bold text-white drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]"
           >
             Ya tengo cuenta, entrar
             <Ico src={`${B}/flecha.svg`} w={13.333} h={13.333} />

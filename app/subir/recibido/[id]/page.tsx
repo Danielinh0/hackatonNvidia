@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { db, esUuid } from "@/lib/db";
+import { requerirUsuario } from "@/lib/sesion";
 import { Ico } from "@/components/ui";
 
 /*
@@ -29,8 +30,12 @@ async function Recibido({ params }: { params: Promise<{ id: string }> }) {
   if (!esUuid(id)) notFound();
 
   await connection();
+  const usuario = await requerirUsuario();
   const d = db();
-  const lote = d.prepare("SELECT total_enviados, rechazados FROM lotes WHERE id = ?").get(id) as Lote | undefined;
+  // Solo lotes de la persona con sesión; si es de alguien más, 404.
+  const lote = d
+    .prepare("SELECT total_enviados, rechazados FROM lotes WHERE id = ? AND usuario_id = ?")
+    .get(id, usuario.id) as Lote | undefined;
   if (!lote) notFound();
   const imagenes = d
     .prepare(

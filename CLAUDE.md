@@ -8,7 +8,7 @@
 - Lee este archivo completo antes de escribir código. Si una petición contradice las secciones 1–10, avisa antes de actuar.
 - **Nunca inventes** métricas, resultados de entrenamiento, logs ni casos de prueba. Todo número debe venir de una ejecución real.
 - Marca como `SIMULADO` en código, UI y documentación todo lo que no sea real (timbrado, QR del PDF, cualquier "emisión").
-- No incluyas claves, tokens, `.env` ni credenciales. `.env*` y `serviceAccount*.json` van en `.gitignore`.
+- No incluyas claves, tokens, `.env` ni credenciales. `.env*`, `serviceAccount*.json` y `data/` (base SQLite con fotos) van en `.gitignore`.
 - Cálculos fiscales solo en `backend-ia/reglas_fiscales.py`, con pruebas de resultado esperado. El LLM nunca calcula ni inventa claves SAT.
 - Todo lo que la IA interprete debe pasar por la pantalla de revisión antes de guardarse.
 - Los integrantes deben entender y poder explicar el código. Explica tus decisiones brevemente al proponer cambios.
@@ -110,7 +110,7 @@ Al concluir las 24 h: se cierra el registro de entregables; entrenamientos termi
 ## 11. Alcance
 | Prio | Funcionalidad |
 |---|---|
-| P0 | Login con Google → carga por lote → detección + OCR → clasificar (ingreso / egreso / pago) → ¿tiene CFDI? → revisión con confianza → guardar → Tona pide datos faltantes y explica |
+| P0 | Login (local con correo y contraseña; Google opcional) → carga por lote → detección + OCR → clasificar (ingreso / egreso / pago) → ¿tiene CFDI? → revisión con confianza → guardar → Tona pide datos faltantes y explica |
 | P1 | Modo accesibilidad (Tona narra, un ticket a la vez) y modo detalle; conciliación ticket vs SPEI; pre-emisión CFDI 4.0 simulada (XML + PDF) |
 | P2 | Indicador estimado de IVA acreditable; guía de alta ante el SAT; factura global |
 - **Simulado (declarado):** timbrado ante PAC, QR del PDF, cualquier emisión real.
@@ -122,7 +122,7 @@ Al concluir las 24 h: se cierra el registro de entregables; entrenamientos termi
 - Reglas con fuente, periodo, supuestos y casos de prueba.
 
 ## 13. Flujo
-1. Login con Google. 2. Subir N fotos (cola con estado por archivo; un fallo no bloquea el lote). 3. Visión clasifica y detecta regiones; OCR solo sobre recortes. 4. Reglas en código: subtotal + IVA 16 % = total, catálogos SAT por consulta. 5. Tona propone clasificación y categoría, pregunta lo que falta. 6. Revisión humana obligatoria. 7. Confirmar → guardar → (P1) XML/PDF simulado.
+1. Login (local; Google cuando haya credenciales). 2. Subir N fotos (cola con estado por archivo; un fallo no bloquea el lote). 3. Visión clasifica y detecta regiones; OCR solo sobre recortes. 4. Reglas en código: subtotal + IVA 16 % = total, catálogos SAT por consulta. 5. Tona propone clasificación y categoría, pregunta lo que falta. 6. Revisión humana obligatoria. 7. Confirmar → guardar → (P1) XML/PDF simulado.
 - **Ingreso vs egreso:** el usuario configura nombre/RFC de su negocio; si el emisor coincide → ingreso, si no → egreso; si no se lee emisor → Tona pregunta.
 - **¿Tiene CFDI?:** se activa con `uuid_cfdi` o `qr_cfdi` detectados; se informa como "indicios" con confianza.
 
@@ -133,18 +133,25 @@ Al concluir las 24 h: se cierra el registro de entregables; entrenamientos termi
 - **Accesibilidad:** texto grande, alto contraste, botones grandes, Tona narra por voz (`speechSynthesis`, es-MX) y guía un ticket por vez.
 - **Detalle:** tabla de campos, imagen con cajas, confianza por campo, edición masiva.
 
-## 16. Arquitectura (Firebase)
+## 16. Arquitectura (SQLite, sin Firebase)
+> Cambio de plan (20-nov-2026): se reemplazó Firebase por **SQLite + acceso local (correo y contraseña)** para que la app sea portable: un solo archivo de base y ningún servicio externo. El login con Google está programado pero **desactivado** hasta que haya credenciales (`docs/login.md`).
 ```text
-PWA (Next.js + TypeScript + Tailwind, Vercel)
-   ├── Firebase Auth (Google)  ·  Firestore  ·  Cloud Storage for Firebase
-   └── HTTPS + ID token ── Cloudflare Tunnel ── Servidor NGC (FastAPI :8000)
-                                                  ├── POST /vision/analizar
-                                                  └── POST /asistente/chat (stream)
+PWA (Next.js 16 + TypeScript + Tailwind) — servidor Node propio (`pnpm build && pnpm start`)
+   ├── Acceso local: /registro y /entrar (contraseña con scrypt) → sesión en cookie httpOnly
+   │      (opcional: Google OpenID Connect + PKCE, aparece solo si hay credenciales)
+   ├── SQLite (`node:sqlite`, integrado en Node ≥ 22.13) → `data/dzuun.sqlite`: usuarios, sesiones, lotes, imágenes
+   └── Servidor Next.js ── HTTPS + secreto compartido ── Cloudflare Tunnel ── Servidor NGC (FastAPI :8000)
+                                                                          ├── POST /vision/analizar
+                                                                          └── POST /asistente/chat (stream)
 ```
-- **Auth:** Google con `signInWithRedirect` en móvil; agregar el dominio de Vercel a "Authorized domains" en Firebase Auth.
-- **Seguridad:** FastAPI verifica el ID token de Firebase (`firebase-admin`) en cada petición; CORS solo al dominio de la PWA; límite de tamaño de imagen.
-- **Sin Firebase Functions:** la lógica de servidor va en rutas de Next.js (generación CFDI simulado) y en FastAPI. Verificar si Storage requiere plan Blaze en el proyecto.
-- **Firestore:** `users/{uid}`, `users/{uid}/lotes/{id}`, `users/{uid}/operaciones/{id}` (tipo, categoria, total, iva, fecha, folio, tiene_cfdi, uuid, conf_global, estado, campos, imagen_path, createdAt), `.../facturas/{id}`, `.../mensajes/{id}`. Reglas de seguridad: cada usuario solo lee y escribe bajo su `uid`.
+- **Auth (local):** `/registro` crea la cuenta (nombre, correo, contraseña ≥ 8; hash scrypt en `lib/contrasena.ts`) y `/entrar` abre sesión (`app/entrar/acciones.ts`). Mensaje de error genérico y mismo tiempo de respuesta exista o no el correo. Cuenta nueva → `/configurar`; luego → inicio.
+- **Parámetros de ruta:** sin sesión, `proxy.ts` manda a `/entrar?siguiente=<ruta pedida con su query>`; al entrar o registrarse se regresa ahí. `siguienteSeguro()` en `lib/rutas.ts` solo acepta rutas internas (bloquea `https://…`, `//…`, `/\…` y rutas de acceso). Con sesión, `/bienvenida`, `/entrar` y `/registro` saltan al destino. Avisos por `?motivo=caducada|salida`. Los `[id]` dinámicos se validan como UUID y por dueño.
+- **Google (opcional):** `/auth/google` → Google → `/auth/google/callback`, con `state`, PKCE, `nonce`, `iss`, `aud`, `exp` y correo verificado (`lib/google.ts`); si el correo ya tiene cuenta local, se vincula.
+- **Sesiones:** token aleatorio en cookie `dzuun_sesion` (httpOnly, SameSite=Lax, 30 días); en la base solo su sha256. `proxy.ts` hace la revisión rápida; **cada Server Action y ruta con datos valida la sesión** (`usuarioActual()` / `requerirUsuario()` en `lib/sesion.ts`).
+- **Seguridad:** cada persona solo ve sus lotes e imágenes (consulta filtrada por `usuario_id`; si no es suya → 404). El teléfono **no** llama a FastAPI directamente: el servidor Next.js reenvía la petición con un secreto compartido (`BACKEND_TOKEN` en `.env.local`); FastAPI rechaza lo que no lo traiga. CORS cerrado; límite de imagen 10 MB.
+- **Carga de fotos:** `app/subir/acciones.ts` verifica tamaño, tipo real por bytes y sha256 del teléfono (`lib/verificacion.ts`, con pruebas), guarda en una transacción y relee la huella antes de redirigir a `/subir/recibido/[lote]`. Un fallo no bloquea el lote.
+- **Base de datos:** esquema en `lib/esquema.ts`, se crea sola al primer uso; detalles en `db/README.md`. Tablas actuales: `usuarios`, `sesiones`, `lotes`, `imagenes`. Por agregar: `negocios` (nombre, RFC, régimen), `operaciones` (tipo, categoria, total, iva, fecha, folio, tiene_cfdi, uuid, conf_global, estado, campos JSON, imagen_id), `facturas`, `mensajes`.
+- **Despliegue:** no sirve Vercel (su disco es temporal y se perdería la base). Correr en una computadora o servidor del equipo; para probar desde el teléfono con Google hace falta https (túnel), no la IP de la red local.
 - Reglas fiscales y catálogos SAT en código; el modelo propone, el código valida. Nunca emitir sin pantalla de revisión.
 
 ### Contratos de API
@@ -183,9 +190,8 @@ hackathon-nvidia-oaxaca-2026/
 ├── CLAUDE.md   README.md
 ├── docs/            ficha PDF, pruebas de uso, evidencias, declaracion_ia.md,
 │                    prompt-bueno.md (prompts finales de Stitch), prompt-google-stitch.md (versión con análisis de contraste)
-├── frontend-pwa/    Next.js (TS) + Tailwind -> Vercel; Firebase client SDK
-├── backend-ia/      FastAPI: vision_pipeline.py, llm_service.py, reglas_fiscales.py, auth_firebase.py
-├── firebase/        firestore.rules, storage.rules (sin claves)
+├── frontend-pwa/    Next.js (TS) + Tailwind; acceso local + SQLite, Google opcional (lib/, db/README.md, docs/login.md)
+├── backend-ia/      FastAPI: vision_pipeline.py, llm_service.py, reglas_fiscales.py, auth_backend.py (secreto compartido)
 └── training-ngc/
     ├── vision/      dataset train/val/test, train_vision.py, logs/, weights/
     └── asistente/   dataset JSONL, train_qlora.py, test_10_casos.py, logs/, adapters/
@@ -198,15 +204,19 @@ hackathon-nvidia-oaxaca-2026/
 ## 21. Pendientes
 - [ ] Método de acceso al GPU; confirmar si créditos DLI cuentan como servidores proporcionados
 - [ ] `nvidia-smi` funcionando; túnel probado desde la PWA
-- [ ] Proyecto Firebase creado, Google Auth activo, dominio de Vercel autorizado; confirmar si Storage requiere Blaze
-- [ ] Reglas de Firestore/Storage por `uid` desplegadas
+- [x] Base de datos: SQLite en lugar de Firebase (20-nov-2026)
+- [x] Acceso local (correo + contraseña) y sesiones en SQLite, con regreso a la ruta pedida (20-nov-2026)
+- [ ] (Opcional) Activar Google: crear el Client ID, ponerlo en `.env.local` y probar un login real (`docs/login.md`)
+- [ ] Límite de intentos fallidos al entrar y recuperación de contraseña
+- [ ] Guardar en SQLite el negocio de "Configurar" (nombre, RFC, régimen)
+- [ ] FastAPI: exigir `BACKEND_TOKEN` y llamar al backend solo desde el servidor Next.js
 - [ ] Verificar clave 626 y reglas RESICO en fuentes oficiales
 - [x] Nombre de la app: **Dzuun** (19-nov-2026)
 - [ ] Confirmar asistente/mascota **Bisie'** y reemplazar "Tona" en este archivo, dataset y prompts del LLM
 - [ ] Verificar *dzuun* y *bisieꞌ* (escritura y pronunciación) y citar la fuente en la ficha
 - [ ] Verificar los pasos de alta en el SAT de la bienvenida contra la ficha vigente en sat.gob.mx
-- [ ] Elegir herramienta de bocetos → Figma (conectar MCP de Figma si se usará para pasar diseño a código)
-- [ ] Registrar en `docs/declaracion_ia.md` el uso de Claude Code para naming, prompts de Stitch y paleta
+- [x] Bocetos en Figma ("Pantallas Dzuun"), convertidos a vistas de Next.js; MCP de Figma conectado
+- [ ] Registrar en `docs/declaracion_ia.md` el uso de Claude Code para naming, prompts de Stitch, paleta, conversión Figma → código, carga de fotos y login
 - [ ] Declaración de IA firmada
 
 ---

@@ -1,25 +1,9 @@
 /* Piezas pequeñas reutilizadas entre pantallas. */
-import type { ReactNode } from "react";
-import { AppHeader } from "./AppHeader";
-import { BottomNav, type Pestana } from "./BottomNav";
 
 /** Ícono SVG exportado de Figma; respeta su tamaño original. */
 export function Ico({ src, w, h, className = "" }: { src: string; w: number; h: number; className?: string }) {
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={src} alt="" width={w} height={h} className={`block shrink-0 ${className}`} style={{ width: w, height: h }} />;
-}
-
-/** Marco móvil: encabezado fijo + contenido + navegación inferior. */
-export function PantallaApp({ activa, children }: { activa?: Pestana; children: ReactNode }) {
-  return (
-    <>
-      <AppHeader />
-      <main className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col gap-4 bg-fondo px-4 pt-16 pb-24">
-        {children}
-      </main>
-      <BottomNav activa={activa} />
-    </>
-  );
 }
 
 /**

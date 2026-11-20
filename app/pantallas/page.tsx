@@ -4,8 +4,9 @@ import Link from "next/link";
 const pantallas = [
   { n: 1, ruta: "/", nombre: "Inicio", nodo: "1:2" },
   { n: 2, ruta: "/bienvenida", nombre: "Bienvenida y login", nodo: "1:2985" },
-  { n: 2, ruta: "/bienvenida/cargando", nombre: "Bienvenida · cargando Google", nodo: "1:2662" },
   { n: 2, ruta: "/bienvenida/error", nombre: "Bienvenida · error de conexión", nodo: "1:2819" },
+  { n: 2, ruta: "/entrar", nombre: "Entrar (correo y contraseña)", nodo: "—" },
+  { n: 2, ruta: "/registro", nombre: "Crear cuenta", nodo: "—" },
   { n: 3, ruta: "/configurar", nombre: "Configurar negocio", nodo: "1:475" },
   { n: 4, ruta: "/subir", nombre: "Subir lote", nodo: "1:632" },
   { n: 5, ruta: "/revision/detalle", nombre: "Revisión · modo detalle", nodo: "1:869" },

@@ -19,6 +19,13 @@ export function db(): DatabaseSync {
     const d = new DatabaseSync(RUTA);
     d.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
     d.exec(ESQUEMA);
+    // CREATE TABLE IF NOT EXISTS no modifica tablas viejas: si la base es de una versión
+    // anterior del esquema, avisamos claro en lugar de fallar con errores raros al insertar.
+    const columnas = (d.prepare("PRAGMA table_info(usuarios)").all() as { name: string }[]).map((c) => c.name);
+    if (!columnas.includes("hash_contrasena")) {
+      d.close();
+      throw new Error(`La base ${RUTA} es de un esquema anterior. En desarrollo, borra la carpeta data/ y reinicia.`);
+    }
     global.__dzuunDb = d;
   }
   return global.__dzuunDb;

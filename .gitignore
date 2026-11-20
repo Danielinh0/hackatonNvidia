@@ -45,3 +45,4 @@ serviceAccount*.json
 
 # base de datos SQLite local (contiene las fotos subidas)
 /data/
+docs/login.md

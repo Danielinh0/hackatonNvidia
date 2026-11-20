@@ -3,13 +3,14 @@
 import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { usuarioActual } from "@/lib/sesion";
 import { MAX_ARCHIVOS, MAX_LOTE_BYTES, sha256Hex, verificarArchivo, type TipoPermitido } from "@/lib/verificacion";
 
 /*
  * Recibe un lote de fotos, comprueba cada archivo, guarda los válidos en SQLite,
  * relee los bytes guardados para confirmar que quedaron íntegros y redirige a la
  * pantalla de confirmación.
- * Pendiente: verificar el ID token de Firebase cuando exista el login (CLAUDE.md sec. 16).
+ * Exige sesión válida: el lote queda a nombre de la persona (CLAUDE.md sec. 16).
  */
 
 export type EstadoSubida = { error: string | null; rechazados: { nombre: string; motivo: string }[] };
@@ -17,6 +18,10 @@ export type EstadoSubida = { error: string | null; rechazados: { nombre: string;
 type Aceptado = { nombre: string; tipo: TipoPermitido; sha256: string; huellaCliente: boolean; bytes: Uint8Array };
 
 export async function subirLote(_prev: EstadoSubida, form: FormData): Promise<EstadoSubida> {
+  // Se valida aquí (no basta el proxy): las Server Actions se pueden llamar directamente.
+  const usuario = await usuarioActual();
+  if (!usuario) return { error: "Tu sesión terminó. Vuelve a entrar.", rechazados: [] };
+
   const archivos = form.getAll("archivos").filter((a): a is File => a instanceof File && a.name !== "");
   const huellas = form.getAll("sha256").map(String);
   const tamanos = form.getAll("tamano").map(Number);
@@ -50,8 +55,9 @@ export async function subirLote(_prev: EstadoSubida, form: FormData): Promise<Es
 
   try {
     d.exec("BEGIN IMMEDIATE");
-    d.prepare("INSERT INTO lotes (id, total_enviados, rechazados) VALUES (?, ?, ?)").run(
+    d.prepare("INSERT INTO lotes (id, usuario_id, total_enviados, rechazados) VALUES (?, ?, ?, ?)").run(
       loteId,
+      usuario.id,
       archivos.length,
       JSON.stringify(rechazados),
     );
