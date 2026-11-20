@@ -1,0 +1,10 @@
+TLAPALERIA EL SOL
+Nota  de venta  14199
+Fecha:  2026-07-02   08:42:47
+Subtotal   $ 2720.69
+Iva $   435.31
+Total  $ 3156.00
+Forma pago: TARJETA   DEBITO
+TARJ ****  3457    AUT 968708
+MONEDA: MXN
+Gracias por su visita

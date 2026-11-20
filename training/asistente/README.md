@@ -3,6 +3,51 @@
 > Todo número de este archivo sale de una ejecución real (archivo o log indicado al lado).
 > Lo marcado **PENDIENTE** se llena al terminar la corrida, copiando de `logs/<corrida>/registro.json`. No se estima ni se redondea a mano.
 
+## 0. Guía rápida: correr el modelo en tu laptop
+Para quien va a correr el asistente en la laptop con la RTX 4050 (Linux). No necesitas entrenar nada: solo cargas el modelo base y le pegas el adaptador que se entrenó en el servidor.
+
+**Necesitas:** GPU NVIDIA con driver instalado (`nvidia-smi` debe responder), ~20 GB libres en disco e internet para la primera descarga.
+
+```bash
+# 1) Código actualizado
+cd ~/Documentos/git/hackatonNvidia        # tu copia del repo
+git pull
+
+# 2) Entorno con Python 3.12 (NO 3.14: tokenizers no instala)
+pip install uv                             # si falla: curl -LsSf https://astral.sh/uv/install.sh | sh
+cd backend-ia && rm -rf .venv
+uv venv --python 3.12 && source .venv/bin/activate
+uv pip install torch transformers==4.46.3 peft==0.13.2 bitsandbytes accelerate
+python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"   # debe decir True y la RTX 4050
+
+# 3) Adaptador: copia el .tgz (USB/Drive) a training/asistente y descomprímelo
+cd ../training/asistente
+tar xzf prueba_adaptador.tgz               # crea adapters/prueba/
+ls adapters/prueba                         # adapter_config.json, adapter_model.safetensors
+
+# 4) Correr el modelo
+python leer.py adapters/prueba ejemplos/ticket_ejemplo.txt    # lee un ticket de ejemplo
+python leer.py adapters/prueba                                # interactivo: pega texto, FIN, Enter
+python probar.py adapters/prueba                              # 3 casos de test vs. respuesta esperada
+```
+
+- **La primera vez** se descargan ~15 GB del modelo base desde Hugging Face a `~/.cache/huggingface`; luego ya no.
+- **Cada vez que abras una terminal nueva**, activa el entorno con `source ~/Documentos/git/hackatonNvidia/backend-ia/.venv/bin/activate`.
+- **Al terminar la época** te pasan `epoca1_adaptador.tgz`: lo descomprimes igual y usas `adapters/epoca1` en lugar de `adapters/prueba`.
+- **Para comparar con el modelo sin ajuste:** `python leer.py base ejemplos/ticket_ejemplo.txt`.
+
+**Qué esperar:** `leer.py` imprime el JSON, los segundos que tardó y la memoria de GPU usada. Con `ejemplos/ticket_ejemplo.txt` (es test-00000), el adaptador `prueba` dio en el servidor `Folio "14199"`, `Total "3156.00"`, `FormaPagoLeida "TARJETA DEBITO"` y `FormaPago "AUTO"`.
+
+| Si sale… | Qué hacer |
+|---|---|
+| `Failed building wheel for tokenizers` | Estás en Python 3.14: repite el paso 2 |
+| `False` en la prueba de `torch.cuda` | Falta el driver NVIDIA o se instaló torch sin CUDA: `uv pip install --reinstall torch` |
+| `No encuentro adapters/.../adapter_config.json` | No descomprimiste el `.tgz` dentro de `training/asistente/` |
+| `CUDA out of memory` | No cabe en 6 GB: cierra otros programas que usen la GPU (`nvidia-smi`) y reintenta; si sigue, plan B en la sec. 9 |
+| `⚠ El modelo no devolvió un JSON válido` | Es un resultado real del modelo: guárdalo y avisa, no lo corrijas a mano |
+
+Anota en la sec. 9 lo que salga (memoria, segundos por ticket, si coincide con el servidor).
+
 ## 1. Objetivo del asistente
 El asistente lee el **texto que entrega el OCR** de un ticket, una factura impresa u otro papel y responde **solo un JSON con forma CFDI 4.0** (el contrato de `frontend-pwa/lib/cfdi.ts`, CLAUDE.md sec. 16). Es la tarea (a) de la sec. 17.
 
@@ -134,22 +179,15 @@ El **entrenamiento** se hace en el servidor DLI (sec. 5). La **inferencia** (ser
 **Ojo con la memoria:** el 7B en NF4 ocupa ~5.5 GB (las capas cuantizadas más `embed_tokens` y `lm_head` en fp16) más ~0.5 GB de contexto CUDA. En 6 GB va muy justo. Es una estimación, no una medición: la cifra real la imprime `probar.py`.
 
 ### Pasos
-1. **Código:** `git pull` (trae `probar.py`, este README y el dataset de test).
-2. **Adaptador:** descargar `prueba_adaptador.tgz` del servidor (JupyterLab → `/dli/task/asistente` → clic derecho → Download), pasarlo por USB o Drive y descomprimirlo dentro de `training/asistente/` con `tar xzf prueba_adaptador.tgz`. Queda en `adapters/prueba/`. Al terminar la época, hacer lo mismo con `adapters/epoca1` (`tar czf epoca1_adaptador.tgz adapters/epoca1`).
-3. **Dependencias:** las mismas versiones que en el servidor, para que el resultado sea comparable, en un entorno con **Python 3.12**. Con Python 3.14, `transformers==4.46.3` pide `tokenizers` 0.20, que no trae rueda para 3.14 y su compilación falla (PyO3 admite hasta 3.13):
-   ```bash
-   pip install uv                       # o: curl -LsSf https://astral.sh/uv/install.sh | sh
-   cd backend-ia && rm -rf .venv
-   uv venv --python 3.12 && source .venv/bin/activate
-   uv pip install torch transformers==4.46.3 peft==0.13.2 bitsandbytes accelerate
-   ```
-   La primera corrida descarga el modelo base de Hugging Face (~15 GB).
-4. **Prueba:**
-   ```bash
-   cd training/asistente
-   python probar.py adapters/prueba        # 3 casos
-   ```
-5. **Qué anotar aquí** (de la salida real de `probar.py` y de `logs/probar/*.jsonl`): memoria máx. usada, segundos por caso y si da el **mismo resultado que en el servidor** en los mismos 3 casos.
+Los comandos están en la **sec. 0**. Notas:
+- **De dónde sale el adaptador:** en el servidor (JupyterLab → `/dli/task/asistente`) se empaqueta con `tar czf <corrida>_adaptador.tgz adapters/<corrida>`, se descarga con clic derecho → Download y se pasa por USB o Drive.
+- **Por qué Python 3.12:** se instalan las mismas versiones que en el servidor para que el resultado sea comparable. Con Python 3.14, `transformers==4.46.3` pide `tokenizers` 0.20, que no trae rueda para 3.14, y su compilación falla (PyO3 admite hasta 3.13).
+
+### Resultados en la laptop (llenar con la salida real)
+| Corrida | Memoria máx. (GB) | s/ticket | ¿Igual que en el servidor (test-00000..02)? |
+|---|---|---|---|
+| prueba | **PENDIENTE** | **PENDIENTE** | **PENDIENTE** |
+| epoca1 | **PENDIENTE** | **PENDIENTE** | **PENDIENTE** |
 
 ### Si no cabe (`CUDA out of memory`)
 - No mandar capas a la CPU con transformers: de minutos por ticket.
