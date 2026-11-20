@@ -51,8 +51,9 @@ registrar() {
 }
 
 tao_cmd() {
-  # TAO 5.x usa `tao model <tarea>`; se detecta por si el launcher instalado usa la forma antigua.
-  if tao model --help >/dev/null 2>&1; then echo "tao model"; else echo "tao"; fi
+  # `tao info --verbose` en el lab (TAO 5.5.0): entrenar/evaluar/exportar están en el grupo `model`
+  # (imagen 5.5.0-pyt) y gen_trt_engine de ocdnet/ocrnet en `deploy` (imagen 5.5.0-deploy).
+  echo "tao ${GRUPO:-model}"
 }
 
 monitor_gpu() {
@@ -252,7 +253,9 @@ exportar() {
   correr export_ocdnet ocdnet export
   correr export_ocrnet ocrnet export
   if [ "${1:-}" = "--trt" ]; then
-    correr trt_ocrnet ocrnet gen_trt_engine
+    # Las claves de gen_trt_engine vienen del esquema de tao_pytorch_backend; el contenedor deploy podría
+    # pedir otras. Si falla, no afecta a los pesos ya exportados.
+    GRUPO=deploy TOLERAR=1 correr trt_ocrnet ocrnet gen_trt_engine
   fi
 }
 
