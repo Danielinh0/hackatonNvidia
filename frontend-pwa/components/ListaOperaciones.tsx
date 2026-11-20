@@ -21,7 +21,7 @@ export type Operacion = {
   porRevisar?: boolean;
   simulado?: boolean;
   href: string;
-  /** Solo en ventas confirmadas: datos del botón de pre-factura (lib/prefactura.ts). */
+  /** Solo en ventas: estado de la pre-factura (disponible o qué falta; lib/prefactura.ts). */
   prefactura?: { bloqueo: Bloqueo | null; factura: FacturaGuardada | null; cp: string | null; formaPago: string | null };
   icono: { src: string; w: number; h: number; bg: string };
 };

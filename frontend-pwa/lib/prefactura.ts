@@ -62,29 +62,33 @@ export function datosPrefactura(d: DatabaseSync, usuarioId: string, comprobanteI
   );
 }
 
-export type Bloqueo = { motivo: string; accion: "revisar" | "configurar" | null };
+/** Un dato pendiente para poder facturar y la pantalla donde se completa. */
+export type Pendiente = { dato: string; accion: "revisar" | "configurar" };
 
-/** ¿Se puede generar? Devuelve por qué no (con la pantalla que lo resuelve) o null si sí. */
+/**
+ * motivo: texto corto. accion: la pantalla del primer pendiente.
+ * faltan: TODO lo que falta (para la etiqueta "Para facturar falta…").
+ * noAplica: el documento nunca se factura desde aquí (compra, pago o no se leyó).
+ */
+export type Bloqueo = { motivo: string; accion: "revisar" | "configurar" | null; faltan: Pendiente[]; noAplica?: boolean };
+
+/** ¿Se puede generar? Devuelve todo lo que falta (con la pantalla que lo resuelve) o null si ya está disponible. */
 export function bloqueoPrefactura(c: DatosPrefactura): Bloqueo | null {
-  if (c.estado === "error") return { motivo: "Este documento no se pudo leer.", accion: null };
-  if (c.estado !== "confirmado") {
-    return { motivo: "Primero revisa y confirma lo que leímos. Solo se factura lo que tú revisaste.", accion: "revisar" };
+  if (c.estado === "error") return { motivo: "Este documento no se pudo leer.", accion: null, faltan: [], noAplica: true };
+  if (c.clasificacion === "egreso" || c.clasificacion === "pago") {
+    return { motivo: "Solo se facturan tus ventas. Este documento quedó como compra o pago.", accion: "revisar", faltan: [], noAplica: true };
   }
-  if (c.clasificacion !== "ingreso") {
-    return { motivo: "Solo se facturan tus ventas. Este documento quedó como compra o pago.", accion: "revisar" };
-  }
-  if (!c.negocio_rfc || !c.negocio_regimen) {
-    return { motivo: "Configura el RFC y régimen de tu negocio para facturar.", accion: "configurar" };
-  }
-  const faltan = [
-    !c.subtotal && "subtotal",
-    !c.total_traslados && "IVA",
-    !c.total && "total",
-  ].filter(Boolean);
-  if (faltan.length) {
-    return { motivo: `Falta ${faltan.join(", ")} en la revisión. Lo copiamos del ticket; no lo calculamos.`, accion: "revisar" };
-  }
-  return null;
+  const faltan: Pendiente[] = [];
+  if (c.estado !== "confirmado") faltan.push({ dato: "confirmar la revisión", accion: "revisar" });
+  if (c.clasificacion !== "ingreso") faltan.push({ dato: "marcarlo como venta", accion: "revisar" });
+  // Se copian del ticket revisado; no se calculan (CLAUDE.md sec. 0).
+  if (!c.subtotal) faltan.push({ dato: "subtotal", accion: "revisar" });
+  if (!c.total_traslados) faltan.push({ dato: "IVA", accion: "revisar" });
+  if (!c.total) faltan.push({ dato: "total", accion: "revisar" });
+  if (!c.negocio_rfc) faltan.push({ dato: "RFC de tu negocio", accion: "configurar" });
+  if (!c.negocio_regimen) faltan.push({ dato: "régimen fiscal de tu negocio", accion: "configurar" });
+  if (!faltan.length) return null;
+  return { motivo: `Para facturar falta: ${faltan.map((f) => f.dato).join(", ")}.`, accion: faltan[0].accion, faltan };
 }
 
 /** Tasa del catálogo con la que IVA = subtotal × tasa (a 2 decimales). null si ninguna cuadra. */

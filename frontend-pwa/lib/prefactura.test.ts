@@ -26,6 +26,17 @@ test("solo se factura lo confirmado, y solo si es venta", () => {
   assert.equal(bloqueoPrefactura(LISTO), null);
 });
 
+test("la etiqueta lista todo lo que falta, no solo lo primero", () => {
+  const b = bloqueoPrefactura({ ...LISTO, estado: "por_revisar", total_traslados: null, negocio_rfc: null, negocio_regimen: null })!;
+  assert.deepEqual(b.faltan.map((f) => f.dato), ["confirmar la revisión", "IVA", "RFC de tu negocio", "régimen fiscal de tu negocio"]);
+  assert.equal(b.accion, "revisar");
+  assert.equal(b.noAplica, undefined);
+  // Compras, pagos y documentos ilegibles no se facturan aquí: no hay "faltantes" que completar.
+  assert.equal(bloqueoPrefactura({ ...LISTO, clasificacion: "pago" })!.noAplica, true);
+  assert.equal(bloqueoPrefactura({ ...LISTO, estado: "error" })!.noAplica, true);
+  assert.deepEqual(bloqueoPrefactura({ ...LISTO, clasificacion: null })!.faltan.map((f) => f.dato), ["marcarlo como venta"]);
+});
+
 test("tasa de IVA: la del catálogo que cuadra exacto, o null", () => {
   assert.equal(tasaIva("2150.00", "344.00"), "0.160000");
   assert.equal(tasaIva("100.00", "8.00"), "0.080000");

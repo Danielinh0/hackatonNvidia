@@ -47,36 +47,73 @@ function Descargas({ f }: { f: FacturaGuardada }) {
   );
 }
 
+/** Etiqueta de estado (color + icono + palabra, CLAUDE.md sec. 22): la pre-factura ya se puede generar. */
+function Disponible() {
+  return (
+    <p role="status" className="flex items-center gap-1.5 self-start rounded-full bg-[#1e8e4e] px-3 py-1 text-xs leading-4 font-bold text-white">
+      <span aria-hidden>✓</span> Factura disponible
+    </p>
+  );
+}
+
+/** Etiqueta de lo que falta para facturar, con el enlace a la pantalla donde se completa. */
+function Faltantes({ bloqueo, comprobanteId }: { bloqueo: Bloqueo; comprobanteId: string }) {
+  const revisar = bloqueo.faltan.some((f) => f.accion === "revisar");
+  const configurar = bloqueo.faltan.some((f) => f.accion === "configurar");
+  return (
+    <div role="status" className="flex flex-col gap-2 rounded-2xl bg-[#fef3c7] p-3 text-xs leading-4 text-[#92400e]">
+      <p className="flex items-center gap-1.5 font-bold">
+        <span aria-hidden className="flex size-4 items-center justify-center rounded-full bg-[#f2a900] text-[10px] text-tinta">!</span>
+        Para facturar falta:
+      </p>
+      <ul className="flex flex-wrap gap-1.5">
+        {bloqueo.faltan.map((f) => (
+          <li key={f.dato} className="rounded-full bg-white px-2.5 py-0.5 font-bold text-tinta">{f.dato}</li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {revisar && <Link href={`/revision/sencillo?id=${comprobanteId}`} className="font-bold text-azul underline">Revisar este ticket</Link>}
+        {configurar && <Link href="/configurar" className="font-bold text-azul underline">Configurar mi negocio</Link>}
+      </div>
+    </div>
+  );
+}
+
 export function BotonPrefactura({ comprobanteId, loteId, compacto = false, bloqueo, factura, cpSugerido, formaPagoSugerida }: Props) {
   const [estado, accion, enviando] = useActionState<EstadoPrefactura, FormData>(generarPrefactura, { errores: [], factura });
   const [abierto, setAbierto] = useState(!compacto);
 
   if (estado.factura) return <Descargas f={estado.factura} />;
 
-  if (bloqueo) {
+  if (bloqueo?.noAplica) {
     return (
       <div className="flex flex-col gap-2 rounded-2xl bg-fondo p-3 text-xs leading-4 text-tinta-suave">
         <p><b className="text-tinta">Pre-factura (SIMULADO):</b> {bloqueo.motivo}</p>
         {bloqueo.accion === "revisar" && (
           <Link href={`/revision/sencillo?id=${comprobanteId}`} className="font-bold text-azul underline">Revisar este ticket</Link>
         )}
-        {bloqueo.accion === "configurar" && <Link href="/configurar" className="font-bold text-azul underline">Configurar mi negocio</Link>}
       </div>
     );
   }
 
+  if (bloqueo) return <Faltantes bloqueo={bloqueo} comprobanteId={comprobanteId} />;
+
   if (!abierto) {
     return (
-      <button type="button" onClick={() => setAbierto(true)}
-        className="flex h-11 items-center justify-center rounded-full bg-azul-50 text-sm font-bold text-azul">
-        Generar pre-factura PDF (SIMULADO)
-      </button>
+      <div className="flex flex-col gap-2">
+        <Disponible />
+        <button type="button" onClick={() => setAbierto(true)}
+          className="flex h-11 items-center justify-center rounded-full bg-azul-50 text-sm font-bold text-azul">
+          Generar pre-factura PDF (SIMULADO)
+        </button>
+      </div>
     );
   }
 
   const forma = formaPagoSugerida && formaPagoSugerida in FORMA_PAGO ? formaPagoSugerida : "";
   return (
     <form action={accion} className="flex flex-col gap-2 rounded-2xl bg-fondo p-3">
+      <Disponible />
       <input type="hidden" name="comprobante" value={comprobanteId} />
       {loteId && <input type="hidden" name="lote" value={loteId} />}
       <p className="text-xs leading-4 text-tinta-suave">

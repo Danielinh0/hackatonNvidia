@@ -31,13 +31,15 @@ function grupo(fecha: string, hoy: string, ayer: string) {
   return fechaLarga(fecha);
 }
 
-/** Botón de pre-factura solo en ventas confirmadas: una compra la factura quien te vendió. */
+/** Pre-factura solo en ventas (una compra la factura quien te vendió); si falta algo, la etiqueta dice qué. */
 function prefacturaDe(d: DatabaseSync, usuarioId: string, f: Fila): Operacion["prefactura"] {
-  if (f.estado !== "confirmado" || f.clasificacion !== "ingreso") return undefined;
+  // Ventas (confirmadas o propuestas por RFC): si aún falta algo, la etiqueta dice qué.
+  if (f.clasificacion !== "ingreso") return undefined;
   const datos = datosPrefactura(d, usuarioId, f.id);
   if (!datos) return undefined;
   return {
-    bloqueo: bloqueoPrefactura(datos),
+    // La clasificación propuesta cuenta para la etiqueta; al generar, el servidor exige la confirmada.
+    bloqueo: bloqueoPrefactura({ ...datos, clasificacion: datos.clasificacion ?? f.clasificacion }),
     factura: facturaDeComprobante(d, usuarioId, f.id),
     cp: datos.lugar_expedicion,
     formaPago: datos.forma_pago,
