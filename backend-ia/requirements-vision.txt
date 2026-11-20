@@ -1,0 +1,10 @@
+# Solo visión (app_vision.py u OCDNet + OCRNet dentro de app.py). Corre en CPU, sin GPU.
+# torch desde el índice CPU para no bajar CUDA:
+#   pip install -r requirements-vision.txt --extra-index-url https://download.pytorch.org/whl/cpu
+fastapi==0.115.6
+uvicorn==0.32.1
+python-multipart==0.0.20
+torch>=2.1
+numpy>=1.26
+opencv-python-headless>=4.8
+onnxruntime>=1.17

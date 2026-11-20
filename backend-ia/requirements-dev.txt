@@ -1,0 +1,4 @@
+# Solo para correr las pruebas (tests/). No hace falta GPU ni el modelo.
+-r requirements.txt
+pytest==8.3.4
+httpx==0.28.1

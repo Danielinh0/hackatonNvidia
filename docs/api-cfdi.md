@@ -39,6 +39,9 @@ FACTURAMA_USUARIO=...            # nunca se sube al repo
 FACTURAMA_PASSWORD=...
 ```
 
+## Desde la app: botón de pre-factura
+`/subir/recibido/[id]` tiene un botón por comprobante que usa esta API desde el servidor (`app/facturas/acciones.ts`): `POST /api/cfdi`, luego `GET /api/cfdi/{id}/pdf` y `/xml`, y guarda ambos archivos en SQLite (`facturas`). La persona los abre en `/facturas/{id}/pdf` y `/facturas/{id}/xml`. Solo se habilita con el comprobante confirmado como venta. Si la API corre en otra dirección, `CFDI_API_URL=http://…` (por defecto, el mismo servidor de Next.js).
+
 ## Endpoints
 
 | Método | Ruta | Qué hace | Respuestas |

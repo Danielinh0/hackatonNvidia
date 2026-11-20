@@ -1,0 +1,9 @@
+[
+  {
+    "id": "C6",
+    "nombre": "Servicio de IA apagado",
+    "esperado": "Mensaje de error de conexión, sin datos inventados",
+    "obtenido": "No pudimos conectar con el servicio de análisis.",
+    "ok": true
+  }
+]

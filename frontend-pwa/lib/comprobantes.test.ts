@@ -61,10 +61,11 @@ test("detecta duplicados por huella y solo muestra lotes propios", () => {
     loteId: "l1",
     usuarioId: "u1",
     archivo,
-    analisis: { ok: true, cfdi: l.cfdi, faltantes: l.faltantes, json: CFDI_EJEMPLO, confGlobal: null, simulado: true },
+    analisis: { ok: true, cfdi: l.cfdi, faltantes: l.faltantes, json: CFDI_EJEMPLO, confGlobal: null, simulado: true, simuladoPartes: ["vision"] },
   });
   assert.equal(yaSubido(d, "u1", archivo.sha256), true);
   assert.equal(yaSubido(d, "u2", archivo.sha256), false);
   assert.equal(comprobantesDeLote(d, "l1", "u1").length, 1);
+  assert.equal(comprobantesDeLote(d, "l1", "u1")[0].simulado_partes, '["vision"]');
   assert.equal(comprobantesDeLote(d, "l1", "u2").length, 0);
 });

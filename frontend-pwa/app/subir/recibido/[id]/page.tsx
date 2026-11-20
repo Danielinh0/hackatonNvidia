@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { comprobantesDeLote, type ResumenComprobante } from "@/lib/comprobantes";
+import { bloqueoPrefactura, datosPrefactura, facturaDeComprobante, type Bloqueo, type DatosPrefactura, type FacturaGuardada } from "@/lib/prefactura";
 import { db, esUuid } from "@/lib/db";
 import { requerirUsuario } from "@/lib/sesion";
+import { etiquetaSimulado } from "@/lib/simulado";
+import { BotonPrefactura } from "@/components/BotonPrefactura";
 import { FotoLocal } from "@/components/FotoLocal";
 import { Ico } from "@/components/ui";
 
@@ -42,7 +45,9 @@ function Dato({ etiqueta, valor }: { etiqueta: string; valor: string | null }) {
   );
 }
 
-function Tarjeta({ c }: { c: ResumenComprobante }) {
+type Prefactura = { datos: DatosPrefactura | null; bloqueo: Bloqueo | null; factura: FacturaGuardada | null };
+
+function Tarjeta({ c, loteId, pf }: { c: ResumenComprobante; loteId: string; pf: Prefactura }) {
   const faltantes = JSON.parse(c.faltantes) as string[];
   return (
     <li className="flex flex-col gap-3 rounded-[32px] bg-white p-4 shadow-tarjeta">
@@ -68,7 +73,7 @@ function Tarjeta({ c }: { c: ResumenComprobante }) {
               Datos leídos y guardados
             </span>
             {c.analisis_simulado === 1 && (
-              <span className="rounded-full bg-[#fef3c7] px-2.5 py-0.5 text-[#92400e]">SIMULADO · no lo leyó el modelo</span>
+              <span className="rounded-full bg-[#fef3c7] px-2.5 py-0.5 text-[#92400e]">{etiquetaSimulado(c.simulado_partes)}</span>
             )}
             {c.huella_cliente === 0 && (
               <span className="rounded-full bg-[#fef3c7] px-2.5 py-0.5 text-[#92400e]">Sin huella del teléfono (conexión no segura)</span>
@@ -83,7 +88,8 @@ function Tarjeta({ c }: { c: ResumenComprobante }) {
             <Dato etiqueta="Total" valor={c.total ? dinero(c.total, c.moneda) : null} />
           </dl>
           <p className="text-xs leading-4 font-semibold text-tinta-suave">
-            {c.conceptos === 1 ? "1 concepto" : `${c.conceptos} conceptos`} · Falta tu revisión antes de confirmar.
+            {c.conceptos === 1 ? "1 concepto" : `${c.conceptos} conceptos`} ·{" "}
+            {c.estado === "confirmado" ? "Revisado y confirmado." : "Falta tu revisión antes de confirmar."}
           </p>
           {faltantes.length > 0 && (
             <div className="flex flex-col gap-1 rounded-2xl bg-[#fef3c7] px-3 py-2 text-xs leading-4 text-[#92400e]">
@@ -91,6 +97,14 @@ function Tarjeta({ c }: { c: ResumenComprobante }) {
               <p>{faltantes.map((f) => NOMBRE_CAMPO[f] ?? f).join(" · ")}</p>
             </div>
           )}
+          <BotonPrefactura
+            comprobanteId={c.id}
+            loteId={loteId}
+            bloqueo={pf.bloqueo}
+            factura={pf.factura}
+            cpSugerido={pf.datos?.lugar_expedicion ?? null}
+            formaPagoSugerida={pf.datos?.forma_pago ?? null}
+          />
         </>
       )}
     </li>
@@ -110,6 +124,13 @@ async function Recibido({ params }: { params: Promise<{ id: string }> }) {
     .get(id, usuario.id) as Lote | undefined;
   if (!lote) notFound();
   const comprobantes = comprobantesDeLote(d, id, usuario.id);
+  // Pre-factura por comprobante: solo se puede si ya se revisó y confirmó como venta (lib/prefactura.ts).
+  const prefacturas = new Map<string, Prefactura>(
+    comprobantes.map((c) => {
+      const datos = datosPrefactura(d, usuario.id, c.id);
+      return [c.id, { datos, bloqueo: datos ? bloqueoPrefactura(datos) : null, factura: facturaDeComprobante(d, usuario.id, c.id) }];
+    }),
+  );
 
   const rechazados = JSON.parse(lote.rechazados) as { nombre: string; motivo: string }[];
   const leidos = comprobantes.filter((c) => c.estado !== "error").length;
@@ -135,7 +156,7 @@ async function Recibido({ params }: { params: Promise<{ id: string }> }) {
 
       <ul className="flex flex-col gap-3">
         {comprobantes.map((c) => (
-          <Tarjeta key={c.id} c={c} />
+          <Tarjeta key={c.id} c={c} loteId={id} pf={prefacturas.get(c.id)!} />
         ))}
       </ul>
 

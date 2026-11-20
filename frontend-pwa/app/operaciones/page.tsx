@@ -7,7 +7,9 @@ import { Ico } from "@/components/ui";
 import { db } from "@/lib/db";
 import { diaDe, dinero, fechaLarga, mesActual, nombreMes } from "@/lib/formato";
 import { listarOperaciones, resumenMes, type Operacion as Fila, type ResumenMes } from "@/lib/operaciones";
+import { bloqueoPrefactura, datosPrefactura, facturaDeComprobante } from "@/lib/prefactura";
 import { requerirUsuario } from "@/lib/sesion";
+import type { DatabaseSync } from "node:sqlite";
 
 /*
  * Pantalla 8 · Operaciones (Figma 1:1421) con los comprobantes reales de SQLite (por revisar y confirmados).
@@ -27,6 +29,19 @@ function grupo(fecha: string, hoy: string, ayer: string) {
   if (dia === hoy) return `Hoy • ${fechaLarga(fecha)}`;
   if (dia === ayer) return `Ayer • ${fechaLarga(fecha)}`;
   return fechaLarga(fecha);
+}
+
+/** Botón de pre-factura solo en ventas confirmadas: una compra la factura quien te vendió. */
+function prefacturaDe(d: DatabaseSync, usuarioId: string, f: Fila): Operacion["prefactura"] {
+  if (f.estado !== "confirmado" || f.clasificacion !== "ingreso") return undefined;
+  const datos = datosPrefactura(d, usuarioId, f.id);
+  if (!datos) return undefined;
+  return {
+    bloqueo: bloqueoPrefactura(datos),
+    factura: facturaDeComprobante(d, usuarioId, f.id),
+    cp: datos.lugar_expedicion,
+    formaPago: datos.forma_pago,
+  };
 }
 
 function aVista(f: Fila, hoy: string, ayer: string): Operacion {
@@ -71,7 +86,7 @@ async function Contenido() {
   const ahora = new Date();
   const hoy = diaDe(ahora.toISOString());
   const ayer = diaDe(new Date(ahora.getTime() - 86_400_000).toISOString());
-  const ops = listarOperaciones(d, u.id).map((f) => aVista(f, hoy, ayer));
+  const ops = listarOperaciones(d, u.id).map((f) => ({ ...aVista(f, hoy, ayer), prefactura: prefacturaDe(d, u.id, f) }));
   const r = resumenMes(d, u.id, mes);
 
   return (

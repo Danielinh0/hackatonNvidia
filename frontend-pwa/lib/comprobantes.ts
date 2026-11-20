@@ -6,6 +6,7 @@
 import { randomUUID } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
 import { aCentavos, type Cfdi } from "./cfdi.ts";
+import type { ParteSimulada } from "./simulado.ts";
 
 export type Archivo = {
   origen: "camara" | "archivo";
@@ -17,7 +18,7 @@ export type Archivo = {
 };
 
 export type Analisis =
-  | { ok: true; cfdi: Cfdi; faltantes: string[]; json: unknown; confGlobal: number | null; simulado: boolean }
+  | { ok: true; cfdi: Cfdi; faltantes: string[]; json: unknown; confGlobal: number | null; simulado: boolean; simuladoPartes?: ParteSimulada[] | null }
   | { ok: false; motivo: string };
 
 /** Inserta un comprobante con sus conceptos e impuestos. Llamar dentro de una transacción. */
@@ -40,15 +41,16 @@ export function guardarComprobante(
   d.prepare(
     `INSERT INTO comprobantes (
        id, lote_id, usuario_id, origen, nombre_archivo, tipo_mime, tamano_bytes, sha256, huella_cliente,
-       analisis_simulado, json_modelo, faltantes, conf_global,
+       analisis_simulado, simulado_partes, json_modelo, faltantes, conf_global,
        version, serie, folio, fecha, forma_pago, metodo_pago, moneda, tipo_comprobante, exportacion, lugar_expedicion,
        subtotal, descuento, total, total_centavos, total_traslados, total_retenciones, uuid_cfdi,
        emisor_rfc, emisor_nombre, emisor_regimen,
        receptor_rfc, receptor_nombre, receptor_cp, receptor_regimen, receptor_uso_cfdi)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?,  ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?,  ?, ?, ?,  ?, ?, ?, ?, ?)`,
   ).run(
     ...base,
     analisis.simulado ? 1 : 0,
+    analisis.simuladoPartes ? JSON.stringify(analisis.simuladoPartes) : null,
     JSON.stringify(analisis.json),
     JSON.stringify(analisis.faltantes),
     analisis.confGlobal,
@@ -98,6 +100,7 @@ export type ResumenComprobante = {
   estado: "por_revisar" | "confirmado" | "descartado" | "error";
   error: string | null;
   analisis_simulado: number;
+  simulado_partes: string | null;
   faltantes: string;
   fecha: string | null;
   serie: string | null;
@@ -117,7 +120,7 @@ export function comprobantesDeLote(d: DatabaseSync, loteId: string, usuarioId: s
   return d
     .prepare(
       `SELECT c.id, c.origen, c.nombre_archivo, c.tipo_mime, c.tamano_bytes, c.sha256, c.huella_cliente, c.estado, c.error,
-              c.analisis_simulado, c.faltantes, c.fecha, c.serie, c.folio, c.total, c.moneda,
+              c.analisis_simulado, c.simulado_partes, c.faltantes, c.fecha, c.serie, c.folio, c.total, c.moneda,
               c.emisor_nombre, c.emisor_rfc, c.receptor_nombre, c.receptor_rfc, c.total_traslados,
               (SELECT count(*) FROM conceptos k WHERE k.comprobante_id = c.id) AS conceptos
          FROM comprobantes c

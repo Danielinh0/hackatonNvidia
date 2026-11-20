@@ -5,6 +5,7 @@ import { useActionState, useState, type ReactNode } from "react";
 import { confirmar, descartar, type EstadoRevision } from "@/app/revision/acciones";
 import type { CampoRevision, Clasificacion, ComprobanteRevision } from "@/lib/operaciones";
 import { rutaChat } from "@/lib/rutas";
+import { etiquetaSimulado } from "@/lib/simulado";
 import { BotonVoz } from "./BotonVoz";
 import { ChipConfianza } from "./Confianza";
 import { FotoLocal } from "./FotoLocal";
@@ -119,7 +120,7 @@ export function FormularioRevision({
         <div className="flex flex-wrap items-center gap-1.5 text-xs leading-4 font-bold">
           <span className="truncate text-tinta-suave">{c.nombre_archivo}</span>
           {c.conf_global !== null && <ChipConfianza conf={c.conf_global} />}
-          {c.analisis_simulado === 1 && <span className="rounded-full bg-[#fef3c7] px-2.5 py-0.5 text-[#92400e]">SIMULADO · no lo leyó el modelo</span>}
+          {c.analisis_simulado === 1 && <span className="rounded-full bg-[#fef3c7] px-2.5 py-0.5 text-[#92400e]">{etiquetaSimulado(c.simulado_partes)}</span>}
           <span className={`rounded-full px-2.5 py-0.5 ${c.uuid_cfdi ? "bg-lima/40 text-lima-tinta" : "bg-azul-100 text-tinta-suave"}`}>
             {c.uuid_cfdi ? "Con CFDI (indicio)" : "Sin CFDI detectado"}
           </span>

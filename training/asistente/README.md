@@ -164,10 +164,24 @@ Lectura honesta: con 3 casos solo se ve que el adaptador aprendió el formato; n
 
 Se eligió 1 época (no 2–3 como en el plan inicial) por el tiempo que quedaba en la competencia (~5 h 45 min al lanzarla).
 
-## 8. Evaluación (PENDIENTE)
-- **Extracción:** base vs. `epoca1` con los mismos casos de `test.jsonl` y la misma configuración de generación (greedy, `max_new_tokens=1200`). Métricas: JSON válido, igual al esperado y aciertos por campo (Total, Fecha, Emisor.Rfc, etc.).
-- **10 casos reservados de la sec. 5** (habituales, información incompleta, fuera de alcance, pedir confirmación): **PENDIENTE**, en `test_10_casos.py`.
-- Ejemplos de aciertos y errores: **PENDIENTE**.
+## 8. Evaluación (PENDIENTE de correr)
+Script: `test_10_casos.py`. Toma 20 casos reservados de `test.jsonl` (plantillas no vistas en train/val), 5 por categoría, con semilla fija; la lista queda en `logs/eval/casos.json`.
+
+| Categoría | Qué es | Respuesta correcta |
+|---|---|---|
+| habitual | ticket o CFDI con fecha y total | copiar los datos impresos |
+| incompleto | sin fecha o sin total legible | `"AUTO"` en lo que falta, sin inventar |
+| fuera_de_alcance | texto que no es comprobante (N5) | todo `"AUTO"`, `Conceptos` vacío |
+| limitacion | texto ilegible (X1) | todo `"AUTO"`, no adivinar |
+
+Métricas: JSON válido, misma forma, igual al esperado, aciertos en 11 campos, campos inventados u omitidos, **claves SAT inventadas** y segundos por caso.
+
+```bash
+python test_10_casos.py base                 # un modelo por corrida
+python test_10_casos.py adapters/epoca1
+python test_10_casos.py --comparar logs/eval/base_*.jsonl logs/eval/epoca1_*.jsonl   # sin GPU → logs/eval/comparacion.md
+```
+Resultados: **PENDIENTE** (copiar las tablas de `logs/eval/comparacion.md` y escribir la interpretación).
 
 ## 9. Inferencia en la laptop del equipo (RTX 4050, 6 GB)
 El **entrenamiento** se hace en el servidor DLI (sec. 5). La **inferencia** (servir el modelo a la app) se va a correr en la laptop de un integrante para no competir con la GPU del servidor y trabajar en red local.
@@ -206,7 +220,7 @@ La red UsaLab aísla los equipos (CLAUDE.md sec. 16): usar un hotspot con las la
 
 ## 10. Integración con la app
 `foto → frontend-pwa (lib/analisis.ts) → FastAPI /vision/analizar → YOLO + OCR → Qwen + adaptador → JSON CFDI → validación en código → pantalla de revisión`.
-Corre en la laptop con la RTX 4050 (sec. 9). El adaptador se elige con la variable `ADAPTADOR` (p. ej. `adapters/epoca1`): así el modelo en uso se puede rastrear hasta esta corrida. Detalle en `backend-ia/` (**PENDIENTE**).
+Corre en la laptop con la RTX 4050 (sec. 9). El adaptador se elige con la variable `ADAPTADOR` (p. ej. `adapters/epoca1`): así el modelo en uso se puede rastrear hasta esta corrida. Detalle y arranque en `backend-ia/README.md`.
 
 ## 11. Uso de IA en esta carpeta
 Ver `docs/declaracion_ia.md`: generador del dataset, script de revisión, `train_qlora.py`, `probar.py` y este README se escribieron con apoyo de Claude Code (Anthropic) y los revisa el equipo.

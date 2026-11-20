@@ -1,0 +1,58 @@
+[
+  {
+    "id": "R1",
+    "nombre": "Registro de cuenta nueva",
+    "esperado": "Redirige a /configurar",
+    "obtenido": "/configurar",
+    "ok": true
+  },
+  {
+    "id": "R2",
+    "nombre": "Guardar negocio RESICO 626",
+    "esperado": "Sale de /configurar",
+    "obtenido": "/",
+    "ok": true
+  },
+  {
+    "id": "C1",
+    "nombre": "Subir 1 ticket válido",
+    "esperado": "Recibido con total 3156.00 leído por el asistente; marcado SIMULADO (visión)",
+    "obtenido": "26.1 s · total leído · SIMULADO visible",
+    "ok": true
+  },
+  {
+    "id": "C2",
+    "nombre": "Revisar y confirmar",
+    "esperado": "Botón habilitado con los datos leídos; se guarda",
+    "obtenido": "habilitado al abrir: false · url /revision/detalle",
+    "ok": true
+  },
+  {
+    "id": "C3",
+    "nombre": "Consultar lo guardado en Operaciones",
+    "esperado": "Aparece el ticket confirmado",
+    "obtenido": "aparece",
+    "ok": true
+  },
+  {
+    "id": "C3b",
+    "nombre": "Mi mes de julio 2026",
+    "esperado": "Suma solo lo confirmado",
+    "obtenido": "incluye 3,156",
+    "ok": true
+  },
+  {
+    "id": "C4",
+    "nombre": "Subir la misma foto otra vez",
+    "esperado": "Aviso de duplicado, no se analiza",
+    "obtenido": "aviso de duplicado",
+    "ok": true
+  },
+  {
+    "id": "C5",
+    "nombre": "Lote con archivo inválido + foto válida",
+    "esperado": "Rechaza falso.jpg y procesa ticket_b.png",
+    "obtenido": "23.0 s · válida procesada: true · falso rechazado: true",
+    "ok": true
+  }
+]

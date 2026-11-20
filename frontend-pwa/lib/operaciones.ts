@@ -210,6 +210,7 @@ export type ComprobanteRevision = {
   tamano_bytes: number;
   sha256: string;
   analisis_simulado: number;
+  simulado_partes: string | null;
   conf_global: number | null;
   faltantes: string[];
   clasificacion: Clasificacion | null;
@@ -223,7 +224,7 @@ export function comprobanteParaRevision(d: DatabaseSync, usuarioId: string, id: 
   const columnas = Object.values(CAMPOS_REVISION).map((c) => `c.${c}`).join(", ");
   const fila = d
     .prepare(
-      `SELECT c.id, c.estado, c.origen, c.nombre_archivo, c.tipo_mime, c.tamano_bytes, c.sha256, c.analisis_simulado,
+      `SELECT c.id, c.estado, c.origen, c.nombre_archivo, c.tipo_mime, c.tamano_bytes, c.sha256, c.analisis_simulado, c.simulado_partes,
               c.conf_global, c.faltantes, c.moneda, c.uuid_cfdi, ${CLASIFICACION} AS clasificacion, ${columnas}
          FROM comprobantes c LEFT JOIN negocios n ON n.usuario_id = c.usuario_id
         WHERE c.id = ? AND c.usuario_id = ? AND c.estado IN ('por_revisar', 'confirmado')`,
@@ -246,6 +247,7 @@ export function comprobanteParaRevision(d: DatabaseSync, usuarioId: string, id: 
     tamano_bytes: fila.tamano_bytes as number,
     sha256: fila.sha256 as string,
     analisis_simulado: fila.analisis_simulado as number,
+    simulado_partes: (fila.simulado_partes as string | null) ?? null,
     conf_global: fila.conf_global as number | null,
     faltantes: JSON.parse(fila.faltantes as string) as string[],
     clasificacion: fila.clasificacion as Clasificacion | null,

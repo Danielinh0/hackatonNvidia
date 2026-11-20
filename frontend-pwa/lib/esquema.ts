@@ -77,7 +77,8 @@ CREATE TABLE IF NOT EXISTS comprobantes (
   estado             TEXT    NOT NULL DEFAULT 'por_revisar'
                      CHECK (estado IN ('por_revisar', 'confirmado', 'descartado', 'error')),
   error              TEXT,                           -- por qué no se pudo analizar (estado = 'error')
-  analisis_simulado  INTEGER NOT NULL DEFAULT 0 CHECK (analisis_simulado IN (0, 1)),  -- 1 = SIMULADO, no lo leyó el modelo
+  analisis_simulado  INTEGER NOT NULL DEFAULT 0 CHECK (analisis_simulado IN (0, 1)),  -- 1 = alguna parte fue SIMULADA
+  simulado_partes    TEXT    CHECK (simulado_partes IS NULL OR json_valid(simulado_partes)), -- p. ej. ["vision"]; NULL = no se sabe
   json_modelo        TEXT    CHECK (json_modelo IS NULL OR json_valid(json_modelo)), -- salida cruda del modelo (evidencia)
   faltantes          TEXT    NOT NULL DEFAULT '[]' CHECK (json_valid(faltantes)),    -- campos que el modelo no leyó, p. ej. ["Fecha","Emisor.Rfc"]
   conf_global        REAL    CHECK (conf_global IS NULL OR conf_global BETWEEN 0 AND 1),
@@ -155,6 +156,28 @@ CREATE TABLE IF NOT EXISTS impuestos (
   importe            TEXT
 ) STRICT;
 CREATE INDEX IF NOT EXISTS impuestos_comprobante_idx ON impuestos (comprobante_id);
+
+-- Pre-facturas generadas desde un comprobante confirmado (botón en /subir/recibido/[id]).
+-- Se emiten con la API REST local /api/cfdi. Con CFDI_PROVIDER=mock son SIMULADAS: UUID, sello
+-- y timbre ficticios, sin validez fiscal. El PDF y el XML se guardan aquí para poder consultarlos
+-- después aunque el PAC simulado se reinicie. Una por comprobante (no se factura dos veces).
+CREATE TABLE IF NOT EXISTS facturas (
+  id               TEXT    PRIMARY KEY,                 -- id que devolvió /api/cfdi
+  comprobante_id   TEXT    NOT NULL UNIQUE REFERENCES comprobantes(id) ON DELETE CASCADE,
+  usuario_id       TEXT    NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  uuid             TEXT    NOT NULL,
+  proveedor        TEXT    NOT NULL CHECK (proveedor IN ('mock', 'facturama')),
+  simulado         INTEGER NOT NULL CHECK (simulado IN (0, 1)),
+  serie            TEXT,
+  folio            TEXT,
+  total            TEXT    NOT NULL,
+  pdf              BLOB    NOT NULL,
+  pdf_nombre       TEXT    NOT NULL,
+  xml              TEXT    NOT NULL,
+  xml_nombre       TEXT    NOT NULL,
+  creado_en        TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+) STRICT;
+CREATE INDEX IF NOT EXISTS facturas_usuario_idx ON facturas (usuario_id);
 
 -- Cada corrección que hace la persona en la revisión: qué leyó el modelo y qué quedó.
 -- Sirve para medir errores del modelo y para la evaluación de HCI (CLAUDE.md sec. 5).

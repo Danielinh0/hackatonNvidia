@@ -40,6 +40,9 @@ export function db(): DatabaseSync {
       d.close();
       throw new Error(`La base ${RUTA} es de un esquema anterior. En desarrollo, borra la carpeta data/ y reinicia.`);
     }
+    // Columna agregada el 20-nov-2026: qué parte del análisis fue simulada (lib/simulado.ts).
+    const colsComp = (d.prepare("PRAGMA table_info(comprobantes)").all() as { name: string }[]).map((c) => c.name);
+    if (!colsComp.includes("simulado_partes")) d.exec("ALTER TABLE comprobantes ADD COLUMN simulado_partes TEXT");
     global.__dzuunDb = d;
     global.__dzuunEsquema = ESQUEMA;
   }

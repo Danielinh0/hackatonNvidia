@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
+import type { Bloqueo, FacturaGuardada } from "@/lib/prefactura";
+import { BotonPrefactura } from "./BotonPrefactura";
 import { Ico } from "./ui";
 
 /* Búsqueda y filtros de Operaciones (Figma 1:1425). Filtra en el cliente sobre los datos que manda el servidor (SQLite). */
@@ -19,6 +21,8 @@ export type Operacion = {
   porRevisar?: boolean;
   simulado?: boolean;
   href: string;
+  /** Solo en ventas confirmadas: datos del botón de pre-factura (lib/prefactura.ts). */
+  prefactura?: { bloqueo: Bloqueo | null; factura: FacturaGuardada | null; cp: string | null; formaPago: string | null };
   icono: { src: string; w: number; h: number; bg: string };
 };
 
@@ -34,7 +38,8 @@ function Fila({ op }: { op: Operacion }) {
   const ingreso = op.tipo === "ingreso";
   const media = op.conf !== null && op.conf < 0.85;
   return (
-    <Link href={op.href} className="flex flex-col gap-2 rounded-2xl bg-white p-4 drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]">
+    <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]">
+    <Link href={op.href} className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-3">
           <span className={`flex size-11 shrink-0 items-center justify-center rounded-full ${op.icono.bg}`}>
@@ -83,6 +88,17 @@ function Fila({ op }: { op: Operacion }) {
         )}
       </div>
     </Link>
+    {op.prefactura && (
+      <BotonPrefactura
+        compacto
+        comprobanteId={op.id}
+        bloqueo={op.prefactura.bloqueo}
+        factura={op.prefactura.factura}
+        cpSugerido={op.prefactura.cp}
+        formaPagoSugerida={op.prefactura.formaPago}
+      />
+    )}
+    </div>
   );
 }
 
