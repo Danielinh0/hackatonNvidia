@@ -55,3 +55,8 @@ frontend-pwa/.mock-pac/
 
 # Caché de Hugging Face del entrenamiento (modelo base, ~15 GB)
 training/asistente/cache/
+
+# Adaptadores y checkpoints del asistente (pesados: se entregan por enlace en el Panel)
+training/asistente/adapters/*/
+training/asistente/logs/*/checkpoints/
+training/asistente/*.tgz
