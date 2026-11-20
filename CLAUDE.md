@@ -136,10 +136,10 @@ Al concluir las 24 h: se cierra el registro de entregables; entrenamientos termi
 ## 16. Arquitectura (SQLite, sin Firebase)
 > Cambio de plan (20-nov-2026): se reemplazó Firebase por **SQLite + acceso local (correo y contraseña)** para que la app sea portable: un solo archivo de base y ningún servicio externo. El login con Google está programado pero **desactivado** hasta que haya credenciales (`docs/login.md`).
 ```text
-PWA (Next.js 16 + TypeScript + Tailwind) — servidor Node propio (`pnpm build && pnpm start`)
+PWA (Next.js 16 + TypeScript + Tailwind) en `frontend-pwa/` — servidor Node propio (`cd frontend-pwa && pnpm build && pnpm start`)
    ├── Acceso local: /registro y /entrar (contraseña con scrypt) → sesión en cookie httpOnly
    │      (opcional: Google OpenID Connect + PKCE, aparece solo si hay credenciales)
-   ├── SQLite (`node:sqlite`, integrado en Node ≥ 22.13) → `data/dzuun.sqlite`: usuarios, sesiones, lotes, imágenes
+   ├── SQLite (`node:sqlite`, integrado en Node ≥ 22.13) → `frontend-pwa/data/dzuun.sqlite`: usuarios, sesiones, lotes, comprobantes (sin fotos)
    └── Servidor Next.js ── HTTPS + secreto compartido ── Cloudflare Tunnel ── Servidor NGC (FastAPI :8000)
                                                                           ├── POST /vision/analizar
                                                                           └── POST /asistente/chat (stream)
@@ -148,23 +148,15 @@ PWA (Next.js 16 + TypeScript + Tailwind) — servidor Node propio (`pnpm build &
 - **Parámetros de ruta:** sin sesión, `proxy.ts` manda a `/entrar?siguiente=<ruta pedida con su query>`; al entrar o registrarse se regresa ahí. `siguienteSeguro()` en `lib/rutas.ts` solo acepta rutas internas (bloquea `https://…`, `//…`, `/\…` y rutas de acceso). Con sesión, `/bienvenida`, `/entrar` y `/registro` saltan al destino. Avisos por `?motivo=caducada|salida`. Los `[id]` dinámicos se validan como UUID y por dueño.
 - **Google (opcional):** `/auth/google` → Google → `/auth/google/callback`, con `state`, PKCE, `nonce`, `iss`, `aud`, `exp` y correo verificado (`lib/google.ts`); si el correo ya tiene cuenta local, se vincula.
 - **Sesiones:** token aleatorio en cookie `dzuun_sesion` (httpOnly, SameSite=Lax, 30 días); en la base solo su sha256. `proxy.ts` hace la revisión rápida; **cada Server Action y ruta con datos valida la sesión** (`usuarioActual()` / `requerirUsuario()` en `lib/sesion.ts`).
-- **Seguridad:** cada persona solo ve sus lotes e imágenes (consulta filtrada por `usuario_id`; si no es suya → 404). El teléfono **no** llama a FastAPI directamente: el servidor Next.js reenvía la petición con un secreto compartido (`BACKEND_TOKEN` en `.env.local`); FastAPI rechaza lo que no lo traiga. CORS cerrado; límite de imagen 10 MB.
-- **Carga de fotos:** `app/subir/acciones.ts` verifica tamaño, tipo real por bytes y sha256 del teléfono (`lib/verificacion.ts`, con pruebas), guarda en una transacción y relee la huella antes de redirigir a `/subir/recibido/[lote]`. Un fallo no bloquea el lote.
-- **Base de datos:** esquema en `lib/esquema.ts`, se crea sola al primer uso; detalles en `db/README.md`. Tablas actuales: `usuarios`, `sesiones`, `lotes`, `imagenes`. Por agregar: `negocios` (nombre, RFC, régimen), `operaciones` (tipo, categoria, total, iva, fecha, folio, tiene_cfdi, uuid, conf_global, estado, campos JSON, imagen_id), `facturas`, `mensajes`.
+- **Seguridad:** cada persona solo ve sus lotes y comprobantes (consulta filtrada por `usuario_id`; si no es suya → 404). El teléfono **no** llama a FastAPI directamente: el servidor Next.js reenvía la petición con un secreto compartido (`BACKEND_TOKEN` en `.env.local`); FastAPI rechaza lo que no lo traiga. CORS cerrado; límite de imagen 10 MB.
+- **Privacidad de fotos (20-nov-2026):** la imagen **no se guarda** en el servidor. `app/subir/acciones.ts` verifica tamaño, tipo real por bytes y sha256 del teléfono (`lib/verificacion.ts`), manda los bytes en memoria a FastAPI (`lib/analisis.ts`) y guarda **solo los datos leídos**. La vista previa vive en la memoria del navegador (`lib/fotos-locales.ts`, sin localStorage/IndexedDB); si se recarga o el archivo ya no está, `/subir/recibido/[id]` muestra los datos con el aviso "Por tu privacidad, Dzuun no guarda la foto" y, si venía de un archivo, permite volver a elegirlo para verlo (se compara la huella, no se sube). Duplicados por sha256 se avisan. Un fallo no bloquea el lote. FastAPI tampoco debe guardar la imagen.
+- **Base de datos:** esquema en `lib/esquema.ts`, se crea sola al primer uso; detalles y mapeo JSON → columnas en `db/README.md`. Tablas: `usuarios`, `sesiones`, `lotes`, `comprobantes` (atributos CFDI 4.0 + emisor/receptor + estado, faltantes, `json_modelo`, clasificación), `conceptos`, `impuestos` (traslados/retenciones por concepto o resumen), `correcciones` (modelo vs. persona). Lectura del JSON en `lib/cfdi.ts`; importes como texto decimal; sin cálculos fiscales en TS. Por agregar: `negocios` (nombre, RFC, régimen), `facturas`, `mensajes`. La tabla vieja `imagenes` se borra sola al abrir la base.
 - **Despliegue:** no sirve Vercel (su disco es temporal y se perdería la base). Correr en una computadora o servidor del equipo; para probar desde el teléfono con Google hace falta https (túnel), no la IP de la red local.
+- **Pruebas desde el teléfono (20-nov-2026):** la red del laboratorio (**UsaLab**) aísla a los clientes: el teléfono no llega a `http://<IP>:3000` aunque la app y el firewall estén bien (comprobado: desde la misma computadora todo responde por la IP de la LAN). Opciones: hotspot de un celular con computadora y teléfono en él, o túnel https (Cloudflare Tunnel, `cloudflared` aún no instalado; publica el servidor en internet, acordarlo antes). Para descartar la app, abrir primero `http://<IP>:3000/manifest.webmanifest` y ver si llega la petición a la terminal de `pnpm dev`. En `http://` por IP el navegador no tiene `crypto.subtle`: no calcula la huella del teléfono (se marca "Sin huella") y el inicio con Google no funciona; con el túnel https ambas cosas sí.
 - Reglas fiscales y catálogos SAT en código; el modelo propone, el código valida. Nunca emitir sin pantalla de revisión.
 
 ### Contratos de API
-`POST /vision/analizar` (multipart: imagen) →
-```json
-{
-  "doc_tipo": "ticket | spei | desconocido",
-  "campos": [{"nombre": "total", "valor": "245.00", "conf": 0.91, "bbox": [0, 0, 0, 0]}],
-  "tiene_cfdi": true,
-  "conf_global": 0.78,
-  "errores": []
-}
-```
+`POST /vision/analizar` (multipart: `imagen`; cabecera `Authorization: Bearer <BACKEND_TOKEN>`) → JSON con forma de **CFDI 4.0** (ejemplo en `frontend-pwa/lib/cfdi-ejemplo.ts`): `Version, Serie, Folio, Fecha, FormaPago, MetodoPago, Moneda, TipoDeComprobante, Exportacion, LugarExpedicion, SubTotal, Total, Emisor{Rfc,Nombre,RegimenFiscal}, Receptor{Rfc,Nombre,DomicilioFiscalReceptor,RegimenFiscalReceptor,UsoCFDI}, Conceptos[{…, Impuestos{Traslados[]}}], Impuestos{TotalImpuestosTrasladados, Traslados[]}`. Importes como texto decimal; `"AUTO"` o ausente = no se leyó. Opcional: envolver como `{ "cfdi": {…}, "conf_global": 0.78 }`. Pendiente: confianza por campo (sec. 14) y `doc_tipo` para SPEI. Sin servicio: `ANALISIS_SIMULADO=1` (marcado SIMULADO).
 `POST /asistente/chat` → `{ "mensaje": "...", "modo": "accesibilidad|detalle", "contexto": { "operacion_id": "..." } }`, respuesta en streaming (SSE).
 
 ## 17. Modelos (decisión final)
@@ -198,6 +190,8 @@ hackathon-nvidia-oaxaca-2026/
     ├── vision/      dataset train/val/test, train_vision.py, logs/, weights/
     └── asistente/   dataset JSONL, train_qlora.py, test_10_casos.py, logs/, adapters/
 ```
+- **Todo el código de la PWA vive en `frontend-pwa/`** (reestructura de `main`, 20-nov-2026). Los comandos `pnpm dev | build | start | test | lint` se corren **dentro** de `frontend-pwa/`; en la raíz no hay `package.json` (un `node_modules` en la raíz es residuo y se puede borrar).
+- Ramas: `main` (estructura base) · `FROnt-daniel` (login, SQLite, navbar; ya integra `main` y `zaidbranch`) · `zaidbranch` (`allowedDevOrigins` en `next.config.ts` para abrir `pnpm dev` desde teléfonos de la LAN). Al integrar ramas creadas antes de la reestructura, revisar que los archivos nuevos queden en `frontend-pwa/` y no en la raíz.
 
 ## 20. Roles y plan
 - **Roles:** 1) Visión y datos · 2) Asistente y dataset conversacional · 3) Backend, reglas fiscales, CFDI simulado, túnel y auth · 4) PWA, HCI, pruebas con usuarios, ficha y video.
@@ -205,20 +199,24 @@ hackathon-nvidia-oaxaca-2026/
 
 ## 21. Pendientes
 - [ ] Método de acceso al GPU; confirmar si créditos DLI cuentan como servidores proporcionados
-- [ ] `nvidia-smi` funcionando; túnel probado desde la PWA
+- [ ] `nvidia-smi` funcionando; túnel probado desde la PWA (necesario también para probar en teléfonos: la red UsaLab aísla clientes, sec. 16)
 - [x] Base de datos: SQLite en lugar de Firebase (20-nov-2026)
 - [x] Acceso local (correo + contraseña) y sesiones en SQLite, con regreso a la ruta pedida (20-nov-2026)
 - [ ] (Opcional) Activar Google: crear el Client ID, ponerlo en `.env.local` y probar un login real (`docs/login.md`)
 - [ ] Límite de intentos fallidos al entrar y recuperación de contraseña
 - [ ] Guardar en SQLite el negocio de "Configurar" (nombre, RFC, régimen)
 - [ ] FastAPI: exigir `BACKEND_TOKEN` y llamar al backend solo desde el servidor Next.js
+- [x] Fotos sin almacenar: solo datos leídos en `comprobantes`/`conceptos`/`impuestos` (20-nov-2026)
+- [ ] FastAPI: devolver el JSON CFDI del contrato (sec. 16) y no guardar la imagen; pantalla de revisión real que escriba en `correcciones` y pase a `confirmado`
 - [ ] Verificar clave 626 y reglas RESICO en fuentes oficiales
 - [x] Nombre de la app: **Dzuun** (19-nov-2026)
 - [ ] Confirmar asistente/mascota **Bisie'** y reemplazar "Tona" en este archivo, dataset y prompts del LLM
 - [ ] Verificar *dzuun* y *bisieꞌ* (escritura y pronunciación) y citar la fuente en la ficha
 - [ ] Verificar los pasos de alta en el SAT de la bienvenida contra la ficha vigente en sat.gob.mx
 - [x] Bocetos en Figma ("Pantallas Dzuun"), convertidos a vistas de Next.js; MCP de Figma conectado
-- [ ] Registrar en `docs/declaracion_ia.md` el uso de Claude Code para naming, prompts de Stitch, paleta, conversión Figma → código, carga de fotos y login
+- [x] Reestructura: PWA en `frontend-pwa/`; `main` y `zaidbranch` integradas en `FROnt-daniel` (20-nov-2026)
+- [x] Navbar inferior rediseñada con cuenta integrada y pestaña activa por ruta (20-nov-2026)
+- [ ] Registrar en `docs/declaracion_ia.md` el uso de Claude Code para naming, prompts de Stitch, paleta, conversión Figma → código, carga de fotos, login, integración de ramas y rediseño de la navbar
 - [ ] Declaración de IA firmada
 
 ---
@@ -244,5 +242,6 @@ hackathon-nvidia-oaxaca-2026/
 - Prompts finales en `docs/prompt-bueno.md`: un prompt maestro (sistema de diseño + Inicio) y uno por pantalla, pegados por separado en Stitch modo Mobile. `docs/prompt-google-stitch.md` conserva la versión anterior con la tabla de contraste.
 - **Pantallas:** 1 Inicio (resumen del mes como estimación) · 2 Bienvenida/login · 3 Configurar negocio (nombre, RFC, régimen 626) · 4 Subir lote · 5 Revisión modo detalle · 6 Revisión modo sencillo · 7 Chat con la mascota · 8 Operaciones · 9 Mi mes · 10 Pre-factura SIMULADO · 11 Errores y estados.
 - **Bienvenida (pantalla 2), 4 secciones:** héroe con eslogan y "Continuar con Google" · "Así de fácil" en 3 pasos (foto → la mascota lee y ordena → tú revisas y guardas) · tarjeta "¿Aún no te has dado de alta en el SAT? Recuerda que con Dzuun facturar nunca había sido tan fácil" con 6 pasos (consultar RFC con CURP; inscribirse en línea o con cita; Contraseña y e.firma; elegir régimen, p. ej. RESICO; descargar Constancia de Situación Fiscal; registrarla en Dzuun), nota "Guía informativa, los requisitos pueden cambiar" y enlace subrayado "Para más información ingresa al portal del SAT" → `https://www.sat.gob.mx` (`target="_blank" rel="noopener noreferrer"`) · pie con "Ya tengo cuenta, entrar".
+- **Barra de navegación inferior** (`components/BottomNav.tsx` servidor + `components/BarraNav.tsx` cliente; referencia: Dribbble "Navbar Navigation Bar Apps", variante clara de teléfono, adaptada a la paleta actual). Solo iconos (cada enlace con `aria-label`): Inicio · Operaciones · **Subir** (cuadro rojo `marca` elevado, acción principal siempre visible) · Bisie' · **Cuenta** (avatar → `/configurar`). La pestaña activa se deduce de la ruta (`usePathname`, por prefijo: `/subir/recibido/…` → Subir) y se marca con rayita roja superior + icono rojo; hover con fondo `marca/10`. La cuenta **ya no va en la esquina superior derecha** de ningún encabezado; las pantallas de flujo sin barra (Chat, Configurar, Revisión) salen con "Regresar".
 - Los bocetos son guía visual; el código lo escribe y lo explica el equipo. Toda pantalla usa datos ficticios y rotula estimaciones y SIMULADO.
-- **Tres decisiones de diseño candidatas para la ficha (sec. 5):** botón "Confirmar" bloqueado mientras haya campos de confianza baja; modo sencillo de un ticket por vez con voz; cola de carga donde un fallo no bloquea el lote.
+- **Tres decisiones de diseño candidatas para la ficha (sec. 5):** botón "Confirmar" bloqueado mientras haya campos de confianza baja; modo sencillo de un ticket por vez con voz; cola de carga donde un fallo no bloquea el lote. (Alternativa: "Subir" como botón central elevado siempre visible, porque fotografiar tickets es la tarea principal.)

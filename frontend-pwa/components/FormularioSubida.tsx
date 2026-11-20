@@ -2,24 +2,19 @@
 
 import { startTransition, useActionState, useState, type ChangeEvent } from "react";
 import { subirLote, type EstadoSubida } from "@/app/subir/acciones";
+import { huella, recordarFoto } from "@/lib/fotos-locales";
 import { Ico } from "./ui";
 
 /*
  * Botones "Tomar foto" y "Elegir de la galería" (Figma 1:651) conectados a la subida real.
  * Antes de enviar calcula el sha256 de cada archivo para que el servidor compruebe
- * que llegó idéntico. Si todo sale bien, el servidor redirige a /subir/recibido/[lote].
+ * que llegó idéntico. El servidor lo analiza y NO guarda la imagen; la vista previa
+ * queda solo en la memoria de este navegador (lib/fotos-locales.ts).
+ * Si todo sale bien, el servidor redirige a /subir/recibido/[id].
  */
 const S = "/figma/subir";
 const MAX_BYTES = 10 * 1024 * 1024;
 const inicial: EstadoSubida = { error: null, rechazados: [] };
-
-async function huella(archivo: File): Promise<string> {
-  // crypto.subtle solo existe en contexto seguro (https o localhost). En http por red
-  // local se envía vacío y el servidor marca la huella como "no verificada".
-  if (!globalThis.crypto?.subtle) return "";
-  const digest = await crypto.subtle.digest("SHA-256", await archivo.arrayBuffer());
-  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
-}
 
 export function FormularioSubida() {
   const [estado, enviar, enviando] = useActionState(subirLote, inicial);
@@ -27,7 +22,7 @@ export function FormularioSubida() {
   const [avisoLocal, setAvisoLocal] = useState<string | null>(null);
   const ocupado = preparando || enviando;
 
-  async function alElegir(e: ChangeEvent<HTMLInputElement>) {
+  async function alElegir(e: ChangeEvent<HTMLInputElement>, origen: "camara" | "archivo") {
     const archivos = Array.from(e.target.files ?? []);
     e.target.value = ""; // permite volver a elegir la misma foto
     if (archivos.length === 0) return;
@@ -41,10 +36,15 @@ export function FormularioSubida() {
 
     setPreparando(true);
     const fd = new FormData();
+    fd.append("origen", origen);
     for (const a of archivos.filter((a) => a.size <= MAX_BYTES)) {
+      // crypto.subtle solo existe en https o localhost; en http por red local va vacío
+      // y el servidor marca la huella como "no verificada".
+      const h = await huella(a);
+      recordarFoto(a, h);
       fd.append("archivos", a);
       fd.append("tamano", String(a.size));
-      fd.append("sha256", await huella(a));
+      fd.append("sha256", h);
     }
     setPreparando(false);
     startTransition(() => enviar(fd));
@@ -57,7 +57,7 @@ export function FormularioSubida() {
     <section className="flex flex-col gap-2 py-2">
       <div className="grid grid-cols-2 gap-3">
         <label className={tarjeta}>
-          <input type="file" accept="image/*" capture="environment" className="sr-only" disabled={ocupado} onChange={alElegir} />
+          <input type="file" accept="image/*" capture="environment" className="sr-only" disabled={ocupado} onChange={(e) => alElegir(e, "camara")} />
           <span className="mb-2 flex size-12 items-center justify-center rounded-full bg-durazno shadow-[inset_0px_2px_4px_0px_rgba(0,0,0,0.05)]">
             <Ico src={`${S}/camara.svg`} w={23.333} h={21} />
           </span>
@@ -71,7 +71,7 @@ export function FormularioSubida() {
             multiple
             className="sr-only"
             disabled={ocupado}
-            onChange={alElegir}
+            onChange={(e) => alElegir(e, "archivo")}
           />
           <span className="absolute top-2 right-2 rounded-full bg-azul-150 px-2 py-0.5 text-[10px] leading-[15px] font-bold text-[#001947]">
             Varias a la vez
@@ -88,7 +88,7 @@ export function FormularioSubida() {
         {ocupado && (
           <p role="status" className="flex items-center gap-2 rounded-2xl bg-lima px-4 py-3 text-sm leading-5 font-bold text-lima-tinta">
             <Ico src={`${S}/sync.svg`} w={10} h={10} className="animate-spin" />
-            {preparando ? "Preparando tus fotos…" : "Subiendo y verificando…"}
+            {preparando ? "Preparando tus fotos…" : "Leyendo tus tickets con IA…"}
           </p>
         )}
         {avisoLocal && !ocupado && (

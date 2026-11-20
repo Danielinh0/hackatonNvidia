@@ -17,7 +17,15 @@ export function db(): DatabaseSync {
   if (!global.__dzuunDb) {
     mkdirSync(path.dirname(RUTA), { recursive: true });
     const d = new DatabaseSync(RUTA);
-    d.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
+    // secure_delete: al borrar, SQLite sobrescribe con ceros en lugar de solo marcar libre.
+    d.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000; PRAGMA secure_delete = ON;");
+    // Versiones anteriores guardaban las fotos (tabla `imagenes`, columna BLOB). Ya no se guardan:
+    // se borra la tabla y se compacta el archivo para que los bytes no queden en disco.
+    // Las cuentas, sesiones y lotes se conservan.
+    if (d.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'imagenes'").get()) {
+      d.exec("DROP TABLE imagenes; PRAGMA wal_checkpoint(TRUNCATE); VACUUM;");
+      console.info("dzuun: se borró la tabla `imagenes` (fotos guardadas por versiones anteriores).");
+    }
     d.exec(ESQUEMA);
     // CREATE TABLE IF NOT EXISTS no modifica tablas viejas: si la base es de una versión
     // anterior del esquema, avisamos claro en lugar de fallar con errores raros al insertar.
