@@ -41,8 +41,10 @@ bash scripts/run_lab.sh evaluar
 bash scripts/run_lab.sh exportar --trt
 bash scripts/run_lab.sh empaquetar    # descarga lab/entrega_vision_*.tar.gz ANTES de que cierre la sesión
 ```
-Para no perder el entrenamiento si se cierra la pestaña: `nohup bash scripts/run_lab.sh entrenar > entrenar.out 2>&1 &`
-y revisar con `tail -f entrenar.out`.
+**Los pasos que usan TAO (`convertir`, `prueba`, `entrenar`, `evaluar`, `exportar`) van en primer plano, sin `nohup` ni `&`:**
+el launcher lanza Docker con TTY y sin terminal falla con "the input device is not a TTY". La terminal de JupyterLab sigue
+corriendo en el servidor aunque cierres la pestaña; se recupera en el panel "Running Terminals and Kernels".
+`datos` sí puede ir con `nohup` porque no usa TAO.
 
 ## Rutas del host
 El lab corre dentro de un contenedor y TAO lanza otros contenedores con el Docker del host. Si el host ve

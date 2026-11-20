@@ -64,6 +64,9 @@ monitor_gpu() {
 correr() {
   # correr <nombre_log> <tarea> <acción> [overrides...]: corre TAO con log, monitor de GPU y registro de duración.
   local nombre="$1" tarea="$2" accion="$3"; shift 3
+  # El launcher de TAO lanza Docker con TTY ("Printing tty value True"): sin terminal, Docker responde
+  # "the input device is not a TTY" y no corre nada. Pasa con nohup o con '&'. Visto en el lab (20-nov-2026).
+  [ -t 0 ] || falla "TAO necesita una terminal interactiva. Corre este paso en primer plano en una terminal de JupyterLab, sin nohup ni '&' (la terminal sigue viva aunque cierres la pestaña)."
   mkdir -p "$LOGS"
   local log="$LOGS/${nombre}_$(date +%Y%m%d_%H%M%S).log"
   local gpu_log="${log%.log}_gpu.csv"
@@ -196,7 +199,7 @@ convertir() {
       "dataset_convert.gt_file=/data/ocrnet/$s/gt_list.txt" \
       "dataset_convert.results_dir=/results/ocrnet/lmdb/$s"
     if [ ! -f "$LAB/results/ocrnet/lmdb/$s/data.mdb" ]; then
-      falla "TAO terminó pero no apareció $LAB/results/ocrnet/lmdb/$s/data.mdb. Casi seguro los montajes apuntan a rutas que el Docker del host no ve: ajusta HOST_TRAINING y HOST_LAB y repite 'montajes'."
+      falla "TAO terminó pero no apareció $LAB/results/ocrnet/lmdb/$s/data.mdb. Revisa el log: si dice 'the input device is not a TTY', corre en primer plano; si TAO sí convirtió sin errores, los montajes apuntan a rutas que el Docker del host no ve (ajusta HOST_TRAINING y HOST_LAB y repite 'montajes')."
     fi
     verde "LMDB $s listo."
   done
