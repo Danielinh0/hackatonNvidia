@@ -32,8 +32,45 @@ with open(os.path.join(AQUI, "dataset", "test.jsonl"), encoding="utf-8") as f:
 
 print(f"Cargando {BASE}" + (f" + {adaptador}" if adaptador else " (sin adaptador)") + " ...")
 tok = AutoTokenizer.from_pretrained(BASE)
-q = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16)
-m = AutoModelForCausalLM.from_pretrained(BASE, quantization_config=q, device_map={"": 0})
+gpu_gb = torch.cuda.get_device_properties(0).total_memory / 2**30
+if gpu_gb >= 10:
+    # Servidor (T4 15 GB): todo en la GPU, igual que en el entrenamiento.
+    q = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16)
+    mapa = {"": 0}
+else:
+    # GPU chica (p. ej. RTX 4050 laptop, 6 GB): el 7B en NF4 no cabe completo.
+    # - double quant comprime también las escalas de NF4 (~0.4 GB menos).
+    # - embed_tokens (~1 GB, no se cuantiza) va a la RAM: solo es una búsqueda por token, casi no frena.
+    # Solo cambia dónde vive cada parte del modelo; el adaptador entrenado es el mismo.
+    print(f"GPU de {gpu_gb:.1f} GB: modo memoria baja (double quant + embeddings en CPU).")
+    q = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16,
+                           bnb_4bit_use_double_quant=True, llm_int8_enable_fp32_cpu_offload=True)
+    mapa = {"model.embed_tokens": "cpu", "model.layers": 0, "model.norm": 0, "model.rotary_emb": 0, "lm_head": 0}
+m = AutoModelForCausalLM.from_pretrained(BASE, quantization_config=q, device_map=mapa, torch_dtype=torch.float16)
+if gpu_gb < 10:
+    # accelerate deja embed_tokens "descargado" (pesos en meta, se suben a la GPU en cada paso).
+    # Se quita ese gancho y se pone una copia real en RAM que devuelve el resultado en la GPU.
+    from accelerate.hooks import remove_hook_from_module
+    from huggingface_hub import hf_hub_download
+    from safetensors import safe_open
+
+    class EmbeddingEnCPU(torch.nn.Module):
+        def __init__(self, peso):
+            super().__init__()
+            self.peso = peso  # tensor normal (no Parameter) para que no lo muevan
+
+        def forward(self, ids):
+            return torch.nn.functional.embedding(ids.cpu(), self.peso).to(0)
+
+    clave = "model.embed_tokens.weight"
+    indice = json.load(open(hf_hub_download(BASE, "model.safetensors.index.json")))
+    with safe_open(hf_hub_download(BASE, indice["weight_map"][clave]), framework="pt") as f:
+        peso = f.get_tensor(clave).to(torch.float16)
+    remove_hook_from_module(m.model.embed_tokens)
+    m.model.embed_tokens = EmbeddingEnCPU(peso)
+    m.model.rotary_emb.to(0)  # su buffer inv_freq se queda en CPU con este mapa
+    # Si el mapa dice "cpu", PeftModel vuelve a repartir el modelo (dispatch_model) y lo deja todo en CPU.
+    m.hf_device_map = {"": 0}
 if adaptador:
     m = PeftModel.from_pretrained(m, adaptador)
 m.eval()

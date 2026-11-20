@@ -36,14 +36,17 @@ python probar.py adapters/prueba                              # 3 casos de test 
 - **Al terminar la época** te pasan `epoca1_adaptador.tgz`: lo descomprimes igual y usas `adapters/epoca1` en lugar de `adapters/prueba`.
 - **Para comparar con el modelo sin ajuste:** `python leer.py base ejemplos/ticket_ejemplo.txt`.
 
-**Qué esperar:** `leer.py` imprime el JSON, los segundos que tardó y la memoria de GPU usada. Con `ejemplos/ticket_ejemplo.txt` (es test-00000), el adaptador `prueba` dio en el servidor `Folio "14199"`, `Total "3156.00"`, `FormaPagoLeida "TARJETA DEBITO"` y `FormaPago "AUTO"`.
+**Qué esperar:** `leer.py` imprime el JSON, los segundos que tardó y la memoria de GPU usada. Con `ejemplos/ticket_ejemplo.txt` (es test-00000), el adaptador `prueba` dio en el servidor `Folio "14199"`, `Total "3156.00"`, `FormaPagoLeida "TARJETA DEBITO"` y `FormaPago "AUTO"`. En la RTX 4050 laptop (6 GB, 20-nov-2026) dio esos mismos cuatro campos, en 22.6 s y con 4.52 GB de memoria máxima.
+
+**GPU de menos de 10 GB:** `leer.py` entra solo en *modo memoria baja*: NF4 con double quant y la tabla de embeddings (~1 GB) en RAM en lugar de la GPU. Solo cambia dónde vive cada parte del modelo; el adaptador y el prompt son los mismos. En el servidor (T4) todo sigue en la GPU, como en el entrenamiento.
 
 | Si sale… | Qué hacer |
 |---|---|
+| `No module named 'torch'` | No activaste el entorno: `source ../../backend-ia/.venv/bin/activate` (en fish: `activate.fish`) |
 | `Failed building wheel for tokenizers` | Estás en Python 3.14: repite el paso 2 |
 | `False` en la prueba de `torch.cuda` | Falta el driver NVIDIA o se instaló torch sin CUDA: `uv pip install --reinstall torch` |
 | `No encuentro adapters/.../adapter_config.json` | No descomprimiste el `.tgz` dentro de `training/asistente/` |
-| `CUDA out of memory` | No cabe en 6 GB: cierra otros programas que usen la GPU (`nvidia-smi`) y reintenta; si sigue, plan B en la sec. 9 |
+| `CUDA out of memory` | El modo memoria baja ya está activo: cierra otros programas que usen la GPU (`nvidia-smi`) y reintenta; si sigue, plan B en la sec. 9 |
 | `⚠ El modelo no devolvió un JSON válido` | Es un resultado real del modelo: guárdalo y avisa, no lo corrijas a mano |
 
 Anota en la sec. 9 lo que salga (memoria, segundos por ticket, si coincide con el servidor).
