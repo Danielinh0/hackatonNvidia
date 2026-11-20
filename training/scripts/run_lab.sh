@@ -278,7 +278,7 @@ respaldo() {
     [ -d "$RESULTADOS/$d" ] || continue
     # El mejor modelo + el checkpoint más reciente (TAO retoma solo desde el más reciente de la carpeta).
     for f in "$RESULTADOS/$d/model_best.pth" "$RESULTADOS/$d/best_accuracy.pth" \
-             "$(ls -t "$RESULTADOS/$d"/*.pth 2>/dev/null | head -n 1)"; do
+             "$(ls -t "$RESULTADOS/$d"/*.pth 2>/dev/null | grep -vE '/(model_best|best_accuracy)[^/]*\.pth$' | head -n 1)"; do
       [ -n "$f" ] && [ -f "$f" ] && lista+=("results/${f#"$RESULTADOS/"}")
     done
   done
