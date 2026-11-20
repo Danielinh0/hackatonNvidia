@@ -320,6 +320,7 @@ hackathon-nvidia-oaxaca-2026/
 - **Specs (Etapa 4):** `training/specs/ocdnet.yaml` y `ocrnet.yaml`. Cada clave se comprueba con `scripts/verificar_specs.py` contra el esquema de TAO 5.5. **OCRNet entrena en fp32** porque TAO 5.5 no expone precisión para OCRNet; el fp16 se aplica en su motor TensorRT. Decisiones y pendientes en `training/specs/README.md`.
 - **Lab (Etapa 5):** `training/scripts/run_lab.sh` por pasos (verificar, datos, montajes, modelos, convertir, prueba, entrenar, evaluar, exportar, empaquetar); guía en `training/LAB.md`. Los datos se regeneran en el lab con la misma semilla y se comparan con `training/huella_datos.sha256`. Probado de punta a punta con simuladores de tao/ngc/nvidia-smi; falta la corrida real.
 - **Verificado en el lab con `tao info --verbose` (20-nov-2026):** Tesla T4, driver 545.23.08, 15360 MiB, 90 GB libres. ocdnet/ocrnet: grupo `model`, imagen `nvcr.io/nvidia/tao/tao-toolkit:5.5.0-pyt`; `gen_trt_engine` de ambos en grupo `deploy`, imagen `5.5.0-deploy`.
+- **Preentrenados descargados en el lab (20-nov-2026):** `nvidia/tao/ocdnet:trainable_resnet18_v1.0` → `ocdnet_deformable_resnet18.pth` (sha256 `7bd721cf…71f8`); `nvidia/tao/ocrnet:trainable_v1.0` → `ocrnet_resnet50.pth` (sha256 `51db226c…5d6d`) + su `character_list` (72 bytes), que se usa para evaluar la línea base de OCRNet.
 - **Sin verificar todavía:** formato de `~/.tao_mounts.json`, versiones y licencias de los modelos preentrenados en NGC. Se verifican en el lab.
 
 ## 25. Reglas de trabajo (entrenamiento de visión)

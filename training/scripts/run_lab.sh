@@ -118,14 +118,21 @@ verificar() {
 datos() {
   paso "Generar datos sintéticos"
   cd "$TRAINING"
-  if [ ! -x .venv/bin/python ]; then
-    "$PY" -m venv .venv || falla "No se pudo crear el venv (prueba: apt-get install python3-venv)."
+  local py
+  if [ -x .venv/bin/pip ] || { "$PY" -m venv .venv >/dev/null 2>&1 && [ -x .venv/bin/pip ]; }; then
+    py=.venv/bin/python
+    .venv/bin/pip install -q -r requirements.txt
+  else
+    # El contenedor del lab no trae python3-venv: las dependencias van a una carpeta propia, sin tocar el sistema.
+    rm -rf "$TRAINING/.venv"
+    "$PY" -m pip install -q --target "$TRAINING/.pydeps" -r requirements.txt || falla "pip no pudo instalar requirements.txt"
+    export PYTHONPATH="$TRAINING/.pydeps"
+    py="$PY"
   fi
-  .venv/bin/pip install -q -r requirements.txt
-  .venv/bin/python scripts/main.py --cantidad 500 --semilla 42
-  .venv/bin/python scripts/aumentar.py
-  .venv/bin/python scripts/prep_mod.py --origen data/augmented
-  .venv/bin/python scripts/prep_ocrnet.py
+  "$py" scripts/main.py --cantidad 500 --semilla 42
+  "$py" scripts/aumentar.py
+  "$py" scripts/prep_mod.py --origen data/augmented
+  "$py" scripts/prep_ocrnet.py
   if (cd data && sha256sum -c --quiet ../huella_datos.sha256); then
     verde "Los datos son idénticos byte a byte a los generados en local."
     registrar "datos: regenerados, huellas idénticas a huella_datos.sha256"
