@@ -60,3 +60,7 @@ training/asistente/cache/
 training/asistente/adapters/*/
 training/asistente/logs/*/checkpoints/
 training/asistente/*.tgz
+
+# Entornos de Python
+.venv/
+__pycache__/

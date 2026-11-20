@@ -128,7 +128,7 @@ El **entrenamiento** se hace en el servidor DLI (sec. 5). La **inferencia** (ser
 |---|---|
 | GPU | NVIDIA GeForce RTX 4050 Laptop, 6 GB VRAM (CUDA) |
 | RAM | 16 GB |
-| Sistema | **PENDIENTE** (Windows / Linux) |
+| Sistema | Linux · **Python 3.12** (con 3.14 falla: `tokenizers` no tiene rueda y no compila) |
 | Estado | **PENDIENTE**: probar si cabe |
 
 **Ojo con la memoria:** el 7B en NF4 ocupa ~5.5 GB (las capas cuantizadas más `embed_tokens` y `lm_head` en fp16) más ~0.5 GB de contexto CUDA. En 6 GB va muy justo. Es una estimación, no una medición: la cifra real la imprime `probar.py`.
@@ -136,9 +136,12 @@ El **entrenamiento** se hace en el servidor DLI (sec. 5). La **inferencia** (ser
 ### Pasos
 1. **Código:** `git pull` (trae `probar.py`, este README y el dataset de test).
 2. **Adaptador:** descargar `prueba_adaptador.tgz` del servidor (JupyterLab → `/dli/task/asistente` → clic derecho → Download), pasarlo por USB o Drive y descomprimirlo dentro de `training/asistente/` con `tar xzf prueba_adaptador.tgz`. Queda en `adapters/prueba/`. Al terminar la época, hacer lo mismo con `adapters/epoca1` (`tar czf epoca1_adaptador.tgz adapters/epoca1`).
-3. **Dependencias:** las mismas versiones que en el servidor, para que el resultado sea comparable:
+3. **Dependencias:** las mismas versiones que en el servidor, para que el resultado sea comparable, en un entorno con **Python 3.12**. Con Python 3.14, `transformers==4.46.3` pide `tokenizers` 0.20, que no trae rueda para 3.14 y su compilación falla (PyO3 admite hasta 3.13):
    ```bash
-   pip install torch transformers==4.46.3 peft==0.13.2 bitsandbytes accelerate
+   pip install uv                       # o: curl -LsSf https://astral.sh/uv/install.sh | sh
+   cd backend-ia && rm -rf .venv
+   uv venv --python 3.12 && source .venv/bin/activate
+   uv pip install torch transformers==4.46.3 peft==0.13.2 bitsandbytes accelerate
    ```
    La primera corrida descarga el modelo base de Hugging Face (~15 GB).
 4. **Prueba:**
