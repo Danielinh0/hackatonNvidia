@@ -37,6 +37,7 @@ Pasos, en orden:
   entrenar    entrenamiento completo: `entrenar ocdnet`, `entrenar ocrnet` o `entrenar` (ambos)
   evaluar     evalúa en test: ajustado y, para OCDNet, el preentrenado sin ajustar (línea base)
   exportar    ONNX de ambos; `exportar --trt` además genera el motor TensorRT fp16 de OCRNet
+  respaldo    junta el mejor modelo y el checkpoint más reciente en un .tar.gz chico (córrelo durante el entrenamiento)
   empaquetar  junta pesos, logs, specs, huellas y registro en un .tar.gz para descargar
   todo        verificar + datos + montajes + modelos + convertir + prueba (se detiene antes del entrenamiento largo)
 
@@ -269,6 +270,24 @@ exportar() {
   fi
 }
 
+respaldo() {
+  paso "Respaldo rápido de pesos"
+  local destino lista=()
+  destino="$LAB/respaldo_$(date +%Y%m%d_%H%M).tar.gz"
+  for d in ocdnet/train ocrnet/train; do
+    [ -d "$RESULTADOS/$d" ] || continue
+    # El mejor modelo + el checkpoint más reciente (TAO retoma solo desde el más reciente de la carpeta).
+    for f in "$RESULTADOS/$d/model_best.pth" "$RESULTADOS/$d/best_accuracy.pth" \
+             "$(ls -t "$RESULTADOS/$d"/*.pth 2>/dev/null | head -n 1)"; do
+      [ -n "$f" ] && [ -f "$f" ] && lista+=("results/${f#"$RESULTADOS/"}")
+    done
+  done
+  [ -f "$REGISTRO" ] && lista+=("results/registro_entrenamiento.md")
+  [ "${#lista[@]}" -gt 0 ] || falla "Todavía no hay pesos que respaldar."
+  tar czf "$destino" -C "$LAB" $(printf '%s\n' "${lista[@]}" | sort -u)
+  verde "Listo: $destino ($(du -h "$destino" | cut -f1)). Descárgalo con clic derecho > Download."
+}
+
 empaquetar() {
   paso "Empaquetar resultados"
   local fecha destino
@@ -294,6 +313,7 @@ case "${1:-}" in
   evaluar) evaluar ;;
   exportar) exportar "${2:-}" ;;
   empaquetar) empaquetar ;;
+  respaldo) respaldo ;;
   todo) verificar; datos; montajes; modelos; convertir; prueba ;;
   *) ayuda ;;
 esac
