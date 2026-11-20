@@ -1,34 +1,41 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { ChatBisie } from "@/components/ChatBisie";
 import { Ico } from "@/components/ui";
 import miniatura from "@/public/figma/chat/ticket-miniatura.jpg";
-
+import { useRouter } from "next/navigation";
 /* Pantalla 7 · Chat con Bisie' sobre un ticket (Figma 1:1998). Vista de diseño. */
 const C = "/figma/chat";
 
 export default function Chat() {
+  const router = useRouter();
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-30 mx-auto max-w-[480px] bg-fondo/90 shadow-[0px_1px_8px_0px_rgba(0,0,0,0.04)] backdrop-blur-[24px]">
-        <div className="flex h-16 items-center justify-between px-2">
-          <div className="flex items-center gap-1">
-            <Link href="/revision/sencillo" aria-label="Regresar a revisión de tickets" className="flex size-11 items-center justify-center rounded-full">
-              <Ico src={`${C}/atras.svg`} w={11.775} h={20} />
-            </Link>
-            <div>
-              <h1 className="text-[19px] leading-[23.75px] font-bold text-tinta">Asistente Bisie&apos;</h1>
-              <p className="text-xs leading-4 font-bold text-azul">Ticket #0842</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1">
-            <button aria-label="Ayuda y opciones" className="flex size-11 items-center justify-center rounded-full">
-              <Ico src={`${C}/ayuda.svg`} w={20} h={20} />
-            </button>
-            <span className="size-8 rounded-full bg-azul-150" />
+      <div className="flex h-16 items-center justify-between px-2">
+        <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              aria-label="Regresar a revisión de tickets"
+              className="flex size-11 items-center justify-center rounded-full"
+            >
+            <Ico src={`${C}/atras.svg`} w={11.775} h={20} />
+          </button>
+          <div>
+            <h1 className="text-[19px] leading-[23.75px] font-bold text-tinta">Asistente Bisie&apos;</h1>
+            <p className="text-xs leading-4 font-bold text-azul">Ticket #0842</p>
           </div>
         </div>
-      </header>
+        <div className="flex items-center gap-1">
+          <button aria-label="Ayuda y opciones" className="flex size-11 items-center justify-center rounded-full">
+            <Ico src={`${C}/ayuda.svg`} w={20} h={20} />
+          </button>
+          <span className="size-8 rounded-full bg-azul-150" />
+        </div>
+      </div>
+    </header>
 
       <main className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-fondo pt-16 pb-[72px]">
         {/* Contexto del ticket, anclado */}
