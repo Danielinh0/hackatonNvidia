@@ -322,10 +322,12 @@ hackathon-nvidia-oaxaca-2026/
 ```bash
 cd training && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python scripts/main.py --cantidad 500 --semilla 42   # data/synthetic: images/, anotaciones.json, manifiesto.json
-.venv/bin/python scripts/prep_mod.py                            # data/ocdnet/{train,val,test}/{img,gt}
+.venv/bin/python scripts/aumentar.py --copias 2                 # data/augmented: originales + 2 fotos simuladas por ticket de train
+.venv/bin/python scripts/prep_mod.py --origen data/augmented     # data/ocdnet/{train,val,test}/{img,gt}
 .venv/bin/python scripts/ver_cajas.py -n 4                      # data/revision_cajas/*.png + conteos
 ```
 - Un ticket = una lista de **segmentos** (texto con caja de 4 puntos, etiqueta y número de fila). Una fila con hueco grande (p. ej. "TOTAL" ... "$446.22") se anota como dos segmentos.
 - `###` marca regiones a ignorar: separadores, código de barras e iniciales del logo.
 - El split es al generar: 80/10/10 de tickets; los nombres de comercio y los productos se reparten 70/15/15, así que val y test solo usan comercios y productos que no existen en train. Lo registra `manifiesto.json`.
+- `aumentar.py` (Etapa 2) simula foto de celular: fondo (madera, mesa, tela, kraft, oscuro), perspectiva y rotación ±8° con homografía, pliegues fotométricos, sombra, gradiente de luz y tinte, desenfoque gaussiano o de movimiento, escala 0.75–1.5, ruido y JPEG 35–90. Los polígonos se transforman con la misma homografía. Las copias de un ticket quedan en su mismo split; por defecto solo se aumenta train.
 - Simplificación: todo artículo lleva IVA 16 % (en la realidad muchos alimentos son tasa 0 %).
