@@ -27,6 +27,17 @@ CREATE TABLE IF NOT EXISTS sesiones (
 ) STRICT;
 CREATE INDEX IF NOT EXISTS sesiones_usuario_idx ON sesiones (usuario_id);
 
+-- Negocio de la persona (pantalla "Configurar"). Uno por cuenta.
+-- Con su RFC se decide si un comprobante es ingreso (lo emitió el negocio) o egreso (CLAUDE.md sec. 13).
+CREATE TABLE IF NOT EXISTS negocios (
+  usuario_id     TEXT PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
+  nombre         TEXT NOT NULL CHECK (length(nombre) BETWEEN 2 AND 120),
+  rfc            TEXT NOT NULL CHECK (length(rfc) IN (12, 13)),        -- 12 persona moral, 13 persona física
+  regimen        TEXT NOT NULL CHECK (regimen IN ('626', '612', '625')), -- c_RegimenFiscal (ver lib/negocio.ts)
+  creado_en      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  actualizado_en TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+) STRICT;
+
 -- Un lote = un envío desde la pantalla "Subir" (una o varias fotos).
 CREATE TABLE IF NOT EXISTS lotes (
   id             TEXT    PRIMARY KEY,                -- UUID v4

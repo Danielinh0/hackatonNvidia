@@ -1,21 +1,46 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
+import { BottomNav } from "@/components/BottomNav";
 import { ChatBisie } from "@/components/ChatBisie";
+import { regresoDeChat } from "@/lib/rutas";
 import { Ico } from "@/components/ui";
 import miniatura from "@/public/figma/chat/ticket-miniatura.jpg";
 
-/* Pantalla 7 · Chat con Bisie' sobre un ticket (Figma 1:1998). Vista de diseño. */
+/*
+ * Pantalla 7 · Chat con Bisie' sobre un ticket (Figma 1:1998). Vista de diseño.
+ * Navegación: desde la barra inferior se entra a "/chat" y "Regresar" va al inicio;
+ * desde una pantalla que pide ayuda se entra a "/chat?desde=<ruta>" (lib/rutas.ts → rutaChat)
+ * y "Regresar" vuelve a esa ruta, validada para que solo sea interna.
+ */
 const C = "/figma/chat";
 
-export default function Chat() {
+const claseRegresar = "flex size-11 items-center justify-center rounded-full";
+
+async function Regresar({ searchParams }: { searchParams: PageProps<"/chat">["searchParams"] }) {
+  const destino = regresoDeChat((await searchParams).desde);
+  return (
+    <Link href={destino} aria-label={destino === "/" ? "Regresar al inicio" : "Regresar a la pantalla anterior"} className={claseRegresar}>
+      <Ico src={`${C}/atras.svg`} w={11.775} h={20} />
+    </Link>
+  );
+}
+
+export default function Chat({ searchParams }: PageProps<"/chat">) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-30 mx-auto max-w-[480px] bg-fondo/90 shadow-[0px_1px_8px_0px_rgba(0,0,0,0.04)] backdrop-blur-[24px]">
         <div className="flex h-16 items-center justify-between px-2">
           <div className="flex items-center gap-1">
-            <Link href="/revision/sencillo" aria-label="Regresar a revisión de tickets" className="flex size-11 items-center justify-center rounded-full">
-              <Ico src={`${C}/atras.svg`} w={11.775} h={20} />
-            </Link>
+            <Suspense
+              fallback={
+                <Link href="/" aria-label="Regresar al inicio" className={claseRegresar}>
+                  <Ico src={`${C}/atras.svg`} w={11.775} h={20} />
+                </Link>
+              }
+            >
+              <Regresar searchParams={searchParams} />
+            </Suspense>
             <div>
               <h1 className="text-[19px] leading-[23.75px] font-bold text-tinta">Asistente Bisie&apos;</h1>
               <p className="text-xs leading-4 font-bold text-azul">Ticket #0842</p>
@@ -29,7 +54,7 @@ export default function Chat() {
         </div>
       </header>
 
-      <main className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-fondo pt-16 pb-[72px]">
+      <main className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-fondo pt-16 pb-[calc(136px+env(safe-area-inset-bottom))]">
         {/* Contexto del ticket, anclado */}
         <div className="sticky top-16 z-20 bg-fondo/95 px-4 py-2 backdrop-blur-[12px]">
           <div className="flex items-center gap-4 bg-white p-4 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]">
@@ -64,6 +89,8 @@ export default function Chat() {
 
         <ChatBisie />
       </main>
+
+      <BottomNav activa="bisie" />
     </>
   );
 }

@@ -11,9 +11,15 @@ import { ESQUEMA } from "./esquema";
  * Se guarda en globalThis para no reabrirla en cada recarga de `next dev`.
  */
 const RUTA = process.env.DZUUN_DB ?? path.join(process.cwd(), "data", "dzuun.sqlite");
-const global = globalThis as unknown as { __dzuunDb?: DatabaseSync };
+const global = globalThis as unknown as { __dzuunDb?: DatabaseSync; __dzuunEsquema?: string };
 
 export function db(): DatabaseSync {
+  // En `next dev` la conexión sobrevive a las recargas, pero el código del esquema puede haber
+  // cambiado (p. ej. una tabla nueva). ESQUEMA es idempotente: si cambió, se vuelve a aplicar.
+  if (global.__dzuunDb && global.__dzuunEsquema !== ESQUEMA) {
+    global.__dzuunDb.exec(ESQUEMA);
+    global.__dzuunEsquema = ESQUEMA;
+  }
   if (!global.__dzuunDb) {
     mkdirSync(path.dirname(RUTA), { recursive: true });
     const d = new DatabaseSync(RUTA);
@@ -35,6 +41,7 @@ export function db(): DatabaseSync {
       throw new Error(`La base ${RUTA} es de un esquema anterior. En desarrollo, borra la carpeta data/ y reinicia.`);
     }
     global.__dzuunDb = d;
+    global.__dzuunEsquema = ESQUEMA;
   }
   return global.__dzuunDb;
 }

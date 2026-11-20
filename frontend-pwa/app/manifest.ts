@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-/* Manifest de la PWA. Faltan íconos 192/512 de marca (pendientes de diseño). */
+/* Manifest de la PWA. Íconos: logo del tintero sobre crema de marca (public/iconos/). */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Dzuun",
@@ -12,6 +12,11 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait",
     background_color: "#f9f9ff",
     theme_color: "#f9f9ff",
-    icons: [{ src: "/favicon.ico", sizes: "any", type: "image/x-icon" }],
+    icons: [
+      { src: "/iconos/icono-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/iconos/icono-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/iconos/maskable-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
+      { src: "/iconos/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+    ],
   };
 }

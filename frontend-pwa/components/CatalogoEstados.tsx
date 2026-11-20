@@ -90,7 +90,7 @@ const estados: Estado[] = [
         Criterio RESICO
       </span>
     ),
-    acciones: [{ texto: "Reformular pregunta", icono: [`${E}/reformular.svg`, 15, 15], estilo: "secundario", href: "/chat" }],
+    acciones: [{ texto: "Reformular pregunta", icono: [`${E}/reformular.svg`, 15, 15], estilo: "secundario", href: "/chat?desde=%2Festados" }],
   },
   {
     n: 6, tipo: "error", etiqueta: "Límite de tamaño",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { siguienteSeguro } from "@/lib/rutas";
 import { FormularioCuenta } from "./FormularioCuenta";
-import { Ico, MascotaBisie } from "./ui";
+import { Ico, Logo, MascotaBisie } from "./ui";
 
 /*
  * Marco de /entrar y /registro con la identidad de "Bienvenida" (Figma 1:2985):
@@ -51,9 +51,7 @@ export function PantallaCuenta({ modo, searchParams }: { modo: "entrar" | "regis
           <Ico src="/figma/configurar/atras.svg" w={16} h={16} />
         </Link>
         <span className="flex items-center gap-1">
-          <span className="flex size-8 items-center justify-center rounded-full bg-noche-profunda">
-            <Ico src="/figma/bienvenida/logo.svg" w={13.6} h={13.6} />
-          </span>
+          <Logo alto={28} className="text-noche-profunda" />
           <span className="text-xl leading-7 font-extrabold tracking-[-0.5px] text-noche-profunda">Dzuun</span>
         </span>
         <span className="size-11" />

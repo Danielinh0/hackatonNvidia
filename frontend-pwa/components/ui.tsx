@@ -7,6 +7,22 @@ export function Ico({ src, w, h, className = "" }: { src: string; w: number; h: 
 }
 
 /**
+ * Logo de Dzuun: tintero con pluma (public/logo.svg, proporción ~1:2).
+ * Se pinta con máscara, así que toma el color del texto (`text-tinta`, `text-marca`, `text-white`…).
+ * `alto` en px; el ancho sale de la proporción del dibujo.
+ */
+export function Logo({ alto = 28, className = "" }: { alto?: number; className?: string }) {
+  return (
+    <span
+      role="img"
+      aria-label="Dzuun"
+      className={`icono-mascara block shrink-0 ${className}`}
+      style={{ width: Math.round(alto * 0.4956 * 10) / 10, height: alto, maskImage: "url(/logo.svg)" }}
+    />
+  );
+}
+
+/**
  * Mascota Bisie'. En Figma el nodo "Mascota Bisie'" aún no tiene ilustración,
  * así que se deja el círculo de fondo como espacio reservado.
  */

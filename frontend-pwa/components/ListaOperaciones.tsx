@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import { Ico } from "./ui";
 
-/* Búsqueda y filtros de Operaciones (Figma 1:1425). Filtra en el cliente sobre los datos recibidos. */
+/* Búsqueda y filtros de Operaciones (Figma 1:1425). Filtra en el cliente sobre los datos que manda el servidor (SQLite). */
 const O = "/figma/operaciones";
 
 export type Operacion = {
@@ -11,24 +12,29 @@ export type Operacion = {
   grupo: string;
   emisor: string;
   detalle: string;
-  monto: number;
-  tipo: "gasto" | "ingreso" | "spei";
+  monto: number | null; // centavos con signo (venta +, compra -); null si no se leyó
+  tipo: "gasto" | "ingreso" | "spei" | "otro";
   tieneCfdi: boolean;
-  conf: number;
+  conf: number | null;
   porRevisar?: boolean;
+  simulado?: boolean;
+  href: string;
   icono: { src: string; w: number; h: number; bg: string };
 };
 
 type Filtro = "todos" | "gasto" | "ingreso" | "spei" | "revisar";
 
-const fmt = (n: number) =>
-  `${n >= 0 ? "+" : "-"}$${Math.abs(n).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = (centavos: number | null, conSigno: boolean) => {
+  if (centavos === null) return "—";
+  const t = `$${(Math.abs(centavos) / 100).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return conSigno ? `${centavos >= 0 ? "+" : "-"}${t}` : t;
+};
 
 function Fila({ op }: { op: Operacion }) {
-  const ingreso = op.monto >= 0;
-  const media = op.conf < 0.85;
+  const ingreso = op.tipo === "ingreso";
+  const media = op.conf !== null && op.conf < 0.85;
   return (
-    <article className="flex flex-col gap-2 bg-white p-4 drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]">
+    <Link href={op.href} className="flex flex-col gap-2 rounded-2xl bg-white p-4 drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-3">
           <span className={`flex size-11 shrink-0 items-center justify-center rounded-full ${op.icono.bg}`}>
@@ -40,7 +46,7 @@ function Fila({ op }: { op: Operacion }) {
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end">
-          <p className={`text-[19px] leading-6 font-bold ${ingreso ? "text-oliva" : "text-tinta"}`}>{fmt(op.monto)}</p>
+          <p className={`text-[19px] leading-6 font-bold ${ingreso ? "text-oliva" : "text-tinta"}`}>{fmt(op.monto, op.tipo === "ingreso" || op.tipo === "gasto")}</p>
           <p className={`text-[11px] leading-[16.5px] ${ingreso ? "font-semibold text-oliva" : "text-tinta-suave"}`}>MXN</p>
         </div>
       </div>
@@ -57,12 +63,13 @@ function Fila({ op }: { op: Operacion }) {
               Sin CFDI
             </span>
           )}
+          {op.simulado && <span className="rounded-full bg-[#fef3c7] px-2.5 py-0.5 font-bold text-[#92400e]">SIMULADO</span>}
           {op.porRevisar ? (
             <span className="flex items-center gap-1 rounded-full bg-durazno px-2.5 py-0.5 font-bold text-[#400100]">
               <Ico src={`${O}/campana.svg`} w={9.333} h={11.667} />
               Por revisar
             </span>
-          ) : (
+          ) : op.conf === null ? null : (
             <span className="flex items-center gap-1 rounded-full bg-azul-50 px-2 py-0.5 font-bold text-tinta-suave">
               <span className={`size-1.5 rounded-full ${media ? "bg-azul" : "bg-oliva-viva"}`} />
               {media ? "Media" : "Alta"} ({Math.round(op.conf * 100)}%)
@@ -75,7 +82,7 @@ function Fila({ op }: { op: Operacion }) {
           <Ico src={`${O}/chevron.svg`} w={6.167} h={10} />
         )}
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -109,7 +116,7 @@ export function ListaOperaciones({ operaciones, resumen }: { operaciones: Operac
     { id: "todos", label: "Todos" },
     { id: "gasto", label: "Gastos" },
     { id: "ingreso", label: "Ingresos" },
-    { id: "spei", label: "Pagos SPEI" },
+    { id: "spei", label: "Pagos" },
     { id: "revisar", label: "Por revisar" },
   ];
 
@@ -123,15 +130,8 @@ export function ListaOperaciones({ operaciones, resumen }: { operaciones: Operac
           onChange={(e) => setQ(e.target.value)}
           placeholder="Buscar por emisor, concepto o RFC..."
           aria-label="Buscar operaciones"
-          className="h-[52px] w-full rounded-full bg-white pr-14 pl-11 text-base text-tinta shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] outline-none placeholder:text-tinta-suave/70 focus:ring-2 focus:ring-azul"
+          className="h-[52px] w-full rounded-full bg-white pr-4 pl-11 text-base text-tinta shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] outline-none placeholder:text-tinta-suave/70 focus:ring-2 focus:ring-azul"
         />
-        <button
-          type="button"
-          aria-label="Filtros"
-          className="absolute top-3.5 right-3 flex size-8 items-center justify-center rounded-full bg-azul-50"
-        >
-          <Ico src={`${O}/filtros.svg`} w={13.5} h={13.5} />
-        </button>
       </div>
 
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none]" role="tablist" aria-label="Filtrar">
@@ -169,7 +169,7 @@ export function ListaOperaciones({ operaciones, resumen }: { operaciones: Operac
       <section className="flex flex-col gap-6" aria-live="polite">
         {Object.keys(grupos).length === 0 && (
           <p className="rounded-2xl bg-white p-6 text-center text-sm leading-5 font-semibold text-tinta-suave">
-            No hay operaciones con ese filtro.
+            {operaciones.length === 0 ? "Aún no tienes operaciones. Sube tus tickets para empezar." : "No hay operaciones con ese filtro."}
           </p>
         )}
         {Object.entries(grupos).map(([grupo, ops]) => (

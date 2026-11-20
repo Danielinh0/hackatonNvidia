@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AccionesLogin, Privacidad } from "./AccionesLogin";
-import { Ico, MascotaBisie } from "./ui";
+import { Ico, Logo, MascotaBisie } from "./ui";
 
 /*
  * Pantalla 2 · Bienvenida y login (Figma 1:2985), con sus variantes
@@ -68,9 +68,7 @@ function HeroInicial() {
   return (
     <>
       <div className="flex items-center gap-1 pb-6">
-        <span className="flex size-10 items-center justify-center rounded-full bg-noche-profunda">
-          <Ico src={`${B}/logo.svg`} w={16.995} h={16.992} />
-        </span>
+        <Logo alto={34} className="text-noche-profunda" />
         <span className="text-2xl leading-8 font-extrabold tracking-[-0.6px] text-noche-profunda">Dzuun</span>
       </div>
       <p className="mb-4 flex items-center gap-1 rounded-full bg-lima px-4 py-1 text-xs leading-4 font-bold tracking-[0.6px] text-noche-profunda uppercase">

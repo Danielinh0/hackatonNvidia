@@ -4,7 +4,8 @@ import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { analizarDocumento } from "@/lib/analisis";
 import { guardarComprobante, yaSubido, type Analisis, type Archivo } from "@/lib/comprobantes";
-import { db } from "@/lib/db";
+import { db, esUuid } from "@/lib/db";
+import { quitarConError } from "@/lib/operaciones";
 import { usuarioActual } from "@/lib/sesion";
 import { MAX_ARCHIVOS, MAX_LOTE_BYTES, verificarArchivo } from "@/lib/verificacion";
 
@@ -84,4 +85,13 @@ export async function subirLote(_prev: EstadoSubida, form: FormData): Promise<Es
 
   // redirect() lanza una excepción especial: va fuera del try/catch.
   redirect(`/subir/recibido/${loteId}`);
+}
+
+/** Quita de "Subir" un archivo que falló al analizarse. */
+export async function quitarFallido(form: FormData) {
+  const usuario = await usuarioActual();
+  if (!usuario) redirect("/entrar");
+  const id = String(form.get("id") ?? "");
+  if (esUuid(id)) quitarConError(db(), usuario.id, id);
+  redirect("/subir");
 }

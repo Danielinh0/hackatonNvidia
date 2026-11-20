@@ -60,3 +60,9 @@ body {
   mask-position: center;
   mask-size: contain;
 }
+
+/* Chat: mientras la persona escribe, la caja de mensaje toma el lugar de la barra inferior.
+   Al salir del campo (tocar fuera, enviar y cerrar teclado) la barra vuelve y se puede cambiar de pestaña. */
+body:has(#chat-entrada :focus) nav[aria-label="Principal"] {
+  display: none;
+}

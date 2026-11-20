@@ -40,3 +40,18 @@ export function rutaEntrar(siguiente: string): string {
 
 export const normalizarCorreo = (c: string) => c.trim().toLowerCase();
 export const correoValido = (c: string) => c.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c);
+
+/**
+ * Enlace al chat con Bisie' desde una pantalla que pide ayuda: guarda la página de origen en ?desde=
+ * para que "Regresar" vuelva ahí (continuidad). Desde la barra inferior se usa "/chat" sin origen → regresa al inicio.
+ */
+export function rutaChat(desde?: string): string {
+  const d = desde ? siguienteSeguro(desde) : "/";
+  return d === "/" || d.startsWith("/chat") ? "/chat" : `/chat?desde=${encodeURIComponent(d)}`;
+}
+
+/** Destino de "Regresar" en el chat: la página de origen validada, o el inicio. Nunca el propio chat. */
+export function regresoDeChat(desde: unknown): string {
+  const d = siguienteSeguro(desde);
+  return d.startsWith("/chat") ? "/" : d;
+}

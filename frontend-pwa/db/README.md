@@ -17,6 +17,7 @@ Guarda las cuentas (acceso local con correo y contraseña), sus sesiones y **los
 | `usuarios` | Cuentas: correo (único, sin distinguir mayúsculas), nombre, `hash_contrasena` (scrypt) y, si se activa Google, `google_sub` y foto |
 | `sesiones` | Sesiones abiertas: solo el sha256 del token, a quién pertenece y cuándo vence |
 | `lotes` | Un envío desde "Subir" (de un `usuario_id`): cuántos archivos llegaron y cuáles se rechazaron (`rechazados`, JSON) |
+| `negocios` | Uno por cuenta (pantalla Configurar): nombre, RFC (12 o 13) y régimen (`626`, `612` o `625`). Con su RFC se propone si un comprobante es venta o compra |
 | `comprobantes` | Un documento analizado: metadatos del archivo (origen cámara/archivo, nombre, tipo, tamaño, `sha256`, **sin bytes**), `estado` (`por_revisar` → `confirmado`/`descartado`, o `error` con su motivo), salida cruda del modelo (`json_modelo`), campos que faltan (`faltantes`), atributos del CFDI 4.0 (serie, folio, fecha, forma/método de pago, moneda, tipo, subtotal, total…), emisor, receptor y la clasificación para el negocio (ingreso/egreso/pago, categoría) |
 | `conceptos` | Renglones del comprobante (clave SAT, cantidad, unidad, descripción, valor unitario, importe, objeto de impuesto) |
 | `impuestos` | Traslados (IVA, IEPS) y retenciones; `concepto_id` NULL = resumen del comprobante |
@@ -36,6 +37,8 @@ Guarda las cuentas (acceso local con correo y contraseña), sus sesiones y **los
 | `Impuestos.TotalImpuestosTrasladados/Retenidos` | `total_traslados`, `total_retenciones` |
 | `Impuestos.Traslados/Retenciones[]` | filas en `impuestos` con `concepto_id` NULL |
 | `Complemento.TimbreFiscalDigital.UUID` | `uuid_cfdi` |
+
+Las consultas de las pantallas (operaciones, resumen del mes, semanas, revisión y correcciones) están en `lib/operaciones.ts`; el negocio en `lib/negocio.ts`. Las sumas usan solo lo **confirmado** y no calculan impuestos.
 
 La lectura y validación de forma está en `lib/cfdi.ts` (RFC, decimales, fechas, catálogos cortos; lo inválido queda en NULL). **No** cuadra montos: eso va en `backend-ia/reglas_fiscales.py`. El guardado está en `lib/comprobantes.ts`.
 
@@ -57,7 +60,7 @@ sqlite3 data/dzuun.sqlite "SELECT nombre_archivo, estado, emisor_nombre, total, 
 Variables (`.env.local`): `BACKEND_URL`, `BACKEND_TOKEN`. Sin servicio de visión, `ANALISIS_SIMULADO=1` usa
 `lib/cfdi-ejemplo.ts` y lo marca **SIMULADO** en la base (`analisis_simulado = 1`) y en pantalla.
 
-Pruebas: `pnpm test` (`lib/cfdi.test.ts`, `lib/comprobantes.test.ts`, `lib/verificacion.test.ts`).
+Pruebas: `pnpm test` (`lib/*.test.ts`: cfdi, comprobantes, negocio, operaciones, verificacion, cuenta, google).
 
 **Migración:** si la base es de una versión que guardaba fotos (tabla `imagenes`), al abrirla se borra esa tabla y se
 compacta el archivo (`VACUUM`, con `secure_delete`). Cuentas, sesiones y lotes se conservan.

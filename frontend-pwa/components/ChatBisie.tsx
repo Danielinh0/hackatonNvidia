@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useCallback, useState, useTransition, type FormEvent } from "react";
+import { transcribirVoz } from "@/app/chat/acciones";
 import { Ico } from "./ui";
+import { useGrabadora } from "./useGrabadora";
 
 /*
  * Conversación con Bisie' (Figma 1:2001 y 1:2131).
  * VISTA DE DISEÑO: los mensajes iniciales son del boceto y el envío aún NO llama a
  * POST /asistente/chat. Al enviar, se muestra un aviso honesto en lugar de una respuesta inventada.
+ * Voz: el micrófono graba (useGrabadora) y manda el audio a app/chat/acciones.ts → FastAPI
+ * /asistente/transcribir. El texto reconocido se pone en la caja para que la persona lo revise
+ * antes de enviarlo; si la transcripción no está conectada o falla, se avisa.
  */
 const C = "/figma/chat";
 
@@ -74,6 +79,29 @@ export function ChatBisie() {
     ]);
     setTexto("");
   }
+
+  const avisar = useCallback((t: string) => setExtra((m) => [...m, { id: Date.now(), de: "aviso", texto: t }]), []);
+  const [transcribiendo, iniciarTransicion] = useTransition();
+
+  const alTerminar = useCallback(
+    (audio: Blob) => {
+      iniciarTransicion(async () => {
+        const fd = new FormData();
+        fd.append("audio", new File([audio], "voz", { type: audio.type }));
+        try {
+          const r = await transcribirVoz(fd);
+          if (r.ok) setTexto((t) => (t.trim() ? `${t.trim()} ${r.texto}` : r.texto));
+          else avisar(r.motivo);
+        } catch {
+          avisar("No pudimos conectar con el servidor. Revisa tu conexión.");
+        }
+      });
+    },
+    [avisar],
+  );
+  const grabadora = useGrabadora({ alTerminar, alFallar: avisar });
+  const grabando = grabadora.estado === "grabando";
+  const ocupado = grabadora.estado === "pidiendo" || transcribiendo;
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -171,17 +199,37 @@ export function ChatBisie() {
         </div>
       </div>
 
+      {/* Encima de la barra inferior; mientras se escribe (foco dentro) baja y ocupa su lugar (ver globals.css). */}
       <form
+        id="chat-entrada"
         onSubmit={onSubmit}
-        className="fixed inset-x-0 bottom-0 z-30 mx-auto flex max-w-[480px] items-center gap-1 bg-fondo/95 px-4 pt-2 pb-[max(8px,env(safe-area-inset-bottom))] shadow-[0px_-4px_16px_0px_rgba(0,15,42,0.06)] backdrop-blur-[24px]"
+        className="fixed inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] z-20 mx-auto flex max-w-[480px] items-center gap-1 bg-fondo/95 px-4 py-2 has-[:focus]:bottom-0 has-[:focus]:z-40 has-[:focus]:pb-[max(8px,env(safe-area-inset-bottom))] shadow-[0px_-4px_16px_0px_rgba(0,15,42,0.06)] backdrop-blur-[24px]"
       >
-        <button type="button" aria-label="Dictar por voz" className="flex size-11 shrink-0 items-center justify-center rounded-full bg-azul-50">
-          <Ico src={`${C}/microfono.svg`} w={14} h={19} />
+        <button
+          type="button"
+          onClick={grabando ? grabadora.detener : grabadora.iniciar}
+          disabled={ocupado}
+          aria-pressed={grabando}
+          aria-label={grabando ? "Detener grabación" : "Dictar por voz"}
+          className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-50 ${
+            grabando ? "animate-pulse bg-[#B3261E]" : "bg-azul-50"
+          }`}
+        >
+          {grabando ? <span aria-hidden className="size-3.5 rounded-sm bg-white" /> : <Ico src={`${C}/microfono.svg`} w={14} h={19} />}
         </button>
         <input
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
-          placeholder="Escribe tu respuesta o duda..."
+          readOnly={grabando || transcribiendo}
+          placeholder={
+            grabando
+              ? `Grabando… 0:${String(grabadora.segundos).padStart(2, "0")} · toca ■ para terminar`
+              : transcribiendo
+                ? "Convirtiendo tu voz en texto…"
+                : grabadora.estado === "pidiendo"
+                  ? "Pidiendo permiso del micrófono…"
+                  : "Escribe tu respuesta o duda..."
+          }
           aria-label="Mensaje para Bisie'"
           className="h-[50px] min-w-0 flex-1 rounded-full bg-white px-4 text-base text-tinta outline-none placeholder:text-tinta-suave/60 focus:ring-2 focus:ring-azul"
         />

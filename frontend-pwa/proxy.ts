@@ -27,5 +27,6 @@ export function proxy(req: NextRequest) {
 
 export const config = {
   // Todo menos archivos estáticos, íconos de Figma e imágenes optimizadas.
-  matcher: ["/((?!_next/static|_next/image|figma/|favicon.ico).*)"],
+  // Archivos públicos de marca (logo e íconos de la PWA) se sirven sin sesión: la bienvenida y el instalador los necesitan.
+  matcher: ["/((?!_next/static|_next/image|figma/|iconos/|favicon.ico|logo.svg|icon.svg|apple-icon.png).*)"],
 };

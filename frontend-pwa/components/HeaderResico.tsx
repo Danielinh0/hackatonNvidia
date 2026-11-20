@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "./ui";
 
 /** Encabezado con marca + chip RESICO + "Modo Rápido" (Figma 1:827 y 1:1673). */
 export function HeaderResico({ seccion }: { seccion: string }) {
@@ -6,9 +7,7 @@ export function HeaderResico({ seccion }: { seccion: string }) {
     <header className="fixed inset-x-0 top-0 z-30 mx-auto max-w-[480px] bg-fondo/80 shadow-[0px_1px_8px_0px_rgba(0,0,0,0.04)] backdrop-blur-[24px]">
       <div className="flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="flex size-9 items-center justify-center rounded-full bg-marca text-[22px] leading-7 font-bold text-white">
-            D
-          </span>
+          <Logo alto={32} className="text-tinta" />
           <span className="flex flex-col">
             <span className="flex items-center gap-1">
               <span className="text-xl leading-[26px] font-bold tracking-[-0.5px] text-tinta">Dzuun</span>

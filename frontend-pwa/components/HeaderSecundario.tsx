@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Ico } from "./ui";
+import { Ico, Logo } from "./ui";
 
 /**
  * Encabezado de pantallas de flujo (con botón Regresar), p. ej. Figma 1:615.
@@ -24,9 +24,7 @@ export function HeaderSecundario({
           </Link>
           {titulo ?? (
             <span className="flex items-center gap-1">
-              <span className="flex size-7 items-center justify-center rounded-[32px] bg-marca text-xs leading-4 font-bold text-white">
-                D
-              </span>
+              <Logo alto={26} className="text-tinta" />
               <span className="text-[19px] leading-6 font-bold tracking-[-0.475px] text-tinta">Dzuun</span>
             </span>
           )}
