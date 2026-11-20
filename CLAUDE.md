@@ -122,7 +122,7 @@ Al concluir las 24 h: se cierra el registro de entregables; entrenamientos termi
 - Reglas con fuente, periodo, supuestos y casos de prueba.
 
 ## 13. Flujo
-1. Login con Google. 2. Subir N fotos (cola con estado por archivo; un fallo no bloquea el lote). 3. Visión clasifica y detecta regiones; OCR solo sobre recortes. 4. Reglas en código: subtotal + IVA 16 % = total, catálogos SAT por consulta. 5. Tona propone clasificación y categoría, pregunta lo que falta. 6. Revisión humana obligatoria. 7. Confirmar → guardar → (P1) XML/PDF simulado.
+1. Login con Google. 2. Subir N fotos (cola con estado por archivo; un fallo no bloquea el lote). 3. Visión: OCDNet detecta líneas de texto y OCRNet lee cada línea (sec. 24). El LLM asigna cada línea a un campo. 4. Reglas en código: subtotal + IVA 16 % = total, catálogos SAT por consulta. 5. Tona propone clasificación y categoría, pregunta lo que falta. 6. Revisión humana obligatoria. 7. Confirmar → guardar → (P1) XML/PDF simulado.
 - **Ingreso vs egreso:** el usuario configura nombre/RFC de su negocio; si el emisor coincide → ingreso, si no → egreso; si no se lee emisor → Tona pregunta.
 - **¿Tiene CFDI?:** se activa con `uuid_cfdi` o `qr_cfdi` detectados; se informa como "indicios" con confianza.
 
@@ -158,23 +158,26 @@ PWA (Next.js + TypeScript + Tailwind, Vercel)
   "errores": []
 }
 ```
+> Pendiente (Etapa 6, sec. 24): con OCDNet/OCRNet las cajas son por línea y el LLM asigna el campo; revisar este contrato al implementar el pipeline.
+
 `POST /asistente/chat` → `{ "mensaje": "...", "modo": "accesibilidad|detalle", "contexto": { "operacion_id": "..." } }`, respuesta en streaming (SSE).
 
 ## 17. Modelos (decisión final)
 | Componente | Modelo base | Método | Licencia | Plan B |
 |---|---|---|---|---|
-| Visión | YOLO11s (Ultralytics) | Ajuste fino + export TensorRT FP16 | AGPL-3.0 | YOLO11n / YOLO11m |
-| OCR (NO entrenado, complemento declarado) | PaddleOCR o Tesseract spa | Preentrenado | Apache-2.0 | EasyOCR |
+| Visión: detección de líneas | OCDNet (NVIDIA TAO 5.5.0, pesos preentrenados de NGC) | Ajuste fino en el lab, fp16 | Verificar licencia del modelo en su ficha de NGC | — |
+| Visión: lectura de líneas | OCRNet (NVIDIA TAO 5.5.0, pesos preentrenados de NGC) | Ajuste fino en el lab, fp16 | Verificar licencia del modelo en su ficha de NGC | — |
 | Asistente "Tona" | Qwen2.5-7B-Instruct | QLoRA NF4 + tablas SAT por consulta | Apache-2.0 | Qwen2.5-3B-Instruct |
-- **Clases del detector:** `ticket_total, ticket_fecha, ticket_folio, ticket_emisor, ticket_rfc, ticket_iva, ticket_forma_pago, qr_cfdi, uuid_cfdi, spei_monto, spei_fecha, spei_clave_rastreo, spei_beneficiario`. El tipo de documento se deduce por regla de clases.
-- **Hiperparámetros iniciales (ajustar con validación):** visión imgsz 640, 50–100 épocas, batch 16, parada temprana, aumentos solo en train. QLoRA: NF4, r=16, alpha=32, capas lineales, lr 2e-4, 2–3 épocas, secuencia 1024.
+- **Visión (19/20-nov-2026):** se reemplazó YOLO11s + PaddleOCR por TAO OCDNet + OCRNet. El detector ya no tiene clases de campo: detecta líneas y el LLM decide qué línea es comercio, RFC, total, etc. Detalle en sec. 24.
+- **Asistente:** se mantiene el QLoRA de esta sección como trabajo aparte del de visión (requisito de ajuste de ambos modelos, sec. 2).
+- **Hiperparámetros iniciales del QLoRA (ajustar con validación):** NF4, r=16, alpha=32, capas lineales, lr 2e-4, 2–3 épocas, secuencia 1024.
 - **Dataset de Tona (JSONL, ~1,500–3,000 ejemplos sintéticos revisados):** (a) texto OCR → JSON, (b) ingreso/egreso/categoría, (c) conversación: datos faltantes, explicación, narración, fuera de alcance, pedir confirmación.
 - **Personalidad:** amable, cercana, frases cortas, sin jerga; nunca presenta estimaciones como oficiales; si no sabe, lo dice. Nombre propuesto: Tona.
-- **NVIDIA a documentar:** contenedor NGC (`nvcr.io/nvidia/pytorch`), CUDA, TensorRT (benchmark PyTorch vs TensorRT como evidencia). Opcional: NeMo.
+- **NVIDIA a documentar:** TAO Toolkit 5.5 (entrenamiento de OCDNet/OCRNet), NGC (pesos preentrenados y contenedores), GPU T4 del lab DLI. Opcional: exportar a ONNX y optimizar con TensorRT (despliegue). Opcional: NeMo.
 
 ## 18. Datos
-- Tickets sintéticos: el generador exporta imagen + etiquetas YOLO. Variar plantillas, fuentes, papel, perspectiva, desenfoque, sombras, arrugas, tinta desvanecida.
-- 50–100 fotos reales anonimizadas, etiquetadas a mano, para val y test.
+- Tickets sintéticos: `training/scripts/main.py` exporta imagen + líneas de texto con caja; `prep_mod.py` las convierte a formato ICDAR para OCDNet. Variar plantillas, fuentes, papel, perspectiva, desenfoque, sombras, arrugas, tinta desvanecida.
+- 30–50 fotos reales de tickets, con datos personales tapados, SOLO para prueba (no se entrena con ellas). Si hay tiempo, 20–30 reales anotadas pueden sumarse al entrenamiento.
 - Split por PLANTILLA, no por imagen. Aumentos solo en train. Todo sintético marcado como tal; procedencia y licencia de datasets públicos registradas.
 
 ## 19. Estructura del repo
@@ -187,8 +190,12 @@ hackathon-nvidia-oaxaca-2026/
 ├── frontend-pwa/    Next.js (TS) + Tailwind -> Vercel; Firebase client SDK
 ├── backend-ia/      FastAPI: vision_pipeline.py, llm_service.py, reglas_fiscales.py, auth_firebase.py
 ├── firebase/        firestore.rules, storage.rules (sin claves)
+│                    pipeline/ (inferencia OCDNet -> OCRNet -> texto por línea)
 └── training/
-    ├── vision/      dataset train/val/test, train_vision.py, logs/, weights/
+    ├── data/        raw/ (fotos reales de prueba, fuera de git), synthetic/, ocdnet/, ocrnet/
+    ├── specs/       YAML de TAO (OCDNet, OCRNet)
+    ├── scripts/     main.py (generador), prep_mod.py (export ICDAR), run_lab.sh
+    ├── notebooks/
     └── asistente/   dataset JSONL, train_qlora.py, test_10_casos.py, logs/, adapters/
 ```
 
@@ -209,6 +216,12 @@ hackathon-nvidia-oaxaca-2026/
 - [ ] Elegir herramienta de bocetos → Figma (conectar MCP de Figma si se usará para pasar diseño a código)
 - [ ] Registrar en `docs/declaracion_ia.md` el uso de Claude Code para naming, prompts de Stitch y paleta
 - [ ] Declaración de IA firmada
+- [ ] Visión: configurar la NGC API key en el lab (`ngc config set` y `docker login nvcr.io`, la hace el usuario)
+- [ ] Visión: crear `~/.tao_mounts.json` en el lab
+- [ ] Visión: descargar la imagen Docker de TAO 5.5.0 desde nvcr.io
+- [ ] Visión: entrenamiento corto de prueba (1–2 épocas) para validar los specs
+- [ ] Visión: conseguir 30–50 fotos reales de tickets de prueba con datos personales tapados
+- [ ] Verificar licencias de OCDNet/OCRNet en sus fichas de NGC
 
 ---
 
@@ -235,3 +248,78 @@ hackathon-nvidia-oaxaca-2026/
 - **Bienvenida (pantalla 2), 4 secciones:** héroe con eslogan y "Continuar con Google" · "Así de fácil" en 3 pasos (foto → la mascota lee y ordena → tú revisas y guardas) · tarjeta "¿Aún no te has dado de alta en el SAT? Recuerda que con Dzuun facturar nunca había sido tan fácil" con 6 pasos (consultar RFC con CURP; inscribirse en línea o con cita; Contraseña y e.firma; elegir régimen, p. ej. RESICO; descargar Constancia de Situación Fiscal; registrarla en Dzuun), nota "Guía informativa, los requisitos pueden cambiar" y enlace subrayado "Para más información ingresa al portal del SAT" → `https://www.sat.gob.mx` (`target="_blank" rel="noopener noreferrer"`) · pie con "Ya tengo cuenta, entrar".
 - Los bocetos son guía visual; el código lo escribe y lo explica el equipo. Toda pantalla usa datos ficticios y rotula estimaciones y SIMULADO.
 - **Tres decisiones de diseño candidatas para la ficha (sec. 5):** botón "Confirmar" bloqueado mientras haya campos de confianza baja; modo sencillo de un ticket por vez con voz; cola de carga donde un fallo no bloquea el lote.
+
+---
+
+# Visión: entrenamiento con TAO
+
+## 24. Flujo de entrenamiento y entorno
+- **Objetivo:** leer tickets de compra y venta para extraer comercio, RFC, fecha, folio, artículos, subtotal, IVA y total, y que el usuario los revise antes de guardar.
+- **Flujo:** foto del ticket → **OCDNet** (detecta líneas de texto) → **OCRNet** (lee cada línea) → LLM, con few-shot o RAG, que extrae los campos → validación aritmética y de formato en `backend-ia/reglas_fiscales.py` (subtotal + IVA = total, RFC, fecha) → pantalla de revisión y corrección → guardado.
+- **Decisiones:**
+  - Visión con NVIDIA TAO Toolkit: OCDNet + OCRNet, ajustados desde pesos preentrenados de NGC.
+  - Datos de entrenamiento: tickets sintéticos de `training/scripts/main.py`. Las fotos reales (30–50, con datos personales tapados) son solo de prueba. Si hay tiempo, 20–30 reales anotadas pueden sumarse al entrenamiento.
+  - Línea base: OCDNet/OCRNet preentrenados sin ajustar, comparados contra los ajustados.
+  - NVIDIA DALI descartado: el dataset es pequeño y TAO ya trae su cargador.
+  - Opcional si sobra tiempo: exportar a ONNX y optimizar con TensorRT (cubre "despliegue" en la rúbrica NVIDIA).
+  - Presupuesto: unas 10 h antes de la prueba en vivo.
+- **Dónde se trabaja:**
+  - **El entrenamiento se hace en el lab:** T4, TAO 5.5.0, fp16.
+  - **En local:** generación de datos, conversión de formatos, pipeline de inferencia, extracción con LLM y app. Todo esto debe poder probarse sin GPU.
+- **Entorno del lab (verificado):**
+  - JupyterLab en la nube, contenedor de curso NVIDIA DLI, ruta de trabajo `/dli/task`, usuario root, Ubuntu.
+  - Python 3.10.12: el comando es `python3`; pip está en `/usr/local/bin/pip`.
+  - GPU Tesla T4 de 15 GB, driver 545.23.08, CUDA 12.3. **Sin bf16: entrenar en fp16.**
+  - No hay torch, transformers ni peft. TAO corre sus modelos en sus propios contenedores.
+  - nvidia-tao 5.5.1 (launcher), toolkit 5.5.0. Docker funciona (`/usr/bin/docker`, socket `/var/run/docker.sock`). Aún no hay imágenes descargadas: se bajan de nvcr.io.
+  - Falta `~/.tao_mounts.json`: TAO lo busca y define qué carpetas se montan en los contenedores.
+  - NGC CLI 3.57.2 en `/dli/task/ngc_assets/ngc-cli/ngc`. Hay internet: nvcr.io y api.ngc.nvidia.com responden 401, o sea que solo faltan credenciales. La NGC API key la configura el usuario con `ngc config set` y `docker login`.
+  - Disco: 90 GB libres. `/dli/task/models` está vacía; `/dli/task/data` solo trae un zip de un curso que no se usa.
+  - **La sesión es temporal:** pesos, logs y specs se copian fuera antes de que cierre.
+- **Máquina local:** Ubuntu 24.04, Python 3.12, sin garantía de GPU.
+- **Rúbrica (resumen):** producto funcional 20, visión 20, asistente 20, HCI 15, problema 10, herramientas NVIDIA 10, presentación 5. Se exige:
+  - entrenar o ajustar durante el evento, con train/val/test separados, pesos y logs guardados, y comparación base vs ajustado;
+  - corrección humana y manejo de errores;
+  - funciones simuladas identificadas;
+  - uso de herramientas de IA declarado;
+  - sin datos sensibles ni claves;
+  - ≥5 casos de prueba de la app, incluidos errores y datos inválidos.
+- **Etapas (una a la vez, con confirmación del usuario entre cada una):**
+  1. Corregir `main.py` y `prep_mod.py`, y agregar `ver_cajas.py`.
+  2. Aumentos tipo foto de celular, con las cajas como polígonos de 4 puntos.
+  3. Exportar datos para OCRNet.
+  4. Specs YAML de TAO 5.5.0.
+  5. `run_lab.sh`, con corrida corta de prueba.
+  6. Pipeline de inferencia local + extracción con LLM + validaciones.
+  7. Evaluación base vs ajustado sobre fotos reales.
+- **Problemas de los scripts originales (corregidos en la Etapa 1, 20-nov-2026):**
+  1. El separador y el encabezado de artículos se dibujan sin anotarse.
+  2. Las cajas de totales incluyen espacios de relleno.
+  3. La línea de TOTAL puede salirse de los 440 px.
+  4. No hay split de test con comercios y productos ausentes en train.
+  5. Las comas en el texto rompen el formato ICDAR.
+  6. Falta semilla global.
+  7. Hay poca variedad de comercios, productos y formatos.
+  8. Usan rutas relativas al directorio actual.
+
+## 25. Reglas de trabajo (entrenamiento de visión)
+- Trabajar una etapa a la vez. Al terminar cada una: explicar qué se hizo y cómo probarla, y esperar confirmación.
+- No inventar claves de los specs de TAO. Verificarlas contra la documentación oficial de TAO 5.5 y, si existe, contra los specs por defecto del contenedor (acción `download_specs`). Lo que no se pueda verificar se marca como pendiente de validar en el lab.
+- Explicar brevemente el porqué de cada decisión técnica.
+- Comentarios en el código solo cuando el motivo no sea obvio. Nada de docstrings genéricos ("Función que…") ni emojis. Al corregir los scripts originales, quitar sus comentarios de ese estilo.
+- Nunca escribir claves ni credenciales en archivos. La NGC API key va por variable de entorno o con `ngc config set`.
+- Nada de datos sensibles reales. Los RFC de ejemplo son inventados.
+- El README declara qué es simulado (facturación CFDI) y qué herramientas de IA se usaron.
+- Dependencias fijadas en `requirements.txt`.
+
+### Uso de los scripts (local)
+```bash
+cd training && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python scripts/main.py --cantidad 500 --semilla 42   # data/synthetic: images/, anotaciones.json, manifiesto.json
+.venv/bin/python scripts/prep_mod.py                            # data/ocdnet/{train,val,test}/{img,gt}
+.venv/bin/python scripts/ver_cajas.py -n 4                      # data/revision_cajas/*.png + conteos
+```
+- Un ticket = una lista de **segmentos** (texto con caja de 4 puntos, etiqueta y número de fila). Una fila con hueco grande (p. ej. "TOTAL" ... "$446.22") se anota como dos segmentos.
+- `###` marca regiones a ignorar: separadores, código de barras e iniciales del logo.
+- El split es al generar: 80/10/10 de tickets; los nombres de comercio y los productos se reparten 70/15/15, así que val y test solo usan comercios y productos que no existen en train. Lo registra `manifiesto.json`.
+- Simplificación: todo artículo lleva IVA 16 % (en la realidad muchos alimentos son tasa 0 %).

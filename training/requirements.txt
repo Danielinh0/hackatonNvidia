@@ -1,0 +1,5 @@
+# Generación y conversión de datos (local, sin GPU). Probado con Python 3.12; compatible con 3.10 del lab.
+numpy==1.26.4
+Pillow==10.4.0
+requests==2.32.3
+urllib3==2.8.0

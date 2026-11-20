@@ -45,3 +45,10 @@ serviceAccount*.json
 
 # base de datos SQLite local (contiene las fotos subidas)
 frontend-pwa/data/
+
+# datos generados y fotos reales de prueba (no se suben al repo público)
+training/data/*/*
+!training/data/*/.gitkeep
+training/.venv/
+training/.cache/
+__pycache__/
