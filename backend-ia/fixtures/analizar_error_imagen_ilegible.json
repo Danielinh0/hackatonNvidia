@@ -1,0 +1,39 @@
+{
+ "_aviso": "SIMULADO: ejemplo del contrato de POST /vision/analizar armado desde el ground truth de un ticket sintético. Las confianzas son valores de prueba para pintar el semáforo, no salidas de un modelo.",
+ "imagen": {
+  "archivo": "foto_borrosa.jpg",
+  "ancho": 1080,
+  "alto": 1440
+ },
+ "doc_tipo": "desconocido",
+ "campos": [],
+ "items": [],
+ "categoria_propuesta": null,
+ "tiene_cfdi": false,
+ "uuid_cfdi": null,
+ "validaciones": [],
+ "conf_global": 0.0,
+ "segmentos": [],
+ "modelos": {
+  "ocdnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "ocrnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "llm": {
+   "base": "Qwen2.5-7B-Instruct",
+   "adaptador": null,
+   "sha256": null
+  }
+ },
+ "errores": [
+  {
+   "codigo": "SIN_TEXTO",
+   "campo": null,
+   "mensaje": "No encontré texto en la foto. Intenta con más luz y sin que se mueva."
+  }
+ ]
+}

@@ -148,17 +148,23 @@ PWA (Next.js + TypeScript + Tailwind, Vercel)
 - Reglas fiscales y catálogos SAT en código; el modelo propone, el código valida. Nunca emitir sin pantalla de revisión.
 
 ### Contratos de API
-`POST /vision/analizar` (multipart: imagen) →
+`POST /vision/analizar` (multipart: imagen) → un solo JSON ya clasificado. Por dentro, el backend encadena: `pipeline/` (OCDNet → OCRNet → segmentos) → `llm_service.py` (segmentos → campos) → `reglas_fiscales.py` (validaciones).
 ```json
 {
   "doc_tipo": "ticket | spei | desconocido",
-  "campos": [{"nombre": "total", "valor": "245.00", "conf": 0.91, "bbox": [0, 0, 0, 0]}],
-  "tiene_cfdi": true,
+  "segmentos": [{"id": 21, "texto": "$1363.00", "poligono": [[372,437],[493,438],[493,460],[372,459]], "linea": 14, "conf_caja": 0.96, "conf_ocr": 0.91}],
+  "campos": [{"nombre": "total", "valor": "1363.00", "texto_original": "$1363.00", "conf": 0.87, "seg": [21]}],
+  "items": [{"cantidad": "4", "descripcion": "TACOS DE CECINA", "precio_unitario": "90.00", "importe": "360.00", "conf": 0.9, "seg": [8, 9, 10]}],
+  "categoria_propuesta": "restaurante",
+  "tiene_cfdi": false, "uuid_cfdi": null,
+  "validaciones": [{"regla": "subtotal_mas_iva_igual_total", "ok": true, "detalle": "..."}],
   "conf_global": 0.78,
-  "errores": []
+  "modelos": {"ocdnet": {"archivo": "...", "sha256": "..."}, "ocrnet": {"archivo": "...", "sha256": "..."}, "llm": {"base": "Qwen2.5-7B-Instruct", "adaptador": "...", "sha256": "..."}},
+  "errores": [{"codigo": "CAMPO_FALTANTE", "campo": "rfc", "mensaje": "..."}]
 }
 ```
-> Pendiente (Etapa 6, sec. 24): con OCDNet/OCRNet las cajas son por línea y el LLM asigna el campo; revisar este contrato al implementar el pipeline.
+- `seg` enlaza cada campo con sus segmentos (caja y confianza para la revisión). `modelos` acredita ante el jurado qué pesos entrenados se usaron.
+- Ejemplos SIMULADOS para programar sin modelos: `backend-ia/fixtures/` (ver su README).
 
 `POST /asistente/chat` → `{ "mensaje": "...", "modo": "accesibilidad|detalle", "contexto": { "operacion_id": "..." } }`, respuesta en streaming (SSE).
 
@@ -189,8 +195,8 @@ hackathon-nvidia-oaxaca-2026/
 │                    fuentes/ (diccionarios zapotecos), pruebas_uso/, evidencias/
 ├── frontend-pwa/    Next.js (TS) + Tailwind -> Vercel; Firebase client SDK
 ├── backend-ia/      FastAPI: vision_pipeline.py, llm_service.py, reglas_fiscales.py, auth_firebase.py
+│                    pipeline/ (inferencia OCDNet -> OCRNet -> segmentos), fixtures/ (ejemplos SIMULADOS del contrato)
 ├── firebase/        firestore.rules, storage.rules (sin claves)
-│                    pipeline/ (inferencia OCDNet -> OCRNet -> texto por línea)
 └── training/
     ├── data/        raw/ (fotos reales de prueba, fuera de git), synthetic/, ocdnet/, ocrnet/
     ├── specs/       YAML de TAO (OCDNet, OCRNet)

@@ -1,0 +1,793 @@
+{
+ "_aviso": "SIMULADO: ejemplo del contrato de POST /vision/analizar armado desde el ground truth de un ticket sintético. Las confianzas son valores de prueba para pintar el semáforo, no salidas de un modelo.",
+ "imagen": {
+  "archivo": "ticket_00082.png",
+  "ancho": 440,
+  "alto": 546
+ },
+ "doc_tipo": "ticket",
+ "campos": [
+  {
+   "nombre": "comercio",
+   "valor": "GASOLINERIA EL FARO",
+   "texto_original": "GASOLINERIA EL FARO",
+   "conf": 0.81,
+   "seg": [
+    0
+   ]
+  },
+  {
+   "nombre": "rfc",
+   "valor": "NAOC990117312",
+   "texto_original": "RFC: NAOC990117312",
+   "conf": 0.85,
+   "seg": [
+    3
+   ]
+  },
+  {
+   "nombre": "fecha_hora",
+   "valor": "2026-04-24 03:27",
+   "texto_original": "2026-04-24 03:27",
+   "conf": 0.62,
+   "seg": [
+    4
+   ]
+  },
+  {
+   "nombre": "folio",
+   "valor": "56807940",
+   "texto_original": "NO. VENTA: 56807940",
+   "conf": 0.86,
+   "seg": [
+    5
+   ]
+  },
+  {
+   "nombre": "subtotal",
+   "valor": "1983.51",
+   "texto_original": "$1,983.51",
+   "conf": 0.8,
+   "seg": [
+    15
+   ]
+  },
+  {
+   "nombre": "iva",
+   "valor": "317.36",
+   "texto_original": "$317.36",
+   "conf": 0.83,
+   "seg": [
+    17
+   ]
+  },
+  {
+   "nombre": "total",
+   "valor": "2300.87",
+   "texto_original": "$2,300.87",
+   "conf": 0.86,
+   "seg": [
+    19
+   ]
+  },
+  {
+   "nombre": "forma_pago",
+   "valor": "TARJETA DEBITO",
+   "texto_original": "TARJETA DEBITO",
+   "conf": 0.88,
+   "seg": [
+    20
+   ]
+  }
+ ],
+ "items": [
+  {
+   "cantidad": "56.074",
+   "descripcion": "DIESEL",
+   "precio_unitario": "25.49",
+   "importe": "1429.33",
+   "conf": 0.61,
+   "seg": [
+    8,
+    9,
+    10
+   ]
+  },
+  {
+   "cantidad": "21.69",
+   "descripcion": "DIESEL AUTOMOTRIZ",
+   "precio_unitario": "25.55",
+   "importe": "554.18",
+   "conf": 0.89,
+   "seg": [
+    11,
+    12,
+    13
+   ]
+  }
+ ],
+ "categoria_propuesta": "gasolinera",
+ "tiene_cfdi": false,
+ "uuid_cfdi": null,
+ "validaciones": [
+  {
+   "regla": "subtotal_mas_iva_igual_total",
+   "ok": true,
+   "detalle": "1983.51 + 317.36 = 2300.87"
+  },
+  {
+   "regla": "formato_rfc",
+   "ok": true,
+   "detalle": "NAOC990117312"
+  }
+ ],
+ "conf_global": 0.62,
+ "segmentos": [
+  {
+   "id": 0,
+   "texto": "GASOLINERIA EL FARO",
+   "poligono": [
+    [
+     101.6,
+     98.1
+    ],
+    [
+     340.6,
+     99.9
+    ],
+    [
+     340.5,
+     114.9
+    ],
+    [
+     101.5,
+     113.1
+    ]
+   ],
+   "linea": 1,
+   "conf_caja": 0.91,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 1,
+   "texto": "CALZ. MAGNOLIAS #472, COL. PRESIDENTES",
+   "poligono": [
+    [
+     95.8,
+     124.1
+    ],
+    [
+     346.8,
+     125.9
+    ],
+    [
+     346.7,
+     135.9
+    ],
+    [
+     95.7,
+     134.1
+    ]
+   ],
+   "linea": 2,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.93
+  },
+  {
+   "id": 2,
+   "texto": "C.P. 68181 OAXACA DE JUAREZ, OAX.",
+   "poligono": [
+    [
+     112.2,
+     137.2
+    ],
+    [
+     330.2,
+     138.8
+    ],
+    [
+     330.1,
+     148.8
+    ],
+    [
+     112.1,
+     147.2
+    ]
+   ],
+   "linea": 3,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 3,
+   "texto": "RFC: NAOC990117312",
+   "poligono": [
+    [
+     161.5,
+     151.6
+    ],
+    [
+     280.5,
+     152.4
+    ],
+    [
+     280.5,
+     160.4
+    ],
+    [
+     161.5,
+     159.6
+    ]
+   ],
+   "linea": 4,
+   "conf_caja": 0.96,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 4,
+   "texto": "2026-04-24 03:27",
+   "poligono": [
+    [
+     25.7,
+     171.6
+    ],
+    [
+     131.7,
+     172.4
+    ],
+    [
+     131.7,
+     180.4
+    ],
+    [
+     25.7,
+     179.6
+    ]
+   ],
+   "linea": 5,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.7
+  },
+  {
+   "id": 5,
+   "texto": "NO. VENTA: 56807940",
+   "poligono": [
+    [
+     290.4,
+     173.5
+    ],
+    [
+     415.4,
+     174.4
+    ],
+    [
+     415.4,
+     182.4
+    ],
+    [
+     290.4,
+     181.5
+    ]
+   ],
+   "linea": 5,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.93
+  },
+  {
+   "id": 6,
+   "texto": "BOMBA: 1",
+   "poligono": [
+    [
+     25.6,
+     186.6
+    ],
+    [
+     78.6,
+     187.0
+    ],
+    [
+     78.6,
+     195.0
+    ],
+    [
+     25.6,
+     194.6
+    ]
+   ],
+   "linea": 6,
+   "conf_caja": 0.64,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 7,
+   "texto": "DESPACHADOR: 27",
+   "poligono": [
+    [
+     316.7,
+     188.7
+    ],
+    [
+     415.7,
+     189.4
+    ],
+    [
+     415.6,
+     197.4
+    ],
+    [
+     316.7,
+     196.7
+    ]
+   ],
+   "linea": 6,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 8,
+   "texto": "DIESEL",
+   "poligono": [
+    [
+     25.4,
+     219.6
+    ],
+    [
+     75.4,
+     219.9
+    ],
+    [
+     75.3,
+     229.9
+    ],
+    [
+     25.3,
+     229.6
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 9,
+   "texto": "56.074 L x $25.49",
+   "poligono": [
+    [
+     25.3,
+     237.6
+    ],
+    [
+     147.2,
+     238.5
+    ],
+    [
+     147.2,
+     248.5
+    ],
+    [
+     25.2,
+     247.6
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.64
+  },
+  {
+   "id": 10,
+   "texto": "$1,429.33",
+   "poligono": [
+    [
+     350.4,
+     239.9
+    ],
+    [
+     415.4,
+     240.4
+    ],
+    [
+     415.3,
+     251.4
+    ],
+    [
+     350.3,
+     250.9
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.68,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 11,
+   "texto": "DIESEL AUTOMOTRIZ",
+   "poligono": [
+    [
+     25.1,
+     253.6
+    ],
+    [
+     168.1,
+     254.6
+    ],
+    [
+     168.1,
+     264.6
+    ],
+    [
+     25.1,
+     263.6
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 12,
+   "texto": "21.690 L x $25.55",
+   "poligono": [
+    [
+     25.0,
+     271.6
+    ],
+    [
+     147.0,
+     272.5
+    ],
+    [
+     146.9,
+     282.5
+    ],
+    [
+     24.9,
+     281.6
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.91,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 13,
+   "texto": "$554.18",
+   "poligono": [
+    [
+     364.6,
+     274.0
+    ],
+    [
+     414.6,
+     274.4
+    ],
+    [
+     414.5,
+     284.4
+    ],
+    [
+     364.5,
+     284.0
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 14,
+   "texto": "SUBTOTAL",
+   "poligono": [
+    [
+     24.7,
+     310.6
+    ],
+    [
+     91.7,
+     311.1
+    ],
+    [
+     91.6,
+     321.1
+    ],
+    [
+     24.6,
+     320.6
+    ]
+   ],
+   "linea": 13,
+   "conf_caja": 0.78,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 15,
+   "texto": "$1,983.51",
+   "poligono": [
+    [
+     339.1,
+     311.9
+    ],
+    [
+     415.1,
+     312.4
+    ],
+    [
+     415.0,
+     325.4
+    ],
+    [
+     339.0,
+     324.9
+    ]
+   ],
+   "linea": 13,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 16,
+   "texto": "I.V.A.",
+   "poligono": [
+    [
+     24.6,
+     328.6
+    ],
+    [
+     74.6,
+     328.9
+    ],
+    [
+     74.5,
+     338.9
+    ],
+    [
+     24.5,
+     338.6
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.63,
+   "conf_ocr": 0.67
+  },
+  {
+   "id": 17,
+   "texto": "$317.36",
+   "poligono": [
+    [
+     355.7,
+     330.0
+    ],
+    [
+     414.7,
+     330.4
+    ],
+    [
+     414.7,
+     342.4
+    ],
+    [
+     355.7,
+     342.0
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.93
+  },
+  {
+   "id": 18,
+   "texto": "TOTAL MXN",
+   "poligono": [
+    [
+     24.4,
+     350.6
+    ],
+    [
+     137.4,
+     351.4
+    ],
+    [
+     137.3,
+     366.4
+    ],
+    [
+     24.3,
+     365.6
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.99,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 19,
+   "texto": "$2,300.87",
+   "poligono": [
+    [
+     301.1,
+     350.6
+    ],
+    [
+     414.1,
+     351.4
+    ],
+    [
+     413.9,
+     371.4
+    ],
+    [
+     300.9,
+     370.6
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.93
+  },
+  {
+   "id": 20,
+   "texto": "TARJETA DEBITO",
+   "poligono": [
+    [
+     24.2,
+     377.6
+    ],
+    [
+     125.2,
+     378.3
+    ],
+    [
+     125.2,
+     386.3
+    ],
+    [
+     24.2,
+     385.6
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 21,
+   "texto": "**** 1309",
+   "poligono": [
+    [
+     349.4,
+     379.9
+    ],
+    [
+     414.4,
+     380.4
+    ],
+    [
+     414.3,
+     388.4
+    ],
+    [
+     349.3,
+     387.9
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.66,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 22,
+   "texto": "AUT: 971306",
+   "poligono": [
+    [
+     24.1,
+     392.6
+    ],
+    [
+     97.1,
+     393.1
+    ],
+    [
+     97.1,
+     401.1
+    ],
+    [
+     24.1,
+     400.6
+    ]
+   ],
+   "linea": 17,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 23,
+   "texto": "GRACIAS POR SU COMPRA",
+   "poligono": [
+    [
+     149.7,
+     419.5
+    ],
+    [
+     288.7,
+     420.5
+    ],
+    [
+     288.6,
+     428.5
+    ],
+    [
+     149.6,
+     427.5
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.96,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 24,
+   "texto": "FACTURE DENTRO DEL MES",
+   "poligono": [
+    [
+     146.3,
+     433.5
+    ],
+    [
+     291.3,
+     434.5
+    ],
+    [
+     291.2,
+     442.5
+    ],
+    [
+     146.2,
+     441.5
+    ]
+   ],
+   "linea": 19,
+   "conf_caja": 0.96,
+   "conf_ocr": 0.75
+  },
+  {
+   "id": 25,
+   "texto": "MUESTRA DE PRUEBA - SIN VALOR FISCAL",
+   "poligono": [
+    [
+     100.0,
+     455.1
+    ],
+    [
+     337.0,
+     456.9
+    ],
+    [
+     336.9,
+     464.9
+    ],
+    [
+     99.9,
+     463.1
+    ]
+   ],
+   "linea": 20,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.99
+  }
+ ],
+ "modelos": {
+  "ocdnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "ocrnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "llm": {
+   "base": "Qwen2.5-7B-Instruct",
+   "adaptador": null,
+   "sha256": null
+  }
+ },
+ "errores": []
+}

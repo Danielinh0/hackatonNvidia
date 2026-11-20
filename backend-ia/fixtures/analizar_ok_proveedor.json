@@ -1,0 +1,1051 @@
+{
+ "_aviso": "SIMULADO: ejemplo del contrato de POST /vision/analizar armado desde el ground truth de un ticket sintético. Las confianzas son valores de prueba para pintar el semáforo, no salidas de un modelo.",
+ "imagen": {
+  "archivo": "ticket_00026.png",
+  "ancho": 552,
+  "alto": 660
+ },
+ "doc_tipo": "ticket",
+ "campos": [
+  {
+   "nombre": "comercio",
+   "valor": "ABASTOS EL ROBLE",
+   "texto_original": "ABASTOS EL ROBLE",
+   "conf": 0.79,
+   "seg": [
+    0
+   ]
+  },
+  {
+   "nombre": "rfc",
+   "valor": "ARX881206U6N",
+   "texto_original": "RFC: ARX881206U6N",
+   "conf": 0.86,
+   "seg": [
+    3
+   ]
+  },
+  {
+   "nombre": "fecha_hora",
+   "valor": "05-NOV-2026 07:32",
+   "texto_original": "05-NOV-2026 07:32",
+   "conf": 0.45,
+   "seg": [
+    4
+   ]
+  },
+  {
+   "nombre": "folio",
+   "valor": "7470640",
+   "texto_original": "FOLIO: 7470640",
+   "conf": 0.7,
+   "seg": [
+    5
+   ]
+  },
+  {
+   "nombre": "subtotal",
+   "valor": "6315.00",
+   "texto_original": "$6,315.00",
+   "conf": 0.8,
+   "seg": [
+    23
+   ]
+  },
+  {
+   "nombre": "iva",
+   "valor": "1010.40",
+   "texto_original": "$1,010.40",
+   "conf": 0.52,
+   "seg": [
+    25
+   ]
+  },
+  {
+   "nombre": "total",
+   "valor": "7325.40",
+   "texto_original": "$7,325.40",
+   "conf": 0.81,
+   "seg": [
+    27
+   ]
+  },
+  {
+   "nombre": "efectivo",
+   "valor": "7350.00",
+   "texto_original": "$7,350.00",
+   "conf": 0.73,
+   "seg": [
+    29
+   ]
+  },
+  {
+   "nombre": "cambio",
+   "valor": "24.60",
+   "texto_original": "$24.60",
+   "conf": 0.94,
+   "seg": [
+    31
+   ]
+  }
+ ],
+ "items": [
+  {
+   "cantidad": "3",
+   "descripcion": "CAJA CAFE SOL 12PZ",
+   "precio_unitario": "690.00",
+   "importe": "2070.00",
+   "conf": 0.66,
+   "seg": [
+    10,
+    11,
+    12
+   ]
+  },
+  {
+   "cantidad": "11",
+   "descripcion": "CAJA SOPA INST 12PZ",
+   "precio_unitario": "120.00",
+   "importe": "1320.00",
+   "conf": 0.46,
+   "seg": [
+    13,
+    14,
+    15
+   ]
+  },
+  {
+   "cantidad": "9",
+   "descripcion": "BOLSA HIELO 5KG",
+   "precio_unitario": "35.00",
+   "importe": "315.00",
+   "conf": 0.74,
+   "seg": [
+    16,
+    17,
+    18
+   ]
+  },
+  {
+   "cantidad": "9",
+   "descripcion": "CAJA LECHE 12PZ",
+   "precio_unitario": "290.00",
+   "importe": "2610.00",
+   "conf": 0.49,
+   "seg": [
+    19,
+    20,
+    21
+   ]
+  }
+ ],
+ "categoria_propuesta": "proveedor",
+ "tiene_cfdi": false,
+ "uuid_cfdi": null,
+ "validaciones": [
+  {
+   "regla": "subtotal_mas_iva_igual_total",
+   "ok": true,
+   "detalle": "6315.00 + 1010.40 = 7325.40"
+  },
+  {
+   "regla": "formato_rfc",
+   "ok": true,
+   "detalle": "ARX881206U6N"
+  }
+ ],
+ "conf_global": 0.45,
+ "segmentos": [
+  {
+   "id": 0,
+   "texto": "ABASTOS EL ROBLE",
+   "poligono": [
+    [
+     147.1,
+     106.4
+    ],
+    [
+     397.0,
+     101.7
+    ],
+    [
+     397.4,
+     119.7
+    ],
+    [
+     147.4,
+     124.4
+    ]
+   ],
+   "linea": 1,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 1,
+   "texto": "CALLE REFORMA #102, COL. SAN FELIPE",
+   "poligono": [
+    [
+     125.3,
+     137.8
+    ],
+    [
+     419.2,
+     132.3
+    ],
+    [
+     419.5,
+     144.3
+    ],
+    [
+     125.5,
+     149.8
+    ]
+   ],
+   "linea": 2,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.63
+  },
+  {
+   "id": 2,
+   "texto": "C.P. 68251 SANTA LUCIA DEL CAMINO, OAX.",
+   "poligono": [
+    [
+     108.8,
+     155.1
+    ],
+    [
+     436.7,
+     149.0
+    ],
+    [
+     437.0,
+     161.0
+    ],
+    [
+     109.0,
+     167.1
+    ]
+   ],
+   "linea": 3,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 3,
+   "texto": "RFC: ARX881206U6N",
+   "poligono": [
+    [
+     201.6,
+     170.4
+    ],
+    [
+     344.5,
+     167.7
+    ],
+    [
+     344.7,
+     177.7
+    ],
+    [
+     201.8,
+     180.4
+    ]
+   ],
+   "linea": 4,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 4,
+   "texto": "05-NOV-2026 07:32",
+   "poligono": [
+    [
+     32.5,
+     196.5
+    ],
+    [
+     175.5,
+     193.8
+    ],
+    [
+     175.6,
+     203.8
+    ],
+    [
+     32.7,
+     206.5
+    ]
+   ],
+   "linea": 5,
+   "conf_caja": 0.69,
+   "conf_ocr": 0.65
+  },
+  {
+   "id": 5,
+   "texto": "FOLIO: 7470640",
+   "poligono": [
+    [
+     396.7,
+     189.7
+    ],
+    [
+     514.7,
+     187.5
+    ],
+    [
+     514.9,
+     197.5
+    ],
+    [
+     396.9,
+     199.7
+    ]
+   ],
+   "linea": 5,
+   "conf_caja": 0.75,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 6,
+   "texto": "CLIENTE: MOSTRADOR",
+   "poligono": [
+    [
+     32.8,
+     214.5
+    ],
+    [
+     183.8,
+     211.7
+    ],
+    [
+     184.0,
+     221.7
+    ],
+    [
+     33.0,
+     224.5
+    ]
+   ],
+   "linea": 6,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 7,
+   "texto": "CANT.",
+   "poligono": [
+    [
+     33.6,
+     257.5
+    ],
+    [
+     75.6,
+     256.7
+    ],
+    [
+     75.8,
+     266.7
+    ],
+    [
+     33.8,
+     267.5
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 8,
+   "texto": "PRODUCTO",
+   "poligono": [
+    [
+     84.0,
+     256.6
+    ],
+    [
+     151.0,
+     255.3
+    ],
+    [
+     151.2,
+     265.3
+    ],
+    [
+     84.2,
+     266.6
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.81,
+   "conf_ocr": 0.84
+  },
+  {
+   "id": 9,
+   "texto": "IMPORTE",
+   "poligono": [
+    [
+     456.7,
+     249.6
+    ],
+    [
+     515.7,
+     248.5
+    ],
+    [
+     515.9,
+     258.5
+    ],
+    [
+     456.9,
+     259.6
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.63
+  },
+  {
+   "id": 10,
+   "texto": "3",
+   "poligono": [
+    [
+     33.9,
+     275.5
+    ],
+    [
+     43.9,
+     275.3
+    ],
+    [
+     44.2,
+     287.3
+    ],
+    [
+     34.2,
+     287.5
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.84,
+   "conf_ocr": 0.78
+  },
+  {
+   "id": 11,
+   "texto": "CAJA CAFE SOL 12PZ",
+   "poligono": [
+    [
+     95.2,
+     274.3
+    ],
+    [
+     279.1,
+     270.9
+    ],
+    [
+     279.3,
+     282.9
+    ],
+    [
+     95.4,
+     286.3
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 12,
+   "texto": "$2,070.00",
+   "poligono": [
+    [
+     424.0,
+     266.2
+    ],
+    [
+     516.0,
+     264.5
+    ],
+    [
+     516.3,
+     280.5
+    ],
+    [
+     424.3,
+     282.2
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.74
+  },
+  {
+   "id": 13,
+   "texto": "11",
+   "poligono": [
+    [
+     34.4,
+     299.5
+    ],
+    [
+     54.4,
+     299.1
+    ],
+    [
+     54.6,
+     311.1
+    ],
+    [
+     34.6,
+     311.5
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 14,
+   "texto": "CAJA SOPA INST 12PZ",
+   "poligono": [
+    [
+     95.6,
+     298.3
+    ],
+    [
+     289.6,
+     294.7
+    ],
+    [
+     289.8,
+     306.7
+    ],
+    [
+     95.8,
+     310.3
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 15,
+   "texto": "$1,320.00",
+   "poligono": [
+    [
+     424.5,
+     290.2
+    ],
+    [
+     516.4,
+     288.5
+    ],
+    [
+     516.7,
+     304.5
+    ],
+    [
+     424.8,
+     306.2
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.62,
+   "conf_ocr": 0.75
+  },
+  {
+   "id": 16,
+   "texto": "9",
+   "poligono": [
+    [
+     34.8,
+     321.5
+    ],
+    [
+     44.8,
+     321.3
+    ],
+    [
+     45.0,
+     333.3
+    ],
+    [
+     35.0,
+     333.5
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 17,
+   "texto": "BOLSA HIELO 5KG",
+   "poligono": [
+    [
+     96.0,
+     320.3
+    ],
+    [
+     249.0,
+     317.5
+    ],
+    [
+     249.2,
+     329.5
+    ],
+    [
+     96.2,
+     332.3
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 18,
+   "texto": "$315.00",
+   "poligono": [
+    [
+     445.3,
+     311.9
+    ],
+    [
+     516.3,
+     310.5
+    ],
+    [
+     516.6,
+     326.5
+    ],
+    [
+     445.6,
+     327.8
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.76,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 19,
+   "texto": "9",
+   "poligono": [
+    [
+     35.2,
+     344.5
+    ],
+    [
+     45.2,
+     344.3
+    ],
+    [
+     45.4,
+     356.3
+    ],
+    [
+     35.5,
+     356.5
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.84,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 20,
+   "texto": "CAJA LECHE 12PZ",
+   "poligono": [
+    [
+     96.4,
+     343.3
+    ],
+    [
+     249.4,
+     340.5
+    ],
+    [
+     249.6,
+     352.5
+    ],
+    [
+     96.7,
+     355.3
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.68
+  },
+  {
+   "id": 21,
+   "texto": "$2,610.00",
+   "poligono": [
+    [
+     425.3,
+     335.2
+    ],
+    [
+     517.3,
+     333.5
+    ],
+    [
+     517.6,
+     349.5
+    ],
+    [
+     425.6,
+     351.2
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.78,
+   "conf_ocr": 0.63
+  },
+  {
+   "id": 22,
+   "texto": "SUB-TOTAL",
+   "poligono": [
+    [
+     36.1,
+     393.5
+    ],
+    [
+     128.1,
+     391.8
+    ],
+    [
+     128.3,
+     403.8
+    ],
+    [
+     36.4,
+     405.5
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.79,
+   "conf_ocr": 0.99
+  },
+  {
+   "id": 23,
+   "texto": "$6,315.00",
+   "poligono": [
+    [
+     426.2,
+     384.2
+    ],
+    [
+     518.2,
+     382.5
+    ],
+    [
+     518.5,
+     398.5
+    ],
+    [
+     426.5,
+     400.2
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 24,
+   "texto": "IVA 16.00%",
+   "poligono": [
+    [
+     36.5,
+     414.5
+    ],
+    [
+     138.5,
+     412.6
+    ],
+    [
+     138.7,
+     424.6
+    ],
+    [
+     36.8,
+     426.5
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.77
+  },
+  {
+   "id": 25,
+   "texto": "$1,010.40",
+   "poligono": [
+    [
+     426.6,
+     405.2
+    ],
+    [
+     518.6,
+     403.5
+    ],
+    [
+     518.9,
+     419.5
+    ],
+    [
+     426.9,
+     421.2
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.72,
+   "conf_ocr": 0.72
+  },
+  {
+   "id": 26,
+   "texto": "TOTAL A PAGAR",
+   "poligono": [
+    [
+     37.0,
+     439.5
+    ],
+    [
+     240.0,
+     435.7
+    ],
+    [
+     240.3,
+     453.7
+    ],
+    [
+     37.3,
+     457.5
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 27,
+   "texto": "$7,325.40",
+   "poligono": [
+    [
+     378.5,
+     430.1
+    ],
+    [
+     518.5,
+     427.5
+    ],
+    [
+     519.0,
+     452.5
+    ],
+    [
+     379.0,
+     455.1
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.88,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 28,
+   "texto": "PAGO CON:",
+   "poligono": [
+    [
+     37.6,
+     470.5
+    ],
+    [
+     129.6,
+     468.7
+    ],
+    [
+     129.8,
+     480.7
+    ],
+    [
+     37.8,
+     482.5
+    ]
+   ],
+   "linea": 17,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 29,
+   "texto": "$7,350.00",
+   "poligono": [
+    [
+     427.6,
+     461.2
+    ],
+    [
+     519.6,
+     459.5
+    ],
+    [
+     519.9,
+     475.5
+    ],
+    [
+     427.9,
+     477.2
+    ]
+   ],
+   "linea": 17,
+   "conf_caja": 0.74,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 30,
+   "texto": "SU CAMBIO:",
+   "poligono": [
+    [
+     38.0,
+     492.4
+    ],
+    [
+     140.0,
+     490.6
+    ],
+    [
+     140.2,
+     502.6
+    ],
+    [
+     38.2,
+     504.4
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 31,
+   "texto": "$24.60",
+   "poligono": [
+    [
+     458.6,
+     482.6
+    ],
+    [
+     519.6,
+     481.5
+    ],
+    [
+     519.9,
+     497.5
+    ],
+    [
+     458.9,
+     498.6
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.97,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 32,
+   "texto": "FACTURE DENTRO DEL MES",
+   "poligono": [
+    [
+     187.1,
+     521.7
+    ],
+    [
+     372.0,
+     518.2
+    ],
+    [
+     372.2,
+     528.2
+    ],
+    [
+     187.3,
+     531.7
+    ]
+   ],
+   "linea": 19,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 33,
+   "texto": "GRACIAS POR SU COMPRA",
+   "poligono": [
+    [
+     191.6,
+     540.6
+    ],
+    [
+     368.6,
+     537.3
+    ],
+    [
+     368.8,
+     547.3
+    ],
+    [
+     191.8,
+     550.6
+    ]
+   ],
+   "linea": 20,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 34,
+   "texto": "MUESTRA DE PRUEBA - SIN VALOR FISCAL",
+   "poligono": [
+    [
+     129.1,
+     566.8
+    ],
+    [
+     432.0,
+     561.1
+    ],
+    [
+     432.2,
+     571.1
+    ],
+    [
+     129.2,
+     576.8
+    ]
+   ],
+   "linea": 21,
+   "conf_caja": 0.94,
+   "conf_ocr": 0.94
+  }
+ ],
+ "modelos": {
+  "ocdnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "ocrnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "llm": {
+   "base": "Qwen2.5-7B-Instruct",
+   "adaptador": null,
+   "sha256": null
+  }
+ },
+ "errores": []
+}

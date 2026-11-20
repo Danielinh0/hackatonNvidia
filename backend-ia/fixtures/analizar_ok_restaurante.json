@@ -1,0 +1,1063 @@
+{
+ "_aviso": "SIMULADO: ejemplo del contrato de POST /vision/analizar armado desde el ground truth de un ticket sintético. Las confianzas son valores de prueba para pintar el semáforo, no salidas de un modelo.",
+ "imagen": {
+  "archivo": "ticket_00165.png",
+  "ancho": 606,
+  "alto": 768
+ },
+ "doc_tipo": "ticket",
+ "campos": [
+  {
+   "nombre": "comercio",
+   "valor": "CAFETERIA EL FARO",
+   "texto_original": "CAFETERIA EL FARO",
+   "conf": 0.65,
+   "seg": [
+    0
+   ]
+  },
+  {
+   "nombre": "rfc",
+   "valor": "JUTC150224JWH",
+   "texto_original": "RFC: JUTC150224JWH",
+   "conf": 0.6,
+   "seg": [
+    2
+   ]
+  },
+  {
+   "nombre": "fecha_hora",
+   "valor": "09/06/2026 00:45",
+   "texto_original": "09/06/2026 00:45",
+   "conf": 0.8,
+   "seg": [
+    3
+   ]
+  },
+  {
+   "nombre": "folio",
+   "valor": "94991132",
+   "texto_original": "FOLIO: 94991132",
+   "conf": 0.86,
+   "seg": [
+    4
+   ]
+  },
+  {
+   "nombre": "subtotal",
+   "valor": "905.00",
+   "texto_original": "$905.00",
+   "conf": 0.71,
+   "seg": [
+    23
+   ]
+  },
+  {
+   "nombre": "iva",
+   "valor": "144.80",
+   "texto_original": "$144.80",
+   "conf": 0.89,
+   "seg": [
+    25
+   ]
+  },
+  {
+   "nombre": "total",
+   "valor": "1049.80",
+   "texto_original": "$1049.80",
+   "conf": 0.85,
+   "seg": [
+    27
+   ]
+  },
+  {
+   "nombre": "efectivo",
+   "valor": "1050.00",
+   "texto_original": "$1050.00",
+   "conf": 0.93,
+   "seg": [
+    29
+   ]
+  },
+  {
+   "nombre": "cambio",
+   "valor": "0.20",
+   "texto_original": "$0.20",
+   "conf": 0.54,
+   "seg": [
+    31
+   ]
+  }
+ ],
+ "items": [
+  {
+   "cantidad": "1",
+   "descripcion": "CALDO DE RES",
+   "precio_unitario": "120.00",
+   "importe": "120.00",
+   "conf": 0.65,
+   "seg": [
+    7,
+    8,
+    9
+   ]
+  },
+  {
+   "cantidad": "3",
+   "descripcion": "TACOS AL PASTOR",
+   "precio_unitario": "75.00",
+   "importe": "225.00",
+   "conf": 0.7,
+   "seg": [
+    10,
+    11,
+    12
+   ]
+  },
+  {
+   "cantidad": "3",
+   "descripcion": "MOLE COLORADITO",
+   "precio_unitario": "140.00",
+   "importe": "420.00",
+   "conf": 0.54,
+   "seg": [
+    13,
+    14,
+    15
+   ]
+  },
+  {
+   "cantidad": "2",
+   "descripcion": "ATOLE BLANCO",
+   "precio_unitario": "25.00",
+   "importe": "50.00",
+   "conf": 0.64,
+   "seg": [
+    16,
+    17,
+    18
+   ]
+  },
+  {
+   "cantidad": "1",
+   "descripcion": "TACOS DE CECINA",
+   "precio_unitario": "90.00",
+   "importe": "90.00",
+   "conf": 0.71,
+   "seg": [
+    19,
+    20,
+    21
+   ]
+  }
+ ],
+ "categoria_propuesta": "restaurante",
+ "tiene_cfdi": false,
+ "uuid_cfdi": null,
+ "validaciones": [
+  {
+   "regla": "subtotal_mas_iva_igual_total",
+   "ok": true,
+   "detalle": "905.00 + 144.80 = 1049.80"
+  },
+  {
+   "regla": "formato_rfc",
+   "ok": true,
+   "detalle": "JUTC150224JWH"
+  }
+ ],
+ "conf_global": 0.6,
+ "segmentos": [
+  {
+   "id": 0,
+   "texto": "CAFETERIA EL FARO",
+   "poligono": [
+    [
+     166.5,
+     36.5
+    ],
+    [
+     452.5,
+     41.7
+    ],
+    [
+     452.1,
+     61.7
+    ],
+    [
+     166.2,
+     56.5
+    ]
+   ],
+   "linea": 0,
+   "conf_caja": 0.72,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 1,
+   "texto": "BLVD. EDUARDO MATA #804, COL. VOLCANES",
+   "poligono": [
+    [
+     137.7,
+     67.9
+    ],
+    [
+     479.7,
+     74.2
+    ],
+    [
+     479.5,
+     86.2
+    ],
+    [
+     137.5,
+     79.9
+    ]
+   ],
+   "linea": 1,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.83
+  },
+  {
+   "id": 2,
+   "texto": "RFC: JUTC150224JWH",
+   "poligono": [
+    [
+     227.4,
+     88.6
+    ],
+    [
+     389.3,
+     91.5
+    ],
+    [
+     389.2,
+     101.5
+    ],
+    [
+     227.2,
+     98.6
+    ]
+   ],
+   "linea": 2,
+   "conf_caja": 0.91,
+   "conf_ocr": 0.66
+  },
+  {
+   "id": 3,
+   "texto": "09/06/2026 00:45",
+   "poligono": [
+    [
+     44.0,
+     108.2
+    ],
+    [
+     188.0,
+     110.9
+    ],
+    [
+     187.7,
+     123.9
+    ],
+    [
+     43.7,
+     121.2
+    ]
+   ],
+   "linea": 3,
+   "conf_caja": 0.84,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 4,
+   "texto": "FOLIO: 94991132",
+   "poligono": [
+    [
+     43.6,
+     128.2
+    ],
+    [
+     178.6,
+     130.7
+    ],
+    [
+     178.4,
+     140.7
+    ],
+    [
+     43.4,
+     138.2
+    ]
+   ],
+   "linea": 4,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 5,
+   "texto": "MESA: 14",
+   "poligono": [
+    [
+     43.2,
+     149.2
+    ],
+    [
+     115.2,
+     150.5
+    ],
+    [
+     115.0,
+     160.5
+    ],
+    [
+     43.1,
+     159.2
+    ]
+   ],
+   "linea": 5,
+   "conf_caja": 0.66,
+   "conf_ocr": 0.74
+  },
+  {
+   "id": 6,
+   "texto": "MESERO: ANA",
+   "poligono": [
+    [
+     472.2,
+     157.0
+    ],
+    [
+     571.1,
+     158.8
+    ],
+    [
+     571.0,
+     168.8
+    ],
+    [
+     472.0,
+     167.0
+    ]
+   ],
+   "linea": 5,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.72
+  },
+  {
+   "id": 7,
+   "texto": "CALDO DE RES",
+   "poligono": [
+    [
+     42.4,
+     196.2
+    ],
+    [
+     179.4,
+     198.7
+    ],
+    [
+     179.1,
+     211.7
+    ],
+    [
+     42.1,
+     209.2
+    ]
+   ],
+   "linea": 7,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.72
+  },
+  {
+   "id": 8,
+   "texto": "1 x $120.00",
+   "poligono": [
+    [
+     42.0,
+     219.2
+    ],
+    [
+     153.9,
+     221.3
+    ],
+    [
+     153.6,
+     237.3
+    ],
+    [
+     41.7,
+     235.2
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.69,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 9,
+   "texto": "$120.00",
+   "poligono": [
+    [
+     498.5,
+     227.5
+    ],
+    [
+     569.4,
+     228.8
+    ],
+    [
+     569.2,
+     244.8
+    ],
+    [
+     498.2,
+     243.5
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.96,
+   "conf_ocr": 0.83
+  },
+  {
+   "id": 10,
+   "texto": "TACOS AL PASTOR",
+   "poligono": [
+    [
+     41.5,
+     244.2
+    ],
+    [
+     212.5,
+     247.3
+    ],
+    [
+     212.2,
+     260.3
+    ],
+    [
+     41.3,
+     257.2
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.99,
+   "conf_ocr": 0.79
+  },
+  {
+   "id": 11,
+   "texto": "3 x $75.00",
+   "poligono": [
+    [
+     41.1,
+     266.2
+    ],
+    [
+     143.1,
+     268.1
+    ],
+    [
+     142.8,
+     284.1
+    ],
+    [
+     40.8,
+     282.2
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.91,
+   "conf_ocr": 0.91
+  },
+  {
+   "id": 12,
+   "texto": "$225.00",
+   "poligono": [
+    [
+     497.6,
+     274.5
+    ],
+    [
+     568.6,
+     275.8
+    ],
+    [
+     568.3,
+     291.8
+    ],
+    [
+     497.3,
+     290.5
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.77,
+   "conf_ocr": 0.91
+  },
+  {
+   "id": 13,
+   "texto": "MOLE COLORADITO",
+   "poligono": [
+    [
+     40.6,
+     291.2
+    ],
+    [
+     211.6,
+     294.3
+    ],
+    [
+     211.4,
+     307.3
+    ],
+    [
+     40.4,
+     304.2
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 14,
+   "texto": "3 x $140.00",
+   "poligono": [
+    [
+     40.3,
+     311.2
+    ],
+    [
+     152.3,
+     313.2
+    ],
+    [
+     152.0,
+     329.2
+    ],
+    [
+     40.0,
+     327.2
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.81,
+   "conf_ocr": 0.77
+  },
+  {
+   "id": 15,
+   "texto": "$420.00",
+   "poligono": [
+    [
+     496.8,
+     319.5
+    ],
+    [
+     567.8,
+     320.8
+    ],
+    [
+     567.5,
+     336.8
+    ],
+    [
+     496.5,
+     335.5
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.68,
+   "conf_ocr": 0.79
+  },
+  {
+   "id": 16,
+   "texto": "ATOLE BLANCO",
+   "poligono": [
+    [
+     39.8,
+     336.2
+    ],
+    [
+     176.8,
+     338.7
+    ],
+    [
+     176.6,
+     351.7
+    ],
+    [
+     39.6,
+     349.2
+    ]
+   ],
+   "linea": 13,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.71
+  },
+  {
+   "id": 17,
+   "texto": "2 x $25.00",
+   "poligono": [
+    [
+     39.4,
+     357.2
+    ],
+    [
+     141.4,
+     359.1
+    ],
+    [
+     141.1,
+     375.1
+    ],
+    [
+     39.2,
+     373.2
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 18,
+   "texto": "$50.00",
+   "poligono": [
+    [
+     506.1,
+     365.7
+    ],
+    [
+     567.1,
+     366.8
+    ],
+    [
+     566.8,
+     382.8
+    ],
+    [
+     505.9,
+     381.7
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.88,
+   "conf_ocr": 0.75
+  },
+  {
+   "id": 19,
+   "texto": "TACOS DE CECINA",
+   "poligono": [
+    [
+     39.0,
+     384.2
+    ],
+    [
+     209.9,
+     387.3
+    ],
+    [
+     209.7,
+     400.3
+    ],
+    [
+     38.7,
+     397.2
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 20,
+   "texto": "1 x $90.00",
+   "poligono": [
+    [
+     38.6,
+     406.2
+    ],
+    [
+     140.5,
+     408.0
+    ],
+    [
+     140.2,
+     424.0
+    ],
+    [
+     38.3,
+     422.2
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.99,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 21,
+   "texto": "$90.00",
+   "poligono": [
+    [
+     505.3,
+     414.7
+    ],
+    [
+     566.2,
+     415.8
+    ],
+    [
+     566.0,
+     431.8
+    ],
+    [
+     505.0,
+     430.7
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.77
+  },
+  {
+   "id": 22,
+   "texto": "SUB-TOTAL",
+   "poligono": [
+    [
+     37.5,
+     465.2
+    ],
+    [
+     140.5,
+     467.1
+    ],
+    [
+     140.2,
+     480.1
+    ],
+    [
+     37.2,
+     478.2
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.78,
+   "conf_ocr": 0.99
+  },
+  {
+   "id": 23,
+   "texto": "$905.00",
+   "poligono": [
+    [
+     485.6,
+     471.3
+    ],
+    [
+     565.6,
+     472.8
+    ],
+    [
+     565.3,
+     489.8
+    ],
+    [
+     485.3,
+     488.3
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.79,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 24,
+   "texto": "IVA:",
+   "poligono": [
+    [
+     37.0,
+     491.2
+    ],
+    [
+     83.0,
+     492.0
+    ],
+    [
+     82.8,
+     505.0
+    ],
+    [
+     36.8,
+     504.2
+    ]
+   ],
+   "linea": 19,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.93
+  },
+  {
+   "id": 25,
+   "texto": "$144.80",
+   "poligono": [
+    [
+     485.1,
+     497.3
+    ],
+    [
+     565.1,
+     498.8
+    ],
+    [
+     564.8,
+     515.8
+    ],
+    [
+     484.8,
+     514.3
+    ]
+   ],
+   "linea": 19,
+   "conf_caja": 0.97,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 26,
+   "texto": "TOTAL",
+   "poligono": [
+    [
+     36.5,
+     519.2
+    ],
+    [
+     120.5,
+     520.7
+    ],
+    [
+     120.1,
+     540.7
+    ],
+    [
+     36.1,
+     539.2
+    ]
+   ],
+   "linea": 20,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 27,
+   "texto": "$1049.80",
+   "poligono": [
+    [
+     430.1,
+     523.3
+    ],
+    [
+     564.1,
+     525.8
+    ],
+    [
+     563.6,
+     551.8
+    ],
+    [
+     429.6,
+     549.3
+    ]
+   ],
+   "linea": 20,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 28,
+   "texto": "PAGO CON:",
+   "poligono": [
+    [
+     35.8,
+     556.2
+    ],
+    [
+     138.8,
+     558.0
+    ],
+    [
+     138.6,
+     571.0
+    ],
+    [
+     35.6,
+     569.2
+    ]
+   ],
+   "linea": 21,
+   "conf_caja": 0.97,
+   "conf_ocr": 0.75
+  },
+  {
+   "id": 29,
+   "texto": "$1050.00",
+   "poligono": [
+    [
+     472.5,
+     562.1
+    ],
+    [
+     563.5,
+     563.8
+    ],
+    [
+     563.2,
+     580.8
+    ],
+    [
+     472.2,
+     579.1
+    ]
+   ],
+   "linea": 21,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 30,
+   "texto": "CAMBIO",
+   "poligono": [
+    [
+     35.3,
+     582.2
+    ],
+    [
+     103.3,
+     583.4
+    ],
+    [
+     103.1,
+     596.4
+    ],
+    [
+     35.1,
+     595.2
+    ]
+   ],
+   "linea": 22,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.82
+  },
+  {
+   "id": 31,
+   "texto": "$0.20",
+   "poligono": [
+    [
+     506.3,
+     588.7
+    ],
+    [
+     563.3,
+     589.8
+    ],
+    [
+     563.0,
+     606.8
+    ],
+    [
+     506.0,
+     605.7
+    ]
+   ],
+   "linea": 22,
+   "conf_caja": 0.82,
+   "conf_ocr": 0.66
+  },
+  {
+   "id": 32,
+   "texto": "PROPINA SUGERIDA 10%: $104.98",
+   "poligono": [
+    [
+     34.9,
+     605.2
+    ],
+    [
+     295.9,
+     609.9
+    ],
+    [
+     295.6,
+     623.9
+    ],
+    [
+     34.7,
+     619.2
+    ]
+   ],
+   "linea": 23,
+   "conf_caja": 0.8,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 33,
+   "texto": "FACTURE DENTRO DEL MES",
+   "poligono": [
+    [
+     199.3,
+     641.2
+    ],
+    [
+     397.3,
+     644.8
+    ],
+    [
+     397.1,
+     654.8
+    ],
+    [
+     199.1,
+     651.2
+    ]
+   ],
+   "linea": 24,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 34,
+   "texto": "MUESTRA DE PRUEBA - SIN VALOR FISCAL",
+   "poligono": [
+    [
+     135.8,
+     666.0
+    ],
+    [
+     459.8,
+     671.9
+    ],
+    [
+     459.6,
+     681.9
+    ],
+    [
+     135.7,
+     676.0
+    ]
+   ],
+   "linea": 25,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.74
+  }
+ ],
+ "modelos": {
+  "ocdnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "ocrnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "llm": {
+   "base": "Qwen2.5-7B-Instruct",
+   "adaptador": null,
+   "sha256": null
+  }
+ },
+ "errores": []
+}

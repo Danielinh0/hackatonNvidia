@@ -1,0 +1,897 @@
+{
+ "_aviso": "SIMULADO: ejemplo del contrato de POST /vision/analizar armado desde el ground truth de un ticket sintético. Las confianzas son valores de prueba para pintar el semáforo, no salidas de un modelo.",
+ "imagen": {
+  "archivo": "ticket_00083.png",
+  "ancho": 426,
+  "alto": 621
+ },
+ "doc_tipo": "ticket",
+ "campos": [
+  {
+   "nombre": "comercio",
+   "valor": "FERRETERIA Y PINTURAS EL ROBLE",
+   "texto_original": "FERRETERIA Y PINTURAS EL ROBLE",
+   "conf": 0.95,
+   "seg": [
+    0
+   ]
+  },
+  {
+   "nombre": "rfc",
+   "valor": "CGFM890815GE6",
+   "texto_original": "RFC CGFM890815GE6",
+   "conf": 0.86,
+   "seg": [
+    3
+   ]
+  },
+  {
+   "nombre": "fecha_hora",
+   "valor": "08/10/26 02:53:00",
+   "texto_original": "08/10/26 02:53:00",
+   "conf": 0.76,
+   "seg": [
+    4
+   ]
+  },
+  {
+   "nombre": "folio",
+   "valor": "86172959",
+   "texto_original": "TRANS: 86172959",
+   "conf": 0.8,
+   "seg": [
+    5
+   ]
+  },
+  {
+   "nombre": "subtotal",
+   "valor": "528.00",
+   "texto_original": "$528.00",
+   "conf": 0.93,
+   "seg": [
+    17
+   ]
+  },
+  {
+   "nombre": "iva",
+   "valor": "84.48",
+   "texto_original": "$84.48",
+   "conf": 0.83,
+   "seg": [
+    19
+   ]
+  },
+  {
+   "nombre": "total",
+   "valor": "612.48",
+   "texto_original": "$612.48",
+   "conf": 0.76,
+   "seg": [
+    21
+   ]
+  },
+  {
+   "nombre": "efectivo",
+   "valor": "650.00",
+   "texto_original": "$650.00",
+   "conf": 0.87,
+   "seg": [
+    23
+   ]
+  },
+  {
+   "nombre": "cambio",
+   "valor": "37.52",
+   "texto_original": "$37.52",
+   "conf": 0.66,
+   "seg": [
+    25
+   ]
+  }
+ ],
+ "items": [
+  {
+   "cantidad": "1",
+   "descripcion": "THINNER 1L",
+   "precio_unitario": "45.00",
+   "importe": "45.00",
+   "conf": 0.6,
+   "seg": [
+    8,
+    9
+   ]
+  },
+  {
+   "cantidad": "4",
+   "descripcion": "FOCO LED 9W",
+   "precio_unitario": "35.00",
+   "importe": "140.00",
+   "conf": 0.7,
+   "seg": [
+    10,
+    11
+   ]
+  },
+  {
+   "cantidad": "3",
+   "descripcion": "CANDADO 40MM",
+   "precio_unitario": "95.00",
+   "importe": "285.00",
+   "conf": 0.67,
+   "seg": [
+    12,
+    13
+   ]
+  },
+  {
+   "cantidad": "1",
+   "descripcion": "TUBO PVC 1/2",
+   "precio_unitario": "58.00",
+   "importe": "58.00",
+   "conf": 0.73,
+   "seg": [
+    14,
+    15
+   ]
+  }
+ ],
+ "categoria_propuesta": "ferreteria",
+ "tiene_cfdi": false,
+ "uuid_cfdi": null,
+ "validaciones": [
+  {
+   "regla": "subtotal_mas_iva_igual_total",
+   "ok": true,
+   "detalle": "528.00 + 84.48 = 612.48"
+  },
+  {
+   "regla": "formato_rfc",
+   "ok": true,
+   "detalle": "CGFM890815GE6"
+  }
+ ],
+ "conf_global": 0.76,
+ "segmentos": [
+  {
+   "id": 0,
+   "texto": "FERRETERIA Y PINTURAS EL ROBLE",
+   "poligono": [
+    [
+     70.6,
+     98.7
+    ],
+    [
+     370.4,
+     109.6
+    ],
+    [
+     369.9,
+     123.6
+    ],
+    [
+     70.1,
+     112.7
+    ]
+   ],
+   "linea": 1,
+   "conf_caja": 0.97,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 1,
+   "texto": "CALLE MACEDONIO ALCALA #1750, COL. LIBERTAD",
+   "poligono": [
+    [
+     99.3,
+     128.7
+    ],
+    [
+     340.1,
+     137.5
+    ],
+    [
+     339.8,
+     147.5
+    ],
+    [
+     98.9,
+     138.7
+    ]
+   ],
+   "linea": 2,
+   "conf_caja": 0.7,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 2,
+   "texto": "C.P. 68120 VILLA DE ZAACHILA, OAX.",
+   "poligono": [
+    [
+     123.8,
+     147.6
+    ],
+    [
+     313.7,
+     154.6
+    ],
+    [
+     313.3,
+     164.6
+    ],
+    [
+     123.4,
+     157.6
+    ]
+   ],
+   "linea": 3,
+   "conf_caja": 0.88,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 3,
+   "texto": "RFC CGFM890815GE6",
+   "poligono": [
+    [
+     170.6,
+     168.4
+    ],
+    [
+     265.5,
+     171.8
+    ],
+    [
+     265.3,
+     179.8
+    ],
+    [
+     170.3,
+     176.4
+    ]
+   ],
+   "linea": 4,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 4,
+   "texto": "08/10/26 02:53:00",
+   "poligono": [
+    [
+     37.4,
+     185.5
+    ],
+    [
+     132.4,
+     189.0
+    ],
+    [
+     131.9,
+     202.0
+    ],
+    [
+     37.0,
+     198.5
+    ]
+   ],
+   "linea": 5,
+   "conf_caja": 0.83,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 5,
+   "texto": "TRANS: 86172959",
+   "poligono": [
+    [
+     36.7,
+     206.5
+    ],
+    [
+     120.6,
+     209.6
+    ],
+    [
+     120.3,
+     217.6
+    ],
+    [
+     36.4,
+     214.5
+    ]
+   ],
+   "linea": 6,
+   "conf_caja": 0.88,
+   "conf_ocr": 0.91
+  },
+  {
+   "id": 6,
+   "texto": "CAJA: 7",
+   "poligono": [
+    [
+     36.0,
+     224.5
+    ],
+    [
+     75.0,
+     225.9
+    ],
+    [
+     74.7,
+     233.9
+    ],
+    [
+     35.7,
+     232.5
+    ]
+   ],
+   "linea": 7,
+   "conf_caja": 0.65,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 7,
+   "texto": "CAJERO: 562",
+   "poligono": [
+    [
+     334.3,
+     235.4
+    ],
+    [
+     396.2,
+     237.6
+    ],
+    [
+     396.0,
+     245.6
+    ],
+    [
+     334.0,
+     243.4
+    ]
+   ],
+   "linea": 7,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 8,
+   "texto": "1 THINNER 1L",
+   "poligono": [
+    [
+     34.5,
+     266.5
+    ],
+    [
+     116.4,
+     269.5
+    ],
+    [
+     116.1,
+     279.4
+    ],
+    [
+     34.1,
+     276.5
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.96,
+   "conf_ocr": 0.63
+  },
+  {
+   "id": 9,
+   "texto": "$45.00",
+   "poligono": [
+    [
+     353.5,
+     277.1
+    ],
+    [
+     394.5,
+     278.6
+    ],
+    [
+     394.0,
+     291.6
+    ],
+    [
+     353.1,
+     290.1
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.78,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 10,
+   "texto": "4 FOCO LED 9W",
+   "poligono": [
+    [
+     33.7,
+     287.4
+    ],
+    [
+     122.7,
+     290.7
+    ],
+    [
+     122.3,
+     300.7
+    ],
+    [
+     33.4,
+     297.4
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.82,
+   "conf_ocr": 0.99
+  },
+  {
+   "id": 11,
+   "texto": "$140.00",
+   "poligono": [
+    [
+     346.0,
+     297.8
+    ],
+    [
+     393.9,
+     299.6
+    ],
+    [
+     393.5,
+     312.6
+    ],
+    [
+     345.5,
+     310.8
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.76
+  },
+  {
+   "id": 12,
+   "texto": "3 CANDADO 40MM",
+   "poligono": [
+    [
+     33.0,
+     308.4
+    ],
+    [
+     127.9,
+     311.9
+    ],
+    [
+     127.5,
+     321.9
+    ],
+    [
+     32.6,
+     318.4
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.91,
+   "conf_ocr": 0.74
+  },
+  {
+   "id": 13,
+   "texto": "$285.00",
+   "poligono": [
+    [
+     345.2,
+     318.8
+    ],
+    [
+     393.2,
+     320.6
+    ],
+    [
+     392.7,
+     333.6
+    ],
+    [
+     344.7,
+     331.8
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.94,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 14,
+   "texto": "1 TUBO PVC 1/2",
+   "poligono": [
+    [
+     32.2,
+     329.4
+    ],
+    [
+     127.1,
+     332.9
+    ],
+    [
+     126.6,
+     346.9
+    ],
+    [
+     31.7,
+     343.4
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.99,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 15,
+   "texto": "$58.00",
+   "poligono": [
+    [
+     351.2,
+     342.1
+    ],
+    [
+     392.1,
+     343.6
+    ],
+    [
+     391.7,
+     356.5
+    ],
+    [
+     350.7,
+     355.1
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.77
+  },
+  {
+   "id": 16,
+   "texto": "SUBTOTAL:",
+   "poligono": [
+    [
+     30.3,
+     381.4
+    ],
+    [
+     91.3,
+     383.6
+    ],
+    [
+     90.9,
+     393.6
+    ],
+    [
+     29.9,
+     391.4
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.88,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 17,
+   "texto": "$528.00",
+   "poligono": [
+    [
+     342.5,
+     391.8
+    ],
+    [
+     390.5,
+     393.5
+    ],
+    [
+     390.0,
+     406.5
+    ],
+    [
+     342.1,
+     404.8
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.94,
+   "conf_ocr": 0.99
+  },
+  {
+   "id": 18,
+   "texto": "IVA 16%",
+   "poligono": [
+    [
+     29.5,
+     404.4
+    ],
+    [
+     77.4,
+     406.1
+    ],
+    [
+     77.1,
+     416.1
+    ],
+    [
+     29.1,
+     414.4
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 19,
+   "texto": "$84.48",
+   "poligono": [
+    [
+     348.5,
+     415.0
+    ],
+    [
+     389.5,
+     416.5
+    ],
+    [
+     389.0,
+     429.5
+    ],
+    [
+     348.0,
+     428.0
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 20,
+   "texto": "TOTAL",
+   "poligono": [
+    [
+     28.5,
+     429.4
+    ],
+    [
+     78.5,
+     431.2
+    ],
+    [
+     78.0,
+     445.2
+    ],
+    [
+     28.0,
+     443.3
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.91
+  },
+  {
+   "id": 21,
+   "texto": "$612.48",
+   "poligono": [
+    [
+     318.4,
+     437.9
+    ],
+    [
+     388.4,
+     440.5
+    ],
+    [
+     387.7,
+     458.5
+    ],
+    [
+     317.8,
+     455.9
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.83,
+   "conf_ocr": 0.91
+  },
+  {
+   "id": 22,
+   "texto": "PAGO CON:",
+   "poligono": [
+    [
+     27.4,
+     459.3
+    ],
+    [
+     88.4,
+     461.6
+    ],
+    [
+     88.0,
+     471.5
+    ],
+    [
+     27.1,
+     469.3
+    ]
+   ],
+   "linea": 17,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 23,
+   "texto": "$650.00",
+   "poligono": [
+    [
+     339.7,
+     469.7
+    ],
+    [
+     387.7,
+     471.5
+    ],
+    [
+     387.2,
+     484.5
+    ],
+    [
+     339.2,
+     482.7
+    ]
+   ],
+   "linea": 17,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 24,
+   "texto": "CAMBIO",
+   "poligono": [
+    [
+     26.6,
+     483.3
+    ],
+    [
+     67.5,
+     484.8
+    ],
+    [
+     67.2,
+     494.8
+    ],
+    [
+     26.2,
+     493.3
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.77
+  },
+  {
+   "id": 25,
+   "texto": "$37.52",
+   "poligono": [
+    [
+     345.6,
+     494.0
+    ],
+    [
+     386.6,
+     495.5
+    ],
+    [
+     386.1,
+     508.4
+    ],
+    [
+     345.1,
+     507.0
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.68,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 26,
+   "texto": "FACTURE DENTRO DEL MES",
+   "poligono": [
+    [
+     143.7,
+     521.6
+    ],
+    [
+     266.6,
+     526.1
+    ],
+    [
+     266.3,
+     534.1
+    ],
+    [
+     143.4,
+     529.6
+    ]
+   ],
+   "linea": 19,
+   "conf_caja": 0.76,
+   "conf_ocr": 0.63
+  },
+  {
+   "id": 27,
+   "texto": "CONSERVE SU TICKET",
+   "poligono": [
+    [
+     154.2,
+     541.0
+    ],
+    [
+     255.1,
+     544.7
+    ],
+    [
+     254.9,
+     552.7
+    ],
+    [
+     153.9,
+     549.0
+    ]
+   ],
+   "linea": 20,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.93
+  },
+  {
+   "id": 28,
+   "texto": "MUESTRA DE PRUEBA - SIN VALOR FISCAL",
+   "poligono": [
+    [
+     102.9,
+     567.2
+    ],
+    [
+     304.7,
+     574.5
+    ],
+    [
+     304.5,
+     582.5
+    ],
+    [
+     102.6,
+     575.1
+    ]
+   ],
+   "linea": 21,
+   "conf_caja": 0.69,
+   "conf_ocr": 0.96
+  }
+ ],
+ "modelos": {
+  "ocdnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "ocrnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "llm": {
+   "base": "Qwen2.5-7B-Instruct",
+   "adaptador": null,
+   "sha256": null
+  }
+ },
+ "errores": []
+}

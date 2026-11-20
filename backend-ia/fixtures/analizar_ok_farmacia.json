@@ -1,0 +1,641 @@
+{
+ "_aviso": "SIMULADO: ejemplo del contrato de POST /vision/analizar armado desde el ground truth de un ticket sintético. Las confianzas son valores de prueba para pintar el semáforo, no salidas de un modelo.",
+ "imagen": {
+  "archivo": "ticket_00047.png",
+  "ancho": 594,
+  "alto": 587
+ },
+ "doc_tipo": "ticket",
+ "campos": [
+  {
+   "nombre": "comercio",
+   "valor": "BOTICA EL ROBLE",
+   "texto_original": "BOTICA EL ROBLE",
+   "conf": 0.62,
+   "seg": [
+    0
+   ]
+  },
+  {
+   "nombre": "rfc",
+   "valor": "OHVV010701NNU",
+   "texto_original": "RFC: OHVV010701NNU",
+   "conf": 0.66,
+   "seg": [
+    2
+   ]
+  },
+  {
+   "nombre": "fecha_hora",
+   "valor": "18-SEP-2026 09:12",
+   "texto_original": "18-SEP-2026 09:12",
+   "conf": 0.91,
+   "seg": [
+    3
+   ]
+  },
+  {
+   "nombre": "folio",
+   "valor": "4097369",
+   "texto_original": "TRANS: 4097369",
+   "conf": 0.94,
+   "seg": [
+    4
+   ]
+  },
+  {
+   "nombre": "subtotal",
+   "valor": "126.00",
+   "texto_original": "$126.00",
+   "conf": 0.91,
+   "seg": [
+    10
+   ]
+  },
+  {
+   "nombre": "iva",
+   "valor": "20.16",
+   "texto_original": "$20.16",
+   "conf": 0.82,
+   "seg": [
+    12
+   ]
+  },
+  {
+   "nombre": "total",
+   "valor": "146.16",
+   "texto_original": "$146.16",
+   "conf": 0.61,
+   "seg": [
+    14
+   ]
+  },
+  {
+   "nombre": "forma_pago",
+   "valor": "TARJETA CREDITO",
+   "texto_original": "TARJETA CREDITO",
+   "conf": 0.88,
+   "seg": [
+    15
+   ]
+  }
+ ],
+ "items": [
+  {
+   "cantidad": "2",
+   "descripcion": "VENDA ELASTICA 5CM",
+   "precio_unitario": "24.00",
+   "importe": "48.00",
+   "conf": 0.7,
+   "seg": [
+    5,
+    6
+   ]
+  },
+  {
+   "cantidad": "2",
+   "descripcion": "LORATADINA 10MG 10T",
+   "precio_unitario": "39.00",
+   "importe": "78.00",
+   "conf": 0.6,
+   "seg": [
+    7,
+    8
+   ]
+  }
+ ],
+ "categoria_propuesta": "farmacia",
+ "tiene_cfdi": false,
+ "uuid_cfdi": null,
+ "validaciones": [
+  {
+   "regla": "subtotal_mas_iva_igual_total",
+   "ok": true,
+   "detalle": "126.00 + 20.16 = 146.16"
+  },
+  {
+   "regla": "formato_rfc",
+   "ok": true,
+   "detalle": "OHVV010701NNU"
+  }
+ ],
+ "conf_global": 0.61,
+ "segmentos": [
+  {
+   "id": 0,
+   "texto": "BOTICA EL ROBLE",
+   "poligono": [
+    [
+     181.4,
+     105.2
+    ],
+    [
+     424.3,
+     113.0
+    ],
+    [
+     423.7,
+     132.0
+    ],
+    [
+     180.8,
+     124.2
+    ]
+   ],
+   "linea": 1,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.69
+  },
+  {
+   "id": 1,
+   "texto": "C. TINOCO Y PALACIOS #111, COL. LA CASCADA",
+   "poligono": [
+    [
+     113.0,
+     133.0
+    ],
+    [
+     490.8,
+     145.1
+    ],
+    [
+     490.5,
+     157.1
+    ],
+    [
+     112.6,
+     145.0
+    ]
+   ],
+   "linea": 2,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.8
+  },
+  {
+   "id": 2,
+   "texto": "RFC: OHVV010701NNU",
+   "poligono": [
+    [
+     220.3,
+     156.5
+    ],
+    [
+     382.3,
+     161.7
+    ],
+    [
+     381.9,
+     171.7
+    ],
+    [
+     220.0,
+     166.5
+    ]
+   ],
+   "linea": 3,
+   "conf_caja": 0.73,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 3,
+   "texto": "18-SEP-2026 09:12",
+   "poligono": [
+    [
+     43.6,
+     175.8
+    ],
+    [
+     196.6,
+     180.7
+    ],
+    [
+     196.2,
+     190.7
+    ],
+    [
+     43.3,
+     185.8
+    ]
+   ],
+   "linea": 4,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.96
+  },
+  {
+   "id": 4,
+   "texto": "TRANS: 4097369",
+   "poligono": [
+    [
+     431.4,
+     188.2
+    ],
+    [
+     557.4,
+     192.3
+    ],
+    [
+     557.0,
+     202.3
+    ],
+    [
+     431.1,
+     198.2
+    ]
+   ],
+   "linea": 4,
+   "conf_caja": 0.96,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 5,
+   "texto": "2 VENDA ELASTICA 5CM",
+   "poligono": [
+    [
+     42.2,
+     220.8
+    ],
+    [
+     270.1,
+     228.1
+    ],
+    [
+     269.7,
+     241.1
+    ],
+    [
+     41.8,
+     233.8
+    ]
+   ],
+   "linea": 6,
+   "conf_caja": 0.96,
+   "conf_ocr": 0.73
+  },
+  {
+   "id": 6,
+   "texto": "$48.00",
+   "poligono": [
+    [
+     487.6,
+     233.1
+    ],
+    [
+     555.6,
+     235.2
+    ],
+    [
+     555.0,
+     252.2
+    ],
+    [
+     487.0,
+     250.0
+    ]
+   ],
+   "linea": 6,
+   "conf_caja": 0.91,
+   "conf_ocr": 0.91
+  },
+  {
+   "id": 7,
+   "texto": "2 LORATADINA 10MG 10T",
+   "poligono": [
+    [
+     41.3,
+     247.8
+    ],
+    [
+     281.2,
+     255.5
+    ],
+    [
+     280.8,
+     268.5
+    ],
+    [
+     40.9,
+     260.8
+    ]
+   ],
+   "linea": 7,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 8,
+   "texto": "$78.00",
+   "poligono": [
+    [
+     486.7,
+     260.0
+    ],
+    [
+     554.7,
+     262.2
+    ],
+    [
+     554.2,
+     279.2
+    ],
+    [
+     486.2,
+     277.0
+    ]
+   ],
+   "linea": 7,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.65
+  },
+  {
+   "id": 9,
+   "texto": "SUBTOTAL:",
+   "poligono": [
+    [
+     39.5,
+     305.8
+    ],
+    [
+     142.4,
+     309.1
+    ],
+    [
+     142.0,
+     322.1
+    ],
+    [
+     39.1,
+     318.8
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 10,
+   "texto": "$126.00",
+   "poligono": [
+    [
+     473.5,
+     317.6
+    ],
+    [
+     553.4,
+     320.2
+    ],
+    [
+     552.9,
+     337.2
+    ],
+    [
+     472.9,
+     334.6
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.93
+  },
+  {
+   "id": 11,
+   "texto": "IVA:",
+   "poligono": [
+    [
+     38.6,
+     331.8
+    ],
+    [
+     84.6,
+     333.2
+    ],
+    [
+     84.2,
+     346.2
+    ],
+    [
+     38.2,
+     344.8
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 12,
+   "texto": "$20.16",
+   "poligono": [
+    [
+     484.0,
+     344.0
+    ],
+    [
+     552.0,
+     346.2
+    ],
+    [
+     551.5,
+     363.2
+    ],
+    [
+     483.5,
+     361.0
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 13,
+   "texto": "TOTAL",
+   "poligono": [
+    [
+     37.7,
+     360.8
+    ],
+    [
+     118.7,
+     363.3
+    ],
+    [
+     118.1,
+     382.3
+    ],
+    [
+     37.1,
+     379.7
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.71
+  },
+  {
+   "id": 14,
+   "texto": "$146.16",
+   "poligono": [
+    [
+     438.2,
+     370.5
+    ],
+    [
+     551.1,
+     374.2
+    ],
+    [
+     550.3,
+     399.1
+    ],
+    [
+     437.4,
+     395.5
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.65,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 15,
+   "texto": "TARJETA CREDITO",
+   "poligono": [
+    [
+     36.6,
+     396.7
+    ],
+    [
+     180.5,
+     401.3
+    ],
+    [
+     180.1,
+     412.3
+    ],
+    [
+     36.2,
+     407.7
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 16,
+   "texto": "**** 6592",
+   "poligono": [
+    [
+     464.0,
+     410.4
+    ],
+    [
+     550.0,
+     413.1
+    ],
+    [
+     549.6,
+     424.1
+    ],
+    [
+     463.7,
+     421.4
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 17,
+   "texto": "AUT: 943668",
+   "poligono": [
+    [
+     35.9,
+     416.7
+    ],
+    [
+     134.9,
+     419.9
+    ],
+    [
+     134.6,
+     429.9
+    ],
+    [
+     35.6,
+     426.7
+    ]
+   ],
+   "linea": 13,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.91
+  },
+  {
+   "id": 18,
+   "texto": "FACTURE DENTRO DEL MES",
+   "poligono": [
+    [
+     192.8,
+     454.8
+    ],
+    [
+     390.7,
+     461.1
+    ],
+    [
+     390.4,
+     471.1
+    ],
+    [
+     192.5,
+     464.7
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.94,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 19,
+   "texto": "MUESTRA DE PRUEBA - SIN VALOR FISCAL",
+   "poligono": [
+    [
+     128.9,
+     480.7
+    ],
+    [
+     452.8,
+     491.1
+    ],
+    [
+     452.4,
+     501.1
+    ],
+    [
+     128.6,
+     490.7
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.62,
+   "conf_ocr": 0.9
+  }
+ ],
+ "modelos": {
+  "ocdnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "ocrnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "llm": {
+   "base": "Qwen2.5-7B-Instruct",
+   "adaptador": null,
+   "sha256": null
+  }
+ },
+ "errores": []
+}

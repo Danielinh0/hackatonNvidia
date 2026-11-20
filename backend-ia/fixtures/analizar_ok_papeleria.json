@@ -1,0 +1,822 @@
+{
+ "_aviso": "SIMULADO: ejemplo del contrato de POST /vision/analizar armado desde el ground truth de un ticket sintético. Las confianzas son valores de prueba para pintar el semáforo, no salidas de un modelo.",
+ "imagen": {
+  "archivo": "ticket_00154.png",
+  "ancho": 458,
+  "alto": 567
+ },
+ "doc_tipo": "ticket",
+ "campos": [
+  {
+   "nombre": "comercio",
+   "valor": "PAPELERIA Y REGALOS EL ROBLE",
+   "texto_original": "PAPELERIA Y REGALOS EL ROBLE",
+   "conf": 0.78,
+   "seg": [
+    0
+   ]
+  },
+  {
+   "nombre": "rfc",
+   "valor": "JBAJ100624GXU",
+   "texto_original": "RFC: JBAJ100624GXU",
+   "conf": 0.82,
+   "seg": [
+    3
+   ]
+  },
+  {
+   "nombre": "fecha_hora",
+   "valor": "2026-04-05 18:43",
+   "texto_original": "2026-04-05 18:43",
+   "conf": 0.76,
+   "seg": [
+    4
+   ]
+  },
+  {
+   "nombre": "folio",
+   "valor": "74306052",
+   "texto_original": "FOLIO: 74306052",
+   "conf": 0.68,
+   "seg": [
+    5
+   ]
+  },
+  {
+   "nombre": "subtotal",
+   "valor": "588.00",
+   "texto_original": "$588.00",
+   "conf": 0.88,
+   "seg": [
+    15
+   ]
+  },
+  {
+   "nombre": "iva",
+   "valor": "94.08",
+   "texto_original": "$94.08",
+   "conf": 0.62,
+   "seg": [
+    17
+   ]
+  },
+  {
+   "nombre": "total",
+   "valor": "682.08",
+   "texto_original": "$682.08",
+   "conf": 0.88,
+   "seg": [
+    19
+   ]
+  },
+  {
+   "nombre": "efectivo",
+   "valor": "700.00",
+   "texto_original": "$700.00",
+   "conf": 0.95,
+   "seg": [
+    21
+   ]
+  },
+  {
+   "nombre": "cambio",
+   "valor": "17.92",
+   "texto_original": "$17.92",
+   "conf": 0.87,
+   "seg": [
+    23
+   ]
+  }
+ ],
+ "items": [
+  {
+   "cantidad": "3",
+   "descripcion": "PEGAMENTO BARRA 40G",
+   "precio_unitario": "24.00",
+   "importe": "72.00",
+   "conf": 0.61,
+   "seg": [
+    6,
+    7
+   ]
+  },
+  {
+   "cantidad": "1",
+   "descripcion": "CARTULINA BLANCA",
+   "precio_unitario": "8.00",
+   "importe": "8.00",
+   "conf": 0.82,
+   "seg": [
+    8,
+    9
+   ]
+  },
+  {
+   "cantidad": "4",
+   "descripcion": "ENGRAPADORA",
+   "precio_unitario": "95.00",
+   "importe": "380.00",
+   "conf": 0.81,
+   "seg": [
+    10,
+    11
+   ]
+  },
+  {
+   "cantidad": "4",
+   "descripcion": "HOJAS OFICIO 100",
+   "precio_unitario": "32.00",
+   "importe": "128.00",
+   "conf": 0.55,
+   "seg": [
+    12,
+    13
+   ]
+  }
+ ],
+ "categoria_propuesta": "papeleria",
+ "tiene_cfdi": false,
+ "uuid_cfdi": null,
+ "validaciones": [
+  {
+   "regla": "subtotal_mas_iva_igual_total",
+   "ok": true,
+   "detalle": "588.00 + 94.08 = 682.08"
+  },
+  {
+   "regla": "formato_rfc",
+   "ok": true,
+   "detalle": "JBAJ100624GXU"
+  }
+ ],
+ "conf_global": 0.76,
+ "segmentos": [
+  {
+   "id": 0,
+   "texto": "PAPELERIA Y REGALOS EL ROBLE",
+   "poligono": [
+    [
+     51.2,
+     97.4
+    ],
+    [
+     404.2,
+     94.6
+    ],
+    [
+     404.3,
+     109.6
+    ],
+    [
+     51.3,
+     112.4
+    ]
+   ],
+   "linea": 1,
+   "conf_caja": 0.97,
+   "conf_ocr": 0.8
+  },
+  {
+   "id": 1,
+   "texto": "BLVD. MACEDONIO ALCALA #1913",
+   "poligono": [
+    [
+     126.9,
+     123.8
+    ],
+    [
+     328.9,
+     122.2
+    ],
+    [
+     328.9,
+     130.2
+    ],
+    [
+     127.0,
+     131.8
+    ]
+   ],
+   "linea": 2,
+   "conf_caja": 0.91,
+   "conf_ocr": 0.7
+  },
+  {
+   "id": 2,
+   "texto": "C.P. 68203 SAN ANTONIO DE LA CAL, OAX.",
+   "poligono": [
+    [
+     91.0,
+     139.1
+    ],
+    [
+     365.0,
+     136.9
+    ],
+    [
+     365.1,
+     146.9
+    ],
+    [
+     91.1,
+     149.1
+    ]
+   ],
+   "linea": 3,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.73
+  },
+  {
+   "id": 3,
+   "texto": "RFC: JBAJ100624GXU",
+   "poligono": [
+    [
+     163.2,
+     154.5
+    ],
+    [
+     293.1,
+     153.5
+    ],
+    [
+     293.2,
+     161.5
+    ],
+    [
+     163.2,
+     162.5
+    ]
+   ],
+   "linea": 4,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 4,
+   "texto": "2026-04-05 18:43",
+   "poligono": [
+    [
+     26.2,
+     177.6
+    ],
+    [
+     141.2,
+     176.7
+    ],
+    [
+     141.2,
+     184.7
+    ],
+    [
+     26.2,
+     185.6
+    ]
+   ],
+   "linea": 5,
+   "conf_caja": 0.99,
+   "conf_ocr": 0.77
+  },
+  {
+   "id": 5,
+   "texto": "FOLIO: 74306052",
+   "poligono": [
+    [
+     26.3,
+     193.6
+    ],
+    [
+     134.3,
+     192.7
+    ],
+    [
+     134.3,
+     200.7
+    ],
+    [
+     26.3,
+     201.6
+    ]
+   ],
+   "linea": 6,
+   "conf_caja": 0.97,
+   "conf_ocr": 0.7
+  },
+  {
+   "id": 6,
+   "texto": "3 PEGAMENTO BARRA 40G",
+   "poligono": [
+    [
+     26.6,
+     231.6
+    ],
+    [
+     215.6,
+     230.1
+    ],
+    [
+     215.7,
+     241.1
+    ],
+    [
+     26.7,
+     242.6
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.91,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 7,
+   "texto": "$72.00",
+   "poligono": [
+    [
+     376.6,
+     227.8
+    ],
+    [
+     430.6,
+     227.4
+    ],
+    [
+     430.7,
+     240.4
+    ],
+    [
+     376.7,
+     240.8
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.67,
+   "conf_ocr": 0.91
+  },
+  {
+   "id": 8,
+   "texto": "1 CARTULINA BLANCA",
+   "poligono": [
+    [
+     26.7,
+     252.6
+    ],
+    [
+     188.7,
+     251.3
+    ],
+    [
+     188.8,
+     262.3
+    ],
+    [
+     26.8,
+     263.6
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 9,
+   "texto": "$8.00",
+   "poligono": [
+    [
+     385.7,
+     248.8
+    ],
+    [
+     430.7,
+     248.4
+    ],
+    [
+     430.8,
+     261.4
+    ],
+    [
+     385.8,
+     261.8
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 10,
+   "texto": "4 ENGRAPADORA",
+   "poligono": [
+    [
+     26.9,
+     271.6
+    ],
+    [
+     143.9,
+     270.7
+    ],
+    [
+     144.0,
+     281.7
+    ],
+    [
+     27.0,
+     282.6
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 11,
+   "texto": "$380.00",
+   "poligono": [
+    [
+     367.9,
+     267.9
+    ],
+    [
+     430.9,
+     267.4
+    ],
+    [
+     431.0,
+     280.4
+    ],
+    [
+     368.0,
+     280.9
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 12,
+   "texto": "4 HOJAS OFICIO 100",
+   "poligono": [
+    [
+     27.0,
+     290.6
+    ],
+    [
+     189.0,
+     289.3
+    ],
+    [
+     189.1,
+     300.3
+    ],
+    [
+     27.1,
+     301.6
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.7,
+   "conf_ocr": 0.79
+  },
+  {
+   "id": 13,
+   "texto": "$128.00",
+   "poligono": [
+    [
+     368.0,
+     286.9
+    ],
+    [
+     431.0,
+     286.4
+    ],
+    [
+     431.1,
+     299.4
+    ],
+    [
+     368.1,
+     299.9
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.8,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 14,
+   "texto": "SUBTOTAL:",
+   "poligono": [
+    [
+     27.4,
+     336.6
+    ],
+    [
+     108.4,
+     336.0
+    ],
+    [
+     108.5,
+     347.0
+    ],
+    [
+     27.5,
+     347.6
+    ]
+   ],
+   "linea": 13,
+   "conf_caja": 0.84,
+   "conf_ocr": 0.69
+  },
+  {
+   "id": 15,
+   "texto": "$588.00",
+   "poligono": [
+    [
+     368.4,
+     332.9
+    ],
+    [
+     431.4,
+     332.4
+    ],
+    [
+     431.5,
+     345.4
+    ],
+    [
+     368.5,
+     345.9
+    ]
+   ],
+   "linea": 13,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 16,
+   "texto": "IVA 16.00%",
+   "poligono": [
+    [
+     27.6,
+     354.6
+    ],
+    [
+     117.6,
+     353.9
+    ],
+    [
+     117.6,
+     364.9
+    ],
+    [
+     27.6,
+     365.6
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 17,
+   "texto": "$94.08",
+   "poligono": [
+    [
+     377.5,
+     350.8
+    ],
+    [
+     431.5,
+     350.4
+    ],
+    [
+     431.6,
+     363.4
+    ],
+    [
+     377.6,
+     363.8
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.7
+  },
+  {
+   "id": 18,
+   "texto": "TOTAL",
+   "poligono": [
+    [
+     27.7,
+     375.6
+    ],
+    [
+     90.7,
+     375.1
+    ],
+    [
+     90.8,
+     390.1
+    ],
+    [
+     27.8,
+     390.6
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 19,
+   "texto": "$682.08",
+   "poligono": [
+    [
+     343.5,
+     371.1
+    ],
+    [
+     431.5,
+     370.4
+    ],
+    [
+     431.7,
+     389.4
+    ],
+    [
+     343.7,
+     390.1
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.97,
+   "conf_ocr": 0.91
+  },
+  {
+   "id": 20,
+   "texto": "EFECTIVO",
+   "poligono": [
+    [
+     27.9,
+     401.6
+    ],
+    [
+     99.9,
+     401.0
+    ],
+    [
+     100.0,
+     412.0
+    ],
+    [
+     28.0,
+     412.6
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.76
+  },
+  {
+   "id": 21,
+   "texto": "$700.00",
+   "poligono": [
+    [
+     368.9,
+     397.9
+    ],
+    [
+     431.9,
+     397.4
+    ],
+    [
+     432.0,
+     410.4
+    ],
+    [
+     369.0,
+     410.9
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.97,
+   "conf_ocr": 0.98
+  },
+  {
+   "id": 22,
+   "texto": "SU CAMBIO:",
+   "poligono": [
+    [
+     28.1,
+     420.6
+    ],
+    [
+     118.1,
+     419.9
+    ],
+    [
+     118.2,
+     430.9
+    ],
+    [
+     28.2,
+     431.6
+    ]
+   ],
+   "linea": 17,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 23,
+   "texto": "$17.92",
+   "poligono": [
+    [
+     378.1,
+     416.8
+    ],
+    [
+     432.1,
+     416.4
+    ],
+    [
+     432.2,
+     429.4
+    ],
+    [
+     378.2,
+     429.8
+    ]
+   ],
+   "linea": 17,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 24,
+   "texto": "VUELVA PRONTO",
+   "poligono": [
+    [
+     183.5,
+     451.4
+    ],
+    [
+     277.5,
+     450.6
+    ],
+    [
+     277.6,
+     458.6
+    ],
+    [
+     183.6,
+     459.4
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.91,
+   "conf_ocr": 0.63
+  },
+  {
+   "id": 25,
+   "texto": "MUESTRA DE PRUEBA - SIN VALOR FISCAL",
+   "poligono": [
+    [
+     100.9,
+     476.0
+    ],
+    [
+     359.9,
+     474.0
+    ],
+    [
+     359.9,
+     482.0
+    ],
+    [
+     100.9,
+     484.0
+    ]
+   ],
+   "linea": 19,
+   "conf_caja": 0.72,
+   "conf_ocr": 0.93
+  }
+ ],
+ "modelos": {
+  "ocdnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "ocrnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "llm": {
+   "base": "Qwen2.5-7B-Instruct",
+   "adaptador": null,
+   "sha256": null
+  }
+ },
+ "errores": []
+}

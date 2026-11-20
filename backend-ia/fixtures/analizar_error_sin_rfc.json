@@ -1,0 +1,1002 @@
+{
+ "_aviso": "SIMULADO: ejemplo del contrato de POST /vision/analizar armado desde el ground truth de un ticket sintético. Las confianzas son valores de prueba para pintar el semáforo, no salidas de un modelo.",
+ "imagen": {
+  "archivo": "ticket_00042.png",
+  "ancho": 506,
+  "alto": 657
+ },
+ "doc_tipo": "ticket",
+ "campos": [
+  {
+   "nombre": "comercio",
+   "valor": "MISCELANEA EL ROBLE",
+   "texto_original": "MISCELANEA EL ROBLE",
+   "conf": 0.69,
+   "seg": [
+    0
+   ]
+  },
+  {
+   "nombre": "fecha_hora",
+   "valor": "29-OCT-2026 15:14",
+   "texto_original": "29-OCT-2026 15:14",
+   "conf": 0.63,
+   "seg": [
+    3
+   ]
+  },
+  {
+   "nombre": "folio",
+   "valor": "8871325",
+   "texto_original": "TICKET: 8871325",
+   "conf": 0.84,
+   "seg": [
+    4
+   ]
+  },
+  {
+   "nombre": "subtotal",
+   "valor": "696.00",
+   "texto_original": "696.00",
+   "conf": 0.6,
+   "seg": [
+    20
+   ]
+  },
+  {
+   "nombre": "iva",
+   "valor": "111.36",
+   "texto_original": "111.36",
+   "conf": 0.89,
+   "seg": [
+    22
+   ]
+  },
+  {
+   "nombre": "total",
+   "valor": "807.36",
+   "texto_original": "807.36",
+   "conf": 0.87,
+   "seg": [
+    24
+   ]
+  },
+  {
+   "nombre": "efectivo",
+   "valor": "850.00",
+   "texto_original": "850.00",
+   "conf": 0.72,
+   "seg": [
+    26
+   ]
+  },
+  {
+   "nombre": "cambio",
+   "valor": "42.64",
+   "texto_original": "42.64",
+   "conf": 0.64,
+   "seg": [
+    28
+   ]
+  }
+ ],
+ "items": [
+  {
+   "cantidad": "3",
+   "descripcion": "DETERGENTE POLVO 1KG",
+   "precio_unitario": "39.00",
+   "importe": "117.00",
+   "conf": 0.54,
+   "seg": [
+    5,
+    6
+   ]
+  },
+  {
+   "cantidad": "3",
+   "descripcion": "LECHE DESLACTOSADA 1L",
+   "precio_unitario": "29.00",
+   "importe": "87.00",
+   "conf": 0.56,
+   "seg": [
+    7,
+    8
+   ]
+  },
+  {
+   "cantidad": "2",
+   "descripcion": "GALLETAS MARIAS",
+   "precio_unitario": "19.00",
+   "importe": "38.00",
+   "conf": 0.52,
+   "seg": [
+    9,
+    10
+   ]
+  },
+  {
+   "cantidad": "1",
+   "descripcion": "CLORO 1L",
+   "precio_unitario": "16.00",
+   "importe": "16.00",
+   "conf": 0.74,
+   "seg": [
+    11,
+    12
+   ]
+  },
+  {
+   "cantidad": "3",
+   "descripcion": "CHOCOLATE MESA 6PZ",
+   "precio_unitario": "48.00",
+   "importe": "144.00",
+   "conf": 0.84,
+   "seg": [
+    13,
+    14
+   ]
+  },
+  {
+   "cantidad": "3",
+   "descripcion": "AZUCAR ESTANDAR 1KG",
+   "precio_unitario": "32.00",
+   "importe": "96.00",
+   "conf": 0.52,
+   "seg": [
+    15,
+    16
+   ]
+  },
+  {
+   "cantidad": "4",
+   "descripcion": "HUEVO BLANCO 12PZ",
+   "precio_unitario": "49.50",
+   "importe": "198.00",
+   "conf": 0.73,
+   "seg": [
+    17,
+    18
+   ]
+  }
+ ],
+ "categoria_propuesta": "abarrotes",
+ "tiene_cfdi": false,
+ "uuid_cfdi": null,
+ "validaciones": [
+  {
+   "regla": "subtotal_mas_iva_igual_total",
+   "ok": true,
+   "detalle": "696.00 + 111.36 = 807.36"
+  },
+  {
+   "regla": "formato_rfc",
+   "ok": false,
+   "detalle": "No se encontró RFC en el ticket."
+  }
+ ],
+ "conf_global": 0.0,
+ "segmentos": [
+  {
+   "id": 0,
+   "texto": "MISCELANEA EL ROBLE",
+   "poligono": [
+    [
+     125.8,
+     99.4
+    ],
+    [
+     395.6,
+     108.8
+    ],
+    [
+     395.0,
+     125.8
+    ],
+    [
+     125.2,
+     116.4
+    ]
+   ],
+   "linea": 1,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.75
+  },
+  {
+   "id": 1,
+   "texto": "BLVD. SIMBOLOS PATRIOS #759, COL. PRESIDENTES",
+   "poligono": [
+    [
+     79.1,
+     129.8
+    ],
+    [
+     439.9,
+     142.4
+    ],
+    [
+     439.5,
+     153.4
+    ],
+    [
+     78.7,
+     140.8
+    ]
+   ],
+   "linea": 2,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 2,
+   "texto": "RFC: DNLV050816K3M",
+   "poligono": [
+    [
+     186.9,
+     149.6
+    ],
+    [
+     331.8,
+     154.6
+    ],
+    [
+     331.5,
+     163.6
+    ],
+    [
+     186.6,
+     158.6
+    ]
+   ],
+   "linea": 3,
+   "conf_caja": 0.98,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 3,
+   "texto": "29-OCT-2026 15:14",
+   "poligono": [
+    [
+     42.5,
+     166.6
+    ],
+    [
+     179.4,
+     171.4
+    ],
+    [
+     179.1,
+     180.3
+    ],
+    [
+     42.2,
+     175.6
+    ]
+   ],
+   "linea": 4,
+   "conf_caja": 0.71,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 4,
+   "texto": "TICKET: 8871325",
+   "poligono": [
+    [
+     353.8,
+     177.4
+    ],
+    [
+     473.8,
+     181.6
+    ],
+    [
+     473.5,
+     190.6
+    ],
+    [
+     353.5,
+     186.4
+    ]
+   ],
+   "linea": 4,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 5,
+   "texto": "3 DETERGENTE POLVO 1KG",
+   "poligono": [
+    [
+     41.2,
+     204.6
+    ],
+    [
+     259.0,
+     212.1
+    ],
+    [
+     258.6,
+     224.1
+    ],
+    [
+     40.8,
+     216.6
+    ]
+   ],
+   "linea": 6,
+   "conf_caja": 0.94,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 6,
+   "texto": "117.00",
+   "poligono": [
+    [
+     413.6,
+     217.5
+    ],
+    [
+     472.6,
+     219.6
+    ],
+    [
+     472.2,
+     231.6
+    ],
+    [
+     413.2,
+     229.5
+    ]
+   ],
+   "linea": 6,
+   "conf_caja": 0.75,
+   "conf_ocr": 0.72
+  },
+  {
+   "id": 7,
+   "texto": "3 LECHE DESLACTOSADA 1L",
+   "poligono": [
+    [
+     40.4,
+     225.6
+    ],
+    [
+     267.3,
+     233.4
+    ],
+    [
+     266.9,
+     245.4
+    ],
+    [
+     40.0,
+     237.6
+    ]
+   ],
+   "linea": 7,
+   "conf_caja": 0.89,
+   "conf_ocr": 0.63
+  },
+  {
+   "id": 8,
+   "texto": "87.00",
+   "poligono": [
+    [
+     422.8,
+     238.8
+    ],
+    [
+     471.7,
+     240.5
+    ],
+    [
+     471.3,
+     252.5
+    ],
+    [
+     422.3,
+     250.8
+    ]
+   ],
+   "linea": 7,
+   "conf_caja": 0.94,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 9,
+   "texto": "2 GALLETAS MARIAS",
+   "poligono": [
+    [
+     39.7,
+     247.5
+    ],
+    [
+     207.6,
+     253.4
+    ],
+    [
+     207.2,
+     265.4
+    ],
+    [
+     39.3,
+     259.5
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.68,
+   "conf_ocr": 0.77
+  },
+  {
+   "id": 10,
+   "texto": "38.00",
+   "poligono": [
+    [
+     422.0,
+     260.8
+    ],
+    [
+     471.0,
+     262.5
+    ],
+    [
+     470.6,
+     274.5
+    ],
+    [
+     421.6,
+     272.8
+    ]
+   ],
+   "linea": 8,
+   "conf_caja": 0.72,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 11,
+   "texto": "1 CLORO 1L",
+   "poligono": [
+    [
+     39.0,
+     267.5
+    ],
+    [
+     137.9,
+     271.0
+    ],
+    [
+     137.5,
+     283.0
+    ],
+    [
+     38.6,
+     279.5
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.92,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 12,
+   "texto": "16.00",
+   "poligono": [
+    [
+     421.3,
+     280.8
+    ],
+    [
+     470.3,
+     282.5
+    ],
+    [
+     469.9,
+     294.5
+    ],
+    [
+     420.9,
+     292.8
+    ]
+   ],
+   "linea": 9,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.8
+  },
+  {
+   "id": 13,
+   "texto": "3 CHOCOLATE MESA 6PZ",
+   "poligono": [
+    [
+     38.3,
+     288.5
+    ],
+    [
+     236.1,
+     295.4
+    ],
+    [
+     235.7,
+     307.4
+    ],
+    [
+     37.8,
+     300.5
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.99
+  },
+  {
+   "id": 14,
+   "texto": "144.00",
+   "poligono": [
+    [
+     410.7,
+     301.5
+    ],
+    [
+     469.7,
+     303.5
+    ],
+    [
+     469.2,
+     315.5
+    ],
+    [
+     410.3,
+     313.5
+    ]
+   ],
+   "linea": 10,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 15,
+   "texto": "3 AZUCAR ESTANDAR 1KG",
+   "poligono": [
+    [
+     37.5,
+     309.5
+    ],
+    [
+     245.4,
+     316.7
+    ],
+    [
+     245.0,
+     328.7
+    ],
+    [
+     37.1,
+     321.5
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.65,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 16,
+   "texto": "96.00",
+   "poligono": [
+    [
+     419.8,
+     322.8
+    ],
+    [
+     468.8,
+     324.5
+    ],
+    [
+     468.4,
+     336.5
+    ],
+    [
+     419.4,
+     334.8
+    ]
+   ],
+   "linea": 11,
+   "conf_caja": 0.81,
+   "conf_ocr": 0.64
+  },
+  {
+   "id": 17,
+   "texto": "4 HUEVO BLANCO 12PZ",
+   "poligono": [
+    [
+     36.8,
+     330.5
+    ],
+    [
+     224.7,
+     337.0
+    ],
+    [
+     224.3,
+     349.0
+    ],
+    [
+     36.4,
+     342.5
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 18,
+   "texto": "198.00",
+   "poligono": [
+    [
+     409.2,
+     343.4
+    ],
+    [
+     468.2,
+     345.5
+    ],
+    [
+     467.8,
+     357.5
+    ],
+    [
+     408.8,
+     355.4
+    ]
+   ],
+   "linea": 12,
+   "conf_caja": 0.83,
+   "conf_ocr": 0.88
+  },
+  {
+   "id": 19,
+   "texto": "SUBTOTAL:",
+   "poligono": [
+    [
+     35.1,
+     378.5
+    ],
+    [
+     124.1,
+     381.6
+    ],
+    [
+     123.7,
+     393.5
+    ],
+    [
+     34.7,
+     390.5
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.99,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 20,
+   "texto": "696.00",
+   "poligono": [
+    [
+     407.6,
+     391.4
+    ],
+    [
+     466.5,
+     393.5
+    ],
+    [
+     466.1,
+     405.4
+    ],
+    [
+     407.1,
+     403.4
+    ]
+   ],
+   "linea": 14,
+   "conf_caja": 0.65,
+   "conf_ocr": 0.92
+  },
+  {
+   "id": 21,
+   "texto": "I.V.A.",
+   "poligono": [
+    [
+     34.4,
+     398.5
+    ],
+    [
+     93.4,
+     400.5
+    ],
+    [
+     93.0,
+     412.5
+    ],
+    [
+     34.0,
+     410.4
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.63
+  },
+  {
+   "id": 22,
+   "texto": "111.36",
+   "poligono": [
+    [
+     406.9,
+     411.4
+    ],
+    [
+     465.8,
+     413.4
+    ],
+    [
+     465.4,
+     425.4
+    ],
+    [
+     406.5,
+     423.4
+    ]
+   ],
+   "linea": 15,
+   "conf_caja": 0.95,
+   "conf_ocr": 0.94
+  },
+  {
+   "id": 23,
+   "texto": "TOTAL:",
+   "poligono": [
+    [
+     33.7,
+     420.4
+    ],
+    [
+     118.6,
+     423.4
+    ],
+    [
+     118.0,
+     440.4
+    ],
+    [
+     33.1,
+     437.4
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.94,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 24,
+   "texto": "807.36",
+   "poligono": [
+    [
+     380.2,
+     432.5
+    ],
+    [
+     465.1,
+     435.4
+    ],
+    [
+     464.5,
+     452.4
+    ],
+    [
+     379.6,
+     449.5
+    ]
+   ],
+   "linea": 16,
+   "conf_caja": 0.97,
+   "conf_ocr": 0.9
+  },
+  {
+   "id": 25,
+   "texto": "PAGO CON:",
+   "poligono": [
+    [
+     32.6,
+     451.4
+    ],
+    [
+     121.5,
+     454.5
+    ],
+    [
+     121.1,
+     466.5
+    ],
+    [
+     32.2,
+     463.4
+    ]
+   ],
+   "linea": 17,
+   "conf_caja": 0.66,
+   "conf_ocr": 0.93
+  },
+  {
+   "id": 26,
+   "texto": "850.00",
+   "poligono": [
+    [
+     405.0,
+     464.4
+    ],
+    [
+     464.0,
+     466.4
+    ],
+    [
+     463.6,
+     478.4
+    ],
+    [
+     404.6,
+     476.4
+    ]
+   ],
+   "linea": 17,
+   "conf_caja": 0.99,
+   "conf_ocr": 0.73
+  },
+  {
+   "id": 27,
+   "texto": "CAMBIO",
+   "poligono": [
+    [
+     31.8,
+     473.4
+    ],
+    [
+     90.8,
+     475.5
+    ],
+    [
+     90.4,
+     487.4
+    ],
+    [
+     31.4,
+     485.4
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.76,
+   "conf_ocr": 0.82
+  },
+  {
+   "id": 28,
+   "texto": "42.64",
+   "poligono": [
+    [
+     414.2,
+     486.7
+    ],
+    [
+     463.1,
+     488.4
+    ],
+    [
+     462.7,
+     500.4
+    ],
+    [
+     413.7,
+     498.7
+    ]
+   ],
+   "linea": 18,
+   "conf_caja": 0.66,
+   "conf_ocr": 0.97
+  },
+  {
+   "id": 29,
+   "texto": "FACTURE DENTRO DEL MES",
+   "poligono": [
+    [
+     158.2,
+     511.8
+    ],
+    [
+     335.1,
+     518.0
+    ],
+    [
+     334.8,
+     527.0
+    ],
+    [
+     157.9,
+     520.8
+    ]
+   ],
+   "linea": 19,
+   "conf_caja": 0.93,
+   "conf_ocr": 0.89
+  },
+  {
+   "id": 30,
+   "texto": "CONSERVE SU TICKET",
+   "poligono": [
+    [
+     173.7,
+     529.4
+    ],
+    [
+     318.6,
+     534.4
+    ],
+    [
+     318.3,
+     543.4
+    ],
+    [
+     173.4,
+     538.4
+    ]
+   ],
+   "linea": 20,
+   "conf_caja": 0.9,
+   "conf_ocr": 0.95
+  },
+  {
+   "id": 31,
+   "texto": "MUESTRA DE PRUEBA - SIN VALOR FISCAL",
+   "poligono": [
+    [
+     100.6,
+     551.8
+    ],
+    [
+     389.4,
+     561.9
+    ],
+    [
+     389.1,
+     570.9
+    ],
+    [
+     100.3,
+     560.8
+    ]
+   ],
+   "linea": 21,
+   "conf_caja": 0.88,
+   "conf_ocr": 0.94
+  }
+ ],
+ "modelos": {
+  "ocdnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "ocrnet": {
+   "archivo": null,
+   "sha256": null
+  },
+  "llm": {
+   "base": "Qwen2.5-7B-Instruct",
+   "adaptador": null,
+   "sha256": null
+  }
+ },
+ "errores": [
+  {
+   "codigo": "CAMPO_FALTANTE",
+   "campo": "rfc",
+   "mensaje": "No pude leer el RFC. ¿Me lo dictas?"
+  }
+ ]
+}
