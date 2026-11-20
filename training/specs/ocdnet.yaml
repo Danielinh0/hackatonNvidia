@@ -16,7 +16,7 @@ train:
   seed: 42
   # T4 no soporta bf16; TAO traduce fp16 a precision='16-mixed' de Lightning.
   precision: fp16
-  num_epochs: 40
+  num_epochs: 20
   checkpoint_interval: 2
   validation_interval: 2
   trainer:

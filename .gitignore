@@ -56,3 +56,4 @@ training/data/*.log
 training/lab/
 dzuun_training.tar.gz
 training/.pydeps/
+backend-ia/.venv/
