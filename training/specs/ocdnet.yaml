@@ -1,0 +1,134 @@
+# OCDNet (TAO 5.5.0). Claves verificadas contra nvidia_tao_pytorch/cv/ocdnet/config/default_config.py
+# y los specs de ejemplo de la rama tao_5.5_release. Rutas = rutas DENTRO del contenedor (ver run_lab.sh).
+# Las secciones evaluate, inference y export se usan con las acciones del mismo nombre.
+
+results_dir: /results/ocdnet
+
+model:
+  backbone: deformable_resnet18
+  # Nombre tomado del spec de ejemplo de TAO; run_lab.sh lo sobrescribe con el archivo real descargado de NGC.
+  pretrained_model_path: /models/ocdnet/ocdnet_deformable_resnet18.pth
+  load_pruned_graph: false
+
+train:
+  results_dir: /results/ocdnet/train
+  num_gpus: 1
+  seed: 42
+  # T4 no soporta bf16; TAO traduce fp16 a precision='16-mixed' de Lightning.
+  precision: fp16
+  num_epochs: 40
+  checkpoint_interval: 2
+  validation_interval: 2
+  trainer:
+    clip_grad_norm: 5.0
+  optimizer:
+    type: Adam
+    args:
+      lr: 0.001
+  lr_scheduler:
+    type: WarmupPolyLR
+    args:
+      # TAO exige num_epochs != warmup_epoch.
+      warmup_epoch: 3
+  post_processing:
+    type: SegDetectorRepresenter
+    args:
+      thresh: 0.3
+      box_thresh: 0.55
+      max_candidates: 1000
+      unclip_ratio: 1.5
+  metric:
+    type: QuadMetric
+    args:
+      is_output_polygon: false
+
+dataset:
+  train_dataset:
+    data_path: ['/data/ocdnet/train']
+    args:
+      pre_processes:
+        # Sin Fliplr del ejemplo: el texto en espejo no aparece en tickets reales.
+        - type: IaaAugment
+          args:
+            - {'type': Affine, 'args': {'rotate': [-10, 10]}}
+            - {'type': Resize, 'args': {'size': [0.5, 3]}}
+        - type: EastRandomCropData
+          args:
+            size: [640, 640]
+            max_tries: 50
+            keep_ratio: true
+        - type: MakeBorderMap
+          args:
+            shrink_ratio: 0.4
+            thresh_min: 0.3
+            thresh_max: 0.7
+        - type: MakeShrinkMap
+          args:
+            shrink_ratio: 0.4
+            min_text_size: 8
+      img_mode: BGR
+      filter_keys: [img_path, img_name, text_polys, texts, ignore_tags, shape]
+      ignore_tags: ['*', '###']
+    loader:
+      batch_size: 8
+      shuffle: true
+      pin_memory: true
+      num_workers: 4
+
+  validate_dataset:
+    data_path: ['/data/ocdnet/val']
+    args:
+      pre_processes:
+        # Resize2D con lista = [ancho, alto] (verificado en data_loader/modules/augment.py). El ejemplo usa
+        # [1280, 736], horizontal; los tickets son verticales 3:4, así que se usa 1152x1536 (múltiplos de 32).
+        - type: Resize2D
+          args:
+            short_size: [1152, 1536]
+            resize_text_polys: true
+      img_mode: BGR
+      filter_keys: []
+      ignore_tags: ['*', '###']
+    loader:
+      batch_size: 1
+      shuffle: false
+      pin_memory: false
+      num_workers: 4
+
+evaluate:
+  results_dir: /results/ocdnet/evaluate
+  checkpoint: /results/ocdnet/train/model_best.pth
+  post_processing:
+    type: SegDetectorRepresenter
+    args:
+      thresh: 0.3
+      box_thresh: 0.55
+      max_candidates: 1000
+      unclip_ratio: 1.5
+  metric:
+    type: QuadMetric
+    args:
+      is_output_polygon: false
+
+inference:
+  results_dir: /results/ocdnet/inference
+  checkpoint: /results/ocdnet/train/model_best.pth
+  input_folder: /data/ocdnet/test/img
+  width: 1152
+  height: 1536
+  img_mode: BGR
+  polygon: false
+  show: false
+  post_processing:
+    type: SegDetectorRepresenter
+    args:
+      thresh: 0.3
+      box_thresh: 0.55
+      max_candidates: 1000
+      unclip_ratio: 1.5
+
+export:
+  results_dir: /results/ocdnet/export
+  checkpoint: /results/ocdnet/train/model_best.pth
+  onnx_file: /results/ocdnet/export/ocdnet.onnx
+  width: 1152
+  height: 1536

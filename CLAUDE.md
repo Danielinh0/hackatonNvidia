@@ -270,7 +270,7 @@ hackathon-nvidia-oaxaca-2026/
   - Opcional si sobra tiempo: exportar a ONNX y optimizar con TensorRT (cubre "despliegue" en la rúbrica NVIDIA).
   - Presupuesto: unas 10 h antes de la prueba en vivo.
 - **Dónde se trabaja:**
-  - **El entrenamiento se hace en el lab:** T4, TAO 5.5.0, fp16.
+  - **El entrenamiento se hace en el lab:** T4, TAO 5.5.0. OCDNet en fp16; OCRNet en fp32 (TAO 5.5 no ofrece fp16 para OCRNet).
   - **En local:** generación de datos, conversión de formatos, pipeline de inferencia, extracción con LLM y app. Todo esto debe poder probarse sin GPU.
 - **Entorno del lab (verificado):**
   - JupyterLab en la nube, contenedor de curso NVIDIA DLI, ruta de trabajo `/dli/task`, usuario root, Ubuntu.
@@ -316,6 +316,7 @@ hackathon-nvidia-oaxaca-2026/
 - La lista arma la expresión regular `[^<caracteres>]`: el `-` va al final.
 - Entrada por defecto: escala de grises 32×100, `TPS: True`, `ResNet`, `BiLSTM`, `CTC`.
 - Con `train.pretrained_model_path` se hace fine-tune: si la lista de caracteres cambia el tamaño de la salida, TAO descarta solo la capa de predicción (`load_for_finetune`) y conserva el resto.
+- **Specs (Etapa 4):** `training/specs/ocdnet.yaml` y `ocrnet.yaml`. Cada clave se comprueba con `scripts/verificar_specs.py` contra el esquema de TAO 5.5. **OCRNet entrena en fp32** porque TAO 5.5 no expone precisión para OCRNet; el fp16 se aplica en su motor TensorRT. Decisiones y pendientes en `training/specs/README.md`.
 - **Sin verificar todavía (docs.nvidia.com no respondió desde la máquina local):** nombre exacto de la imagen Docker de TAO 5.5.0, formato de `~/.tao_mounts.json`, versiones y licencias de los modelos preentrenados en NGC. Se verifican en el lab.
 
 ## 25. Reglas de trabajo (entrenamiento de visión)

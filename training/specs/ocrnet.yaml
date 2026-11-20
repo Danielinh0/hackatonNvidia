@@ -1,0 +1,89 @@
+# OCRNet (TAO 5.5.0). Claves verificadas contra nvidia_tao_pytorch/cv/ocrnet/config/default_config.py
+# y experiment_specs/experiment.yaml de la rama tao_5.5_release. Rutas = rutas DENTRO del contenedor.
+# Un solo archivo para todas las acciones (dataset_convert, train, evaluate, inference, export, gen_trt_engine),
+# igual que el ejemplo de TAO. dataset_convert se corre una vez por split sobrescribiendo sus rutas.
+
+results_dir: /results/ocrnet
+# Clave pública con la que NVIDIA cifra los modelos TAO de NGC (la del spec de ejemplo). No es una credencial.
+encryption_key: nvidia_tao
+
+model:
+  # Arquitectura del spec de ejemplo. Debe coincidir con el modelo preentrenado de NGC para que cargue
+  # el backbone: PENDIENTE de confirmar con la ficha del modelo al descargarlo en el lab.
+  TPS: true
+  backbone: ResNet
+  feature_channel: 512
+  sequence: BiLSTM
+  hidden_size: 256
+  prediction: CTC
+  input_width: 100
+  input_height: 32
+  input_channel: 1
+
+dataset:
+  train_dataset_dir: [/results/ocrnet/lmdb/train]
+  val_dataset_dir: /results/ocrnet/lmdb/val
+  # Minúsculas y sin espacio: TAO lee la lista con strip() y filtra comparando label.lower().
+  character_list_file: /data/ocrnet/character_list
+  max_label_length: 25
+  batch_size: 128
+  workers: 4
+  augmentation:
+    keep_aspect_ratio: false
+    # Los recortes ya traen perspectiva, desenfoque y JPEG de aumentar.py; aquí solo un poco más.
+    aug_prob: 0.3
+
+train:
+  results_dir: /results/ocrnet/train
+  num_gpus: 1
+  seed: 42
+  # OCRNet de TAO 5.5 no tiene clave de precisión (no aparece en OCRNetTrainExpConfig ni en scripts/train.py):
+  # entrena en fp32. El fp16 se aplica al generar el motor TensorRT (gen_trt_engine.tensorrt.data_type).
+  num_epochs: 10
+  checkpoint_interval: 1
+  validation_interval: 1
+  clip_grad_norm: 5.0
+  # run_lab.sh lo sobrescribe con el archivo real descargado de NGC.
+  pretrained_model_path: /models/ocrnet/ocrnet_resnet50.pth
+  optim:
+    name: adadelta
+    lr: 0.1
+    lr_scheduler: MultiStep
+    lr_steps: [6, 8]
+    lr_decay: 0.1
+
+evaluate:
+  results_dir: /results/ocrnet/evaluate
+  checkpoint: /results/ocrnet/train/best_accuracy.pth
+  test_dataset_dir: /results/ocrnet/lmdb/test
+  batch_size: 128
+  input_width: 100
+  input_height: 32
+
+inference:
+  results_dir: /results/ocrnet/inference
+  checkpoint: /results/ocrnet/train/best_accuracy.pth
+  inference_dataset_dir: /data/ocrnet/test/images
+  batch_size: 128
+  input_width: 100
+  input_height: 32
+
+export:
+  results_dir: /results/ocrnet/export
+  checkpoint: /results/ocrnet/train/best_accuracy.pth
+  onnx_file: /results/ocrnet/export/ocrnet.onnx
+
+gen_trt_engine:
+  results_dir: /results/ocrnet/trt
+  onnx_file: /results/ocrnet/export/ocrnet.onnx
+  trt_engine: /results/ocrnet/trt/ocrnet_fp16.engine
+  input_channel: 1
+  input_width: 100
+  input_height: 32
+  tensorrt:
+    data_type: fp16
+
+dataset_convert:
+  input_img_dir: /data/ocrnet/train/images
+  gt_file: /data/ocrnet/train/gt_list.txt
+  results_dir: /results/ocrnet/lmdb/train
