@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { Suspense } from "react";
-import { AvatarUsuario, AvatarVacio } from "./AvatarUsuario";
 import { ModoToggle } from "./ModoToggle";
 
 /** Encabezado fijo de las pantallas principales (Figma 1:190). */
@@ -11,16 +9,8 @@ export function AppHeader() {
         <Link href="/" className="text-[19px] leading-6 font-bold text-tinta">
           Dzuun
         </Link>
-        <div className="flex items-center gap-1">
-          <ModoToggle />
-          <span className="relative flex size-11 items-center justify-center">
-            {/* Foto de Google de la persona; en Figma el nodo "Profile" está vacío. */}
-            <Suspense fallback={<AvatarVacio />}>
-              <AvatarUsuario />
-            </Suspense>
-            <span className="pointer-events-none absolute top-1.5 right-1.5 size-2.5 rounded-full bg-lima shadow-[0px_0px_0px_2px_#f9f9ff]" />
-          </span>
-        </div>
+        {/* La cuenta ahora vive en la barra inferior (BottomNav). */}
+        <ModoToggle />
       </div>
     </header>
   );

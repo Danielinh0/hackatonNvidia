@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { AvatarUsuario, AvatarVacio } from "@/components/AvatarUsuario";
 import { requerirUsuario } from "@/lib/sesion";
 import { HeaderSecundario } from "@/components/HeaderSecundario";
 import { Ico, MascotaBisie } from "@/components/ui";
@@ -25,9 +24,6 @@ export default function Configurar() {
             <button aria-label="Ayuda de configuración" className="flex size-11 items-center justify-center rounded-full">
               <Ico src={`${C}/ayuda.svg`} w={18.333} h={18.333} />
             </button>
-            <Suspense fallback={<AvatarVacio />}>
-              <AvatarUsuario />
-            </Suspense>
           </>
         }
       />

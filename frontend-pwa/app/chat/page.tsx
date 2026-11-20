@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { Suspense } from "react";
-import { AvatarUsuario, AvatarVacio } from "@/components/AvatarUsuario";
 import Link from "next/link";
 import { ChatBisie } from "@/components/ChatBisie";
 import { Ico } from "@/components/ui";
@@ -27,9 +25,6 @@ export default function Chat() {
             <button aria-label="Ayuda y opciones" className="flex size-11 items-center justify-center rounded-full">
               <Ico src={`${C}/ayuda.svg`} w={20} h={20} />
             </button>
-            <Suspense fallback={<AvatarVacio />}>
-              <AvatarUsuario />
-            </Suspense>
           </div>
         </div>
       </header>

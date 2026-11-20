@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { Suspense } from "react";
-import { AvatarUsuario, AvatarVacio } from "./AvatarUsuario";
 
 /** Encabezado con marca + chip RESICO + "Modo Rápido" (Figma 1:827 y 1:1673). */
 export function HeaderResico({ seccion }: { seccion: string }) {
@@ -24,9 +22,6 @@ export function HeaderResico({ seccion }: { seccion: string }) {
             <span className="size-2 rounded-full bg-oliva-viva" />
             Modo Rápido
           </span>
-          <Suspense fallback={<AvatarVacio />}>
-            <AvatarUsuario />
-          </Suspense>
         </div>
       </div>
     </header>

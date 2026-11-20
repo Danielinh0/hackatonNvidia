@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { Suspense } from "react";
-import { AvatarUsuario, AvatarVacio } from "@/components/AvatarUsuario";
 import { BotonVoz } from "@/components/BotonVoz";
 import { HeaderSecundario } from "@/components/HeaderSecundario";
 import { Ico, MascotaBisie } from "@/components/ui";
@@ -59,9 +57,6 @@ export default function RevisionSencillo() {
             <button aria-label="Ayuda" className="flex size-11 items-center justify-center rounded-full">
               <Ico src="/figma/configurar/ayuda.svg" w={18.333} h={18.333} />
             </button>
-            <Suspense fallback={<AvatarVacio />}>
-              <AvatarUsuario />
-            </Suspense>
           </>
         }
       />
