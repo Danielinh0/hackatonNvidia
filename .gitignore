@@ -65,8 +65,8 @@ training/asistente/*.tgz
 .venv/
 __pycache__/
 
-# Modelos y adaptadores pesados
-# Si ya estaban versionados, hay que quitarlos del índice con `git rm --cached`.
-/modelos/model_best.pth
-/modelos/ocrnet.onnx
-/training/asistente/prueba_adaptador.gz
+# Modelos y adaptadores pesados — NUNCA subir al repositorio
+# IMPORTANTE: si ya están versionados, quitarlos del índice con `git rm --cached`.
+modelos/model_best.pth
+modelos/ocrnet.onnx
+training/asistente/prueba_adaptador.gz
